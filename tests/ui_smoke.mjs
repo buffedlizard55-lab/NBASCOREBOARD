@@ -1,7 +1,19 @@
-/* Headless smoke test: real index.html + app.js, real committed data/ files. */
-import { JSDOM } from 'jsdom';
+/* Headless smoke test: real index.html + app.js, real committed data/ files.
+ *
+ * Requires Node >= 22 (jsdom 30 pulls an undici build that needs it); the CI workflow
+ * pins that version so this never fails for a mysterious reason.
+ */
 import fs from 'fs';
 import path from 'path';
+
+let JSDOM;
+try {
+  ({ JSDOM } = await import('jsdom'));
+} catch (e) {
+  console.error(`Could not load jsdom on Node ${process.version}: ${e.message}`);
+  console.error('Run this with Node >= 22 (the CI workflow pins it), after: npm --prefix tests install');
+  process.exit(1);
+}
 
 import { fileURLToPath } from 'url';
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
