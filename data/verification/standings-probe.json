@@ -1,5 +1,5 @@
 {
- "generatedAtUtc": "2026-09-25T20:12:13.713222+00:00",
+ "generatedAtUtc": "2026-09-25T20:14:18.036777+00:00",
  "question": "Which official endpoint can supply standings?",
  "candidates": [
   {
@@ -8,7 +8,7 @@
    "httpStatus": 403,
    "bytes": 0,
    "error": "HTTPError 403",
-   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>73G5WFW9Z79VZNRM</RequestId><HostId>DoA47cOkmE"
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>4Q3HWNMKQCY1KKKR</RequestId><HostId>XWwibywcLw"
   },
   {
    "label": "cdn standings/standings.json",
@@ -16,7 +16,7 @@
    "httpStatus": 403,
    "bytes": 0,
    "error": "HTTPError 403",
-   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>8NP95MK95T12J5Z5</RequestId><HostId>51zbg6juGO"
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>4Q3MS8PEXV7CHM43</RequestId><HostId>NYFBk+KLYK"
   },
   {
    "label": "cdn staticData/leagueStandings.json",
@@ -24,7 +24,7 @@
    "httpStatus": 403,
    "bytes": 0,
    "error": "HTTPError 403",
-   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>8NP7V4BMJ7DJDMAD</RequestId><HostId>SZrX2qY/gj"
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>4Q3GZSHC6BTVFJR5</RequestId><HostId>4EECVxYMp7"
   },
   {
    "label": "cdn liveData/standings/standings_00.json",
@@ -32,7 +32,7 @@
    "httpStatus": 403,
    "bytes": 0,
    "error": "HTTPError 403",
-   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>8NPDDMW1ZWHB9FKJ</RequestId><HostId>2hUBy4G5rG"
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>4Q3GPK19WQ02HFT5</RequestId><HostId>WGARZ/pkMD"
   },
   {
    "label": "cdn staticData/standings_2025_26.json",
@@ -40,7 +40,7 @@
    "httpStatus": 403,
    "bytes": 0,
    "error": "HTTPError 403",
-   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>T543RR65TCMZKS6F</RequestId><HostId>Srvdth/yys"
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>4Q3Z8JDWQW88EPD1</RequestId><HostId>aTxUae6Kww"
   },
   {
    "label": "stats leaguestandingsv3",
@@ -60,12 +60,12 @@
    "label": "www standings page",
    "url": "https://www.nba.com/standings",
    "httpStatus": 200,
-   "bytes": 256596,
+   "bytes": 256706,
    "error": null,
    "contentType": "text/html; charset=utf-8",
    "cacheControl": "max-age=0, no-cache, no-store",
    "looksLikeStandings": false,
-   "htmlBytes": 256553,
+   "htmlBytes": 256663,
    "hasTableRows": false,
    "mentionsStandings": true,
    "scriptSrcs": [
@@ -95,23 +95,23 @@
     "/_next/static/chunks/pages/standings-da27d8efc58f9647.js",
     "/_next/static/C0E7a9q2u2RKy38vn91Q2/_buildManifest.js",
     "/_next/static/C0E7a9q2u2RKy38vn91Q2/_ssgManifest.js",
-    "https://www.nba.com/akam/13/a716916",
+    "https://www.nba.com/akam/13/7a18959d",
     "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
     "https://tags.nba.com/nba-web/prod/utag.js",
     "/Vn1nLrjALZIO/WCkQ23/eWPfta/a9Ybmc5EOhz1zY/Ay4KP0QVAw/Ng5fW/SguRHA",
-    "/Vn1nLrjALZIO/WCkQ23/eWPfta/ppYbmc5E/ECISP0QVAw/BF4na/lAXIws6?v=8b23e198-d586-4f37-06ef-cee3cfd017dc"
+    "/Vn1nLrjALZIO/WCkQ23/eWPfta/ppYbmc5E/ECISP0QVAw/BF4na/lAXIws6?v=38533d85-d106-f30d-4ef8-6e4e7e981730"
    ]
   },
   {
    "label": "www standings page (season)",
    "url": "https://www.nba.com/standings?season=2025-26",
    "httpStatus": 200,
-   "bytes": 256831,
+   "bytes": 256908,
    "error": null,
    "contentType": "text/html; charset=utf-8",
    "cacheControl": "max-age=0, no-cache, no-store",
    "looksLikeStandings": false,
-   "htmlBytes": 256788,
+   "htmlBytes": 256865,
    "hasTableRows": false,
    "mentionsStandings": true,
    "scriptSrcs": [
@@ -141,11 +141,11 @@
     "/_next/static/chunks/pages/standings-da27d8efc58f9647.js",
     "/_next/static/C0E7a9q2u2RKy38vn91Q2/_buildManifest.js",
     "/_next/static/C0E7a9q2u2RKy38vn91Q2/_ssgManifest.js",
-    "https://www.nba.com/akam/13/a716916",
+    "https://www.nba.com/akam/13/7a18959d",
     "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
     "https://tags.nba.com/nba-web/prod/utag.js",
     "/Vn1nLrjALZIO/WCkQ23/eWPfta/a9Ybmc5EOhz1zY/Ay4KP0QVAw/Ng5fW/SguRHA",
-    "/Vn1nLrjALZIO/WCkQ23/eWPfta/ppYbmc5E/ECISP0QVAw/BF4na/lAXIws6?v=b632490d-74fb-142c-de61-ea0b4a5a17dc"
+    "/Vn1nLrjALZIO/WCkQ23/eWPfta/ppYbmc5E/ECISP0QVAw/BF4na/lAXIws6?v=12670778-7fd4-6f45-9b08-082a06881730"
    ]
   }
  ],
@@ -213,8 +213,159 @@
    "error": null,
    "matches": [],
    "scannedBytes": 1288
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/webpack-6e3f0e05b49989e3.js",
+   "httpStatus": 200,
+   "bytes": 11889,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 11889
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/framework-ad7abf312d5d61d4.js",
+   "httpStatus": 200,
+   "bytes": 140992,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 140992
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/main-196c53f13b153e43.js",
+   "httpStatus": 200,
+   "bytes": 121519,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 121519
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/pages/_app-f31363c7185906d8.js",
+   "httpStatus": 200,
+   "bytes": 1433987,
+   "error": null,
+   "matches": [
+    "Core-Api-Key",
+    "Core-Api-Version",
+    "/api/v1/authenticate?requestor_id=",
+    "/api/v1/checkauthn/",
+    "/api/v1/capi-preview/`,e),{results:n={}}=await",
+    "core-api.nba.com"
+   ],
+   "scannedBytes": 1433987
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/94463-b80c0ce4f0ed269b.js",
+   "httpStatus": 200,
+   "bytes": 32193,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 32193
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/85246-8f4d03fb8b8434f9.js",
+   "httpStatus": 200,
+   "bytes": 114134,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 114134
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/32044-414cc822cb5f5824.js",
+   "httpStatus": 200,
+   "bytes": 213212,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 213212
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/92590-4117aaa2b753056c.js",
+   "httpStatus": 200,
+   "bytes": 8265,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 8265
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/21293-e9f85ca75bc67996.js",
+   "httpStatus": 200,
+   "bytes": 25504,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 25504
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/18138-295e10460a7a3412.js",
+   "httpStatus": 200,
+   "bytes": 8239,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 8239
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/62458-10a555232b693ce6.js",
+   "httpStatus": 200,
+   "bytes": 35046,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 35046
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/2712-e9b10d910a2b5f46.js",
+   "httpStatus": 200,
+   "bytes": 14219,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 14219
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/44072-0d2dc0aaf6cfb251.js",
+   "httpStatus": 200,
+   "bytes": 11194,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 11194
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/84106-e77160ee977ccd9d.js",
+   "httpStatus": 200,
+   "bytes": 48082,
+   "error": null,
+   "matches": [
+    "leaguestandingsv3"
+   ],
+   "scannedBytes": 48082
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/54361-8abb810257195775.js",
+   "httpStatus": 200,
+   "bytes": 14081,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 14081
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/pages/standings-da27d8efc58f9647.js",
+   "httpStatus": 200,
+   "bytes": 346,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 346
   }
  ],
- "conclusion": "Official JSON candidates that look like standings: none. Endpoint strings found inside nba.com's own JS: 0.",
- "endpointHints": []
+ "conclusion": "Official JSON candidates that look like standings: none. Endpoint strings found inside nba.com's own JS: 7.",
+ "nextDataPagePropsKeys": [
+  "layout",
+  "contentExpanded",
+  "region"
+ ],
+ "standingsShapedNodes": [],
+ "endpointHints": [
+  "/api/v1/authenticate?requestor_id=",
+  "/api/v1/capi-preview/`,e),{results:n={}}=await",
+  "/api/v1/checkauthn/",
+  "Core-Api-Key",
+  "Core-Api-Version",
+  "core-api.nba.com",
+  "leaguestandingsv3"
+ ]
 }
