@@ -2,7 +2,8 @@ name: Probe NBA pages (verification)
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    # Temporary branch audit while workflow_dispatch is unavailable to integration.
+    branches: [main, arena/01a0da68-nbascoreboard]
     paths:
       - 'scripts/probe_pages.py'
       - '.github/workflows/probe-nba-pages.yml'

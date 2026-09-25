@@ -66,6 +66,8 @@ for date in ["2026-09-25", "2024-11-04", "2019-10-22", "1996-06-16"]:
         if nd:
             props = ((nd.get("props") or {}).get("pageProps") or {})
             rec["pagePropsKeys"] = list(props.keys())
+            rec["selectedDate"] = props.get("selectedDate")
+            rec["allGamesInCurrentYearShape"] = describe(props.get("allGamesInCurrentYear"), 0, 4)
             events = props.get("events")
             feed = props.get("gameCardFeed")
             rec["eventsType"] = type(events).__name__
