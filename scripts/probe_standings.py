@@ -131,6 +131,32 @@ for label, url in CANDIDATES:
     print(f"[cand] {label}: status={rec.get('httpStatus')} bytes={rec.get('bytes')} "
           f"err={rec.get('error')}", flush=True)
 
+# Mine the page's own __NEXT_DATA__ for standings-shaped payloads.
+page_raw, _ = fetch("https://www.nba.com/standings", HTML_HEADERS, timeout=30, limit=4_000_000)
+if page_raw:
+    text = page_raw.decode("utf-8", "replace")
+    m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', text, re.S)
+    if m:
+        try:
+            nd = json.loads(m.group(1))
+        except Exception as exc:
+            report["nextDataError"] = str(exc)
+        else:
+            pp = ((nd.get("props") or {}).get("pageProps") or {})
+            report["nextDataPagePropsKeys"] = list(pp.keys())
+            found = []
+            def walk(node, path=""):
+                if isinstance(node, dict):
+                    keys = {k.lower() for k in node.keys()}
+                    if {"wins", "losses"} <= keys or "winpercentage" in keys:
+                        found.append({"path": path, "keys": sorted(node.keys())[:14]})
+                    for k, v in list(node.items())[:40]:
+                        walk(v, f"{path}.{k}")
+                elif isinstance(node, list) and node:
+                    walk(node[0], f"{path}[0]")
+            walk(pp)
+            report["standingsShapedNodes"] = found[:10]
+
 # Read the JS the standings page loads and look for the endpoint it calls.
 page = next((c for c in report["candidates"] if c["label"] == "www standings page"), {})
 bundle_urls = []
@@ -141,10 +167,12 @@ for src in page.get("scriptSrcs", []):
         bundle_urls.append(src)
 
 scanned = 0
-for url in bundle_urls[:20]:
-    if scanned >= 8:  # keep the probe quick and the artifact small
+# Next.js serves the page bundle from the *last* chunks in the list, so scan all of
+# them (bounded) rather than the first few polyfills.
+for url in bundle_urls[:40]:
+    if scanned >= 24:  # keep the probe quick and the artifact small
         break
-    raw, meta = fetch(url, HTML_HEADERS, timeout=30, limit=4_000_000)
+    raw, meta = fetch(url, HTML_HEADERS, timeout=40, limit=8_000_000)
     rec = {"url": url, "httpStatus": meta.get("httpStatus"), "bytes": meta.get("bytes"),
            "error": meta.get("error"), "matches": []}
     if raw:
@@ -156,7 +184,7 @@ for url in bundle_urls[:20]:
                 continue
             seen.add(snippet)
             rec["matches"].append(snippet[:200])
-            if len(rec["matches"]) >= 25:
+            if len(rec["matches"]) >= 40:
                 break
         rec["scannedBytes"] = len(text)
     report["bundles"].append(rec)
