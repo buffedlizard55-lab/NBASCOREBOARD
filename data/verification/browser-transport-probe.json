@@ -1,0 +1,42 @@
+{
+ "generatedAtUtc": "2026-09-25T19:41:36.435686+00:00",
+ "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json",
+ "pageOrigin": "https://buffedlizard55-lab.github.io",
+ "tests": {
+  "browser-shape-no-referer": {
+   "httpStatus": 403,
+   "bytes": 445,
+   "ok": false,
+   "acao": null,
+   "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have perm"
+  },
+  "browser-shape-with-referer": {
+   "httpStatus": 403,
+   "bytes": 445,
+   "ok": false,
+   "acao": null,
+   "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have perm"
+  },
+  "nba-origin-control": {
+   "httpStatus": 200,
+   "bytes": 376,
+   "ok": true,
+   "acao": "https://www.nba.com",
+   "bodyPrefix": "{\r\n  \"meta\": {\r\n    \"version\": 1,\r\n    \"request\": \"https://nba-prod-us-east-1-mediaops-stats.s3.amaz"
+  },
+  "curl-http2-pages-origin-no-referer": {
+   "httpStatus": 403,
+   "bytes": 446,
+   "ok": false,
+   "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have perm",
+   "stderr": ""
+  },
+  "curl-http2-pages-origin-nba-referer": {
+   "httpStatus": 403,
+   "bytes": 446,
+   "ok": false,
+   "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have perm",
+   "stderr": ""
+  }
+ }
+}
