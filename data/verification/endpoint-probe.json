@@ -1,0 +1,719 @@
+{
+  "generatedAtUtc": "2026-09-25T19:21:25.008528+00:00",
+  "runner": {
+    "corsCheckOrigin": "https://buffedlizard55-lab.github.io",
+    "python": "3.12.14",
+    "platform": "linux"
+  },
+  "purpose": "Empirical, timestamped evidence of what official NBA servers return to a real network egress. No values in this file are hand-written.",
+  "probes": [
+    {
+      "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent"
+      ],
+      "ok": false,
+      "httpStatus": 403,
+      "contentType": "text/html",
+      "contentLength": 445,
+      "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;cdn&#46;nba&#46;com&#47;static&#47;json&#47;liveData&#47;scoreboard&#47;todaysScore",
+      "headers": {
+        "mime-version": "1.0",
+        "content-type": "text/html",
+        "content-length": "445",
+        "expires": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "date": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "connection": "close",
+        "x-frame-options": "sameorigin",
+        "x-xss-protection": "1; mode=block",
+        "x-content-type-options": "nosniff",
+        "strict-transport-security": "max-age=86400"
+      },
+      "error": "HTTPError 403",
+      "elapsedMs": 202,
+      "label": "live-scoreboard-today"
+    },
+    {
+      "url": "https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_0022400247.json",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent"
+      ],
+      "ok": false,
+      "httpStatus": 403,
+      "contentType": "text/html",
+      "contentLength": 447,
+      "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;cdn&#46;nba&#46;com&#47;static&#47;json&#47;liveData&#47;playbyplay&#47;playbyplay&",
+      "headers": {
+        "mime-version": "1.0",
+        "content-type": "text/html",
+        "content-length": "447",
+        "expires": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "date": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "connection": "close",
+        "x-frame-options": "sameorigin",
+        "x-xss-protection": "1; mode=block",
+        "x-content-type-options": "nosniff",
+        "strict-transport-security": "max-age=86400"
+      },
+      "error": "HTTPError 403",
+      "elapsedMs": 94,
+      "label": "live-playbyplay-2024"
+    },
+    {
+      "url": "https://cdn.nba.com/static/json/liveData/boxscore/boxscore_0022400247.json",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent"
+      ],
+      "ok": false,
+      "httpStatus": 403,
+      "contentType": "text/html",
+      "contentLength": 443,
+      "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;cdn&#46;nba&#46;com&#47;static&#47;json&#47;liveData&#47;boxscore&#47;boxscore&#95;",
+      "headers": {
+        "mime-version": "1.0",
+        "content-type": "text/html",
+        "content-length": "443",
+        "expires": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "date": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "connection": "close",
+        "x-frame-options": "sameorigin",
+        "x-xss-protection": "1; mode=block",
+        "x-content-type-options": "nosniff",
+        "strict-transport-security": "max-age=86400"
+      },
+      "error": "HTTPError 403",
+      "elapsedMs": 73,
+      "label": "live-boxscore-2024"
+    },
+    {
+      "url": "https://cdn.nba.com/static/json/liveData/odds/odds_todaysGames.json",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent"
+      ],
+      "ok": false,
+      "httpStatus": 403,
+      "contentType": "text/html",
+      "contentLength": 436,
+      "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;cdn&#46;nba&#46;com&#47;static&#47;json&#47;liveData&#47;odds&#47;odds&#95;todaysGa",
+      "headers": {
+        "mime-version": "1.0",
+        "content-type": "text/html",
+        "content-length": "436",
+        "expires": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "date": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "connection": "close",
+        "x-frame-options": "sameorigin",
+        "x-xss-protection": "1; mode=block",
+        "x-content-type-options": "nosniff",
+        "strict-transport-security": "max-age=86400"
+      },
+      "error": "HTTPError 403",
+      "elapsedMs": 82,
+      "label": "live-odds"
+    },
+    {
+      "url": "https://cdn.nba.com/static/json/liveData/channels/v2/channels_00.json",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent"
+      ],
+      "ok": false,
+      "httpStatus": 403,
+      "contentType": "text/html",
+      "contentLength": 442,
+      "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;cdn&#46;nba&#46;com&#47;static&#47;json&#47;liveData&#47;channels&#47;v2&#47;channe",
+      "headers": {
+        "mime-version": "1.0",
+        "content-type": "text/html",
+        "content-length": "442",
+        "expires": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "date": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "connection": "close",
+        "x-frame-options": "sameorigin",
+        "x-xss-protection": "1; mode=block",
+        "x-content-type-options": "nosniff",
+        "strict-transport-security": "max-age=86400"
+      },
+      "error": "HTTPError 403",
+      "elapsedMs": 82,
+      "label": "live-channels"
+    },
+    {
+      "url": "https://cdn.nba.com/static/json/staticData/scheduleLeagueV2_1.json",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent"
+      ],
+      "ok": false,
+      "httpStatus": 403,
+      "contentType": "text/html",
+      "contentLength": 431,
+      "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;cdn&#46;nba&#46;com&#47;static&#47;json&#47;staticData&#47;scheduleLeagueV2&#95;1&#",
+      "headers": {
+        "mime-version": "1.0",
+        "content-type": "text/html",
+        "content-length": "431",
+        "expires": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "date": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "connection": "close",
+        "x-frame-options": "sameorigin",
+        "x-xss-protection": "1; mode=block",
+        "x-content-type-options": "nosniff",
+        "strict-transport-security": "max-age=86400"
+      },
+      "error": "HTTPError 403",
+      "elapsedMs": 74,
+      "label": "static-schedule-v2-1"
+    },
+    {
+      "url": "https://cdn.nba.com/static/json/staticData/scheduleLeagueV2.json",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent"
+      ],
+      "ok": false,
+      "httpStatus": 403,
+      "contentType": "text/html",
+      "contentLength": 425,
+      "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;cdn&#46;nba&#46;com&#47;static&#47;json&#47;staticData&#47;scheduleLeagueV2&#46;jso",
+      "headers": {
+        "mime-version": "1.0",
+        "content-type": "text/html",
+        "content-length": "425",
+        "expires": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "date": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "connection": "close",
+        "x-frame-options": "sameorigin",
+        "x-xss-protection": "1; mode=block",
+        "x-content-type-options": "nosniff",
+        "strict-transport-security": "max-age=86400"
+      },
+      "error": "HTTPError 403",
+      "elapsedMs": 71,
+      "label": "static-schedule-v2"
+    },
+    {
+      "url": "https://cdn.nba.com/static/json/staticData/scheduleLeagueV2_2025_26.json",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent"
+      ],
+      "ok": false,
+      "httpStatus": 403,
+      "contentType": "text/html",
+      "contentLength": 441,
+      "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;cdn&#46;nba&#46;com&#47;static&#47;json&#47;staticData&#47;scheduleLeagueV2&#95;202",
+      "headers": {
+        "mime-version": "1.0",
+        "content-type": "text/html",
+        "content-length": "441",
+        "expires": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "date": "Fri, 25 Sep 2026 19:21:25 GMT",
+        "connection": "close",
+        "x-frame-options": "sameorigin",
+        "x-xss-protection": "1; mode=block",
+        "x-content-type-options": "nosniff",
+        "strict-transport-security": "max-age=86400"
+      },
+      "error": "HTTPError 403",
+      "elapsedMs": 75,
+      "label": "static-schedule-2025-26"
+    },
+    {
+      "url": "https://cdn.nba.com/logos/nba/1610612747/primary/L/logo.svg",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent"
+      ],
+      "ok": true,
+      "httpStatus": 200,
+      "contentType": "image/svg+xml",
+      "contentLength": 12296,
+      "headers": {
+        "last-modified": "Wed, 02 Sep 2020 16:15:57 GMT",
+        "etag": "\"d94b140e57157bfba57822e2ca7e29b1\"",
+        "content-type": "image/svg+xml",
+        "vary": "Accept-Encoding",
+        "date": "Fri, 25 Sep 2026 19:21:25 GMT"
+      },
+      "bodyPrefix": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->\r\n<svg version=\"1.1\" id=\"Layer_3\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http",
+      "elapsedMs": 107,
+      "label": "logo-lakers"
+    },
+    {
+      "url": "https://cdn.nba.com/headshots/nba/latest/260x190/2544.png",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent"
+      ],
+      "ok": true,
+      "httpStatus": 200,
+      "contentType": "image/png",
+      "contentLength": 17051,
+      "headers": {
+        "last-modified": "Fri, 03 Oct 2025 04:05:23 GMT",
+        "etag": "\"e895432fbe74ec2aa5dc80db3f848e1e\"",
+        "content-type": "image/png",
+        "cache-control": "private, no-transform, max-age=43200",
+        "date": "Fri, 25 Sep 2026 19:21:25 GMT"
+      },
+      "bodyPrefix": "\ufffdPNG\r\n\u001a\n\u0000\u0000\u0000\rIHDR\u0000\u0000\u0001\u0004\u0000\u0000\u0000\ufffd\b\u0003\u0000\u0000\u0000\ufffd\ufffd\ufffd\ufffd\u0000\u0000\u0003\u0000PLTE\u0000\u0000\u0000*0-\ufffd\ufffd5eF;oL=yXN+1+ $%\ufffd\ufffd?\u001f!#\"!\"\u001e\u001d\u001d\ufffdXD !!   \u0738:\u0019\u0018\u0019\ufffd\ufffd\ufffd \u001f\u001e$!\"\u000f\u000f\u000e(\u001b\u0015)$#\u0013\u0013\u0013:%\u001ct`|L6-\ufffd\ufffdm\ufffd\ufffd\u001cs~U\ufffd{\u001e\ufffd\ufffd9;&\"KFB\ufffd\ufffd7\ufffd\ufffd\u0019\ufffd\ufffd\ufffd;\"\ufffd\ufffd\ufffd\ufffdRP/\ufffd\ufffdc\n\n\t\ufffd\ufffd \u000e\r\f\b\u0007\u0007\ufffd\ufffd6\ufffd\ufffd\n\u0005\u0005\u0005\ufffd\ufffd\r\ufffd\ufffd\u001c\ufffd\ufffd\u0007c4\u001d\ufffd\ufffd1\ufffd\ufffd:\u0012\u0011\u0010\ufffdV>=$\u0017,\u0019\u0011\ufffdS=^1",
+      "elapsedMs": 83,
+      "label": "headshot-lebron"
+    },
+    {
+      "url": "https://cdn.nba.com/static/json/liveData/scoreboard/scoreboard_20241104.json",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent"
+      ],
+      "ok": false,
+      "httpStatus": 403,
+      "contentType": "text/html",
+      "contentLength": 445,
+      "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;cdn&#46;nba&#46;com&#47;static&#47;json&#47;liveData&#47;scoreboard&#47;scoreboard&",
+      "headers": {
+        "mime-version": "1.0",
+        "content-type": "text/html",
+        "content-length": "445",
+        "expires": "Fri, 25 Sep 2026 19:21:26 GMT",
+        "date": "Fri, 25 Sep 2026 19:21:26 GMT",
+        "connection": "close",
+        "x-frame-options": "sameorigin",
+        "x-xss-protection": "1; mode=block",
+        "x-content-type-options": "nosniff",
+        "strict-transport-security": "max-age=86400"
+      },
+      "error": "HTTPError 403",
+      "elapsedMs": 110,
+      "label": "experimental-date-scoreboard"
+    },
+    {
+      "url": "https://cdn.nba.com/static/json/liveData/scoreboard/scoreboard_00.json",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent"
+      ],
+      "ok": false,
+      "httpStatus": 403,
+      "contentType": "text/html",
+      "contentLength": 439,
+      "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;cdn&#46;nba&#46;com&#47;static&#47;json&#47;liveData&#47;scoreboard&#47;scoreboard&",
+      "headers": {
+        "mime-version": "1.0",
+        "content-type": "text/html",
+        "content-length": "439",
+        "expires": "Fri, 25 Sep 2026 19:21:26 GMT",
+        "date": "Fri, 25 Sep 2026 19:21:26 GMT",
+        "connection": "close",
+        "x-frame-options": "sameorigin",
+        "x-xss-protection": "1; mode=block",
+        "x-content-type-options": "nosniff",
+        "strict-transport-security": "max-age=86400"
+      },
+      "error": "HTTPError 403",
+      "elapsedMs": 68,
+      "label": "experimental-scoreboard-00"
+    },
+    {
+      "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=2025-11-04&LeagueID=00",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45146,
+      "label": "stats-scoreboardv3-2025-11-04"
+    },
+    {
+      "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=2016-06-19&LeagueID=00",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45098,
+      "label": "stats-scoreboardv3-2016-06-19"
+    },
+    {
+      "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=1996-06-16&LeagueID=00",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45115,
+      "label": "stats-scoreboardv3-1996-06-16"
+    },
+    {
+      "url": "https://stats.nba.com/stats/leaguestandingsv3?LeagueID=00&Season=2025-26&SeasonType=Regular+Season",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45160,
+      "label": "stats-leaguestandingsv3-2025-26"
+    },
+    {
+      "url": "https://stats.nba.com/stats/boxscoretraditionalv3?GameID=0022400247&StartPeriod=0&EndPeriod=14&StartRange=0&EndRange=2147483647&RangeType=0",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45082,
+      "label": "stats-boxscoretraditionalv3"
+    },
+    {
+      "url": "https://stats.nba.com/stats/playbyplayv3?GameID=0022400247&StartPeriod=0&EndPeriod=14",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45185,
+      "label": "stats-playbyplayv3"
+    },
+    {
+      "url": "https://stats.nba.com/stats/scheduleleaguev2?LeagueID=00&Season=2025-26",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45055,
+      "label": "stats-scheduleleaguev2"
+    },
+    {
+      "url": "https://stats.nba.com/stats/commonplayerinfo?PlayerID=2544",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45039,
+      "label": "stats-commonplayerinfo"
+    },
+    {
+      "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=2025-11-04&LeagueID=00",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "User-Agent"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45191,
+      "label": "control-no-stats-headers"
+    },
+    {
+      "url": "https://data.nba.net/data/10s/prod/v1/20200102/scoreboard.json",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent"
+      ],
+      "ok": false,
+      "error": "URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'data.nba.net'. (_ssl.c:1010)>",
+      "elapsedMs": 115,
+      "label": "legacy-data-nba-net-2020"
+    },
+    {
+      "url": "https://data.nba.net/prod/v1/20200102/scoreboard.json",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent"
+      ],
+      "ok": false,
+      "error": "URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'data.nba.net'. (_ssl.c:1010)>",
+      "elapsedMs": 7,
+      "label": "legacy-data-nba-net-old-path"
+    },
+    {
+      "url": "https://data.nba.net/data/10s/prod/v1/20251104/scoreboard.json",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent"
+      ],
+      "ok": false,
+      "error": "URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'data.nba.net'. (_ssl.c:1010)>",
+      "elapsedMs": 7,
+      "label": "legacy-data-nba-net-2025"
+    },
+    {
+      "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=2025-11-04&LeagueID=00",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45068,
+      "label": "harvest-scoreboard-2025-11-04"
+    },
+    {
+      "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=2025-06-22&LeagueID=00",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45116,
+      "label": "harvest-scoreboard-2025-06-22"
+    },
+    {
+      "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=2024-11-04&LeagueID=00",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45173,
+      "label": "harvest-scoreboard-2024-11-04"
+    },
+    {
+      "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=2022-01-15&LeagueID=00",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45067,
+      "label": "harvest-scoreboard-2022-01-15"
+    },
+    {
+      "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=2019-10-22&LeagueID=00",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45184,
+      "label": "harvest-scoreboard-2019-10-22"
+    },
+    {
+      "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=2016-06-19&LeagueID=00",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45036,
+      "label": "harvest-scoreboard-2016-06-19"
+    },
+    {
+      "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=2010-06-17&LeagueID=00",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45078,
+      "label": "harvest-scoreboard-2010-06-17"
+    },
+    {
+      "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=2005-06-23&LeagueID=00",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45184,
+      "label": "harvest-scoreboard-2005-06-23"
+    },
+    {
+      "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=1996-06-16&LeagueID=00",
+      "method": "GET",
+      "requestHeaders": [
+        "Accept",
+        "Accept-Encoding",
+        "Origin",
+        "Referer",
+        "User-Agent",
+        "x-nba-stats-origin",
+        "x-nba-stats-token"
+      ],
+      "ok": false,
+      "error": "TimeoutError: The read operation timed out",
+      "elapsedMs": 45142,
+      "label": "harvest-scoreboard-1996-06-16"
+    }
+  ],
+  "coverage": []
+}
