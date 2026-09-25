@@ -156,10 +156,12 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(run["steps"][-1]["result"], "MISMATCH")
         self.assertFalse((self.data / "games" / GAME_ID / "boxscore.json").exists())
 
-    def html(self, modules, selected_date=None):
+    def html(self, modules, selected_date=None, calendar=None):
         props = {"gameCardFeed": {"modules": modules}}
         if selected_date is not None:
             props["selectedDate"] = selected_date
+        if calendar is not None:
+            props["allGamesInCurrentYear"] = calendar
         next_data = {"props": {"pageProps": props}}
         return f'<script id="__NEXT_DATA__" type="application/json">{json.dumps(next_data)}</script>'
 
@@ -209,6 +211,40 @@ class PipelineTests(unittest.TestCase):
         run = log()
         sync.verify_digest_against_boxscore("2024-11-04", run)
         self.assertEqual(run["steps"][0]["result"], "MISMATCH")
+
+    def test_sparse_nba_year_calendar_checks_counts_and_only_skips_explicit_zeros(self):
+        date = "2024-11-04"
+        counts = {"2024": {date: 1, "2024-11-05": 0}}
+        good = self.html([{"cards": [CARD]}], selected_date=date, calendar=counts)
+        with patch.object(sync, "http_get_html", return_value=(good, dict(META))):
+            self.assertTrue(sync.sync_date_digest(date, log()))
+        calendar = self.read("calendar/2024.json")
+        self.assertEqual(calendar["dateCounts"], counts["2024"])
+        self.assertEqual(calendar["_sync"]["source"], sync.games_page_url(date))
+        self.assertEqual(sync.known_calendar_count("2024-11-05"), 0)
+        self.assertIsNone(sync.known_calendar_count("2024-11-06"), "missing is NOT zero")
+        sync.build_index(log())
+        self.assertEqual(self.read("index.json")["calendars"]["2024"]["gameDates"], 1)
+        cursor = self.data / "verification" / "backfill-cursor.json"
+        sync.write_json(str(cursor), {"nextDate": "2024-11-05", "earliestTarget": "2024-11-05"})
+        with patch.object(sync, "http_get_html", side_effect=AssertionError("explicit NBA zero needs no extra page fetch")):
+            sync.backfill_history_step(log(), batch=1)
+        self.assertEqual(self.read("verification/backfill-cursor.json")["lastBatchExplicitZeroSkips"], 1)
+        self.assertFalse((self.data / "scoreboard/2024-11-05.json").exists())
+        unknown = self.html([], selected_date="2024-11-06", calendar=counts)
+        sync.write_json(str(cursor), {"nextDate": "2024-11-06", "earliestTarget": "2024-11-06"})
+        with patch.object(sync, "http_get_html", return_value=(unknown, dict(META))) as fetch:
+            sync.backfill_history_step(log(), batch=1)
+            self.assertTrue(fetch.called, "an omitted date cannot be skipped as empty")
+        self.assertEqual(self.read("scoreboard/2024-11-06.json")["gameCount"], 0)
+        mismatch = self.html([{"cards": [CARD]}], selected_date=date,
+                             calendar={"2024": {date: 2}})
+        before = (self.data / "scoreboard" / f"{date}.json").read_bytes()
+        with patch.object(sync, "http_get_html", return_value=(mismatch, dict(META))):
+            run = log()
+            self.assertFalse(sync.sync_date_digest(date, run, force=True))
+        self.assertEqual(run["steps"][-1]["result"], "MISMATCH")
+        self.assertEqual((self.data / "scoreboard" / f"{date}.json").read_bytes(), before)
 
     def test_known_schedule_prevents_false_empty_night_and_rechecks_cached_zero(self):
         date = "2024-11-04"

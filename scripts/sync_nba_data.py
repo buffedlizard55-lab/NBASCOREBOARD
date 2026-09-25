@@ -15,6 +15,7 @@ WHY SERVER-SIDE (measured, 2026-09-25 — see data/verification/):
 WHAT IT PUBLISHES (all under data/, all traceable to an official URL):
   data/live/scoreboard.json        today's official live scoreboard (raw payload)
   data/schedule/<season>.json      compacted official season schedule (incl. future)
+  data/calendar/<year>.json        NBA.com year-page date counts (sparse; no guessed zeros)
   data/scoreboard/<date>.json      compacted NBA.com date cards, incl. checked empty dates
   data/games/<gameId>/boxscore.json    current or final official player/team statistics
   data/games/<gameId>/playbyplay.json  every official action for a current or final game
@@ -61,7 +62,7 @@ MAX_LOG_RUNS = 30
 GAME_ID = re.compile(r"^\d{10}$")
 HISTORY_DAYS_DEFAULT = 14
 BACKFILL_MAX_DATES = 60
-BACKFILL_BATCH = 6
+BACKFILL_BATCH = 30  # max official date-page reads in one daily full run; stop on any failure
 ARCHIVE_MAX_GAMES_PER_RUN = 24
 # Play-by-play is ~160 KB per game. The archive keeps everything under this budget
 # (~40 MB) and, when it grows past it, drops the OLDEST regular-season play-by-play
@@ -227,6 +228,17 @@ def known_schedule_game_ids(date_str: str) -> set[str]:
     return ids
 
 
+def known_calendar_count(date_str: str) -> int | None:
+    """Only *explicit* NBA.com year-calendar entries are evidence of a count.
+
+    The annual map is sparse: on measured 1996/2019/2024/2026 pages it omitted
+    many dates entirely. An absent key must NEVER be interpreted as zero games.
+    """
+    calendar = load_json(os.path.join(DATA, "calendar", f"{date_str[:4]}.json")) or {}
+    value = (calendar.get("dateCounts") or {}).get(date_str)
+    return value if type(value) is int and value >= 0 else None
+
+
 def scoreboard_error(payload) -> str | None:
     """Never turn a changed/partial NBA response into a fake 'no games' night."""
     sb = payload.get("scoreboard") if isinstance(payload, dict) else None
@@ -234,8 +246,9 @@ def scoreboard_error(payload) -> str | None:
         return "missing or invalid scoreboard.gameDate"
     if not isinstance(sb.get("games"), list):
         return "missing scoreboard.games array"
-    if not sb["games"] and known_schedule_game_ids(sb["gameDate"]):
-        return "empty live feed contradicts published NBA season schedule; retry rather than display zero games"
+    if not sb["games"] and (known_schedule_game_ids(sb["gameDate"]) or
+                            (known_calendar_count(sb["gameDate"]) or 0) > 0):
+        return "empty live feed contradicts an NBA schedule/calendar game night; retry rather than display zero games"
     seen = set()
     for g in sb["games"]:
         if not isinstance(g, dict) or not valid_game_id(g.get("gameId")):
@@ -739,6 +752,47 @@ def compact_card(cd: dict) -> dict | None:
     }
 
 
+def archive_year_calendar(date_str: str, raw: object, card_count: int,
+                          meta: dict, log: dict) -> bool:
+    """Store the *sparse* NBA.com year map alongside the dated card source.
+
+    NBA's `allGamesInCurrentYear` has an explicit count for many dates but is NOT
+    a complete calendar; absent keys stay unknown. Check the selected day against
+    the actual cards whenever it has a count. The page URL and official-byte hash
+    remain attached to the map for manual review.
+    """
+    year = date_str[:4]
+    counts = raw.get(year) if isinstance(raw, dict) else None
+    if counts is None:
+        return True  # older/changed NBA page shape: use the validated cards only
+    if not isinstance(counts, dict) or any(
+        not valid_date(d) or not d.startswith(year) or type(n) is not int or n < 0
+        for d, n in counts.items()
+    ):
+        log["steps"].append({"step": "calendar", "date": date_str, "result": "INVALID",
+                             "url": games_page_url(date_str), "error": "invalid NBA year/date/count map"})
+        return False
+    expected = counts.get(date_str)
+    if expected is not None and expected != card_count:
+        log["steps"].append({"step": "calendar", "date": date_str, "result": "MISMATCH",
+                             "url": games_page_url(date_str),
+                             "error": f"NBA year calendar says {expected} games, date cards say {card_count}"})
+        return False
+    if not counts:
+        return True  # no keys to substantiate or optimize
+    url = games_page_url(date_str)
+    content = {"year": year, "dateCounts": dict(sorted(counts.items())),
+               "knownGameDates": sum(n > 0 for n in counts.values()),
+               "explicitNoGameDates": sum(n == 0 for n in counts.values()),
+               "note": "Missing year-map keys are unknown, NOT evidence of zero games."}
+    written = store_compact(os.path.join(DATA, "calendar", f"{year}.json"), url, content,
+                            "sparse NBA.com year calendar; only explicit date counts are published",
+                            source_sha256=meta.get("sourceSha256"), source_bytes=meta.get("bytes"))
+    log["steps"].append({"step": "calendar", "year": year, "date": date_str, "result": "OK",
+                         "knownDates": len(counts), "written": written})
+    return True
+
+
 def cards_for_date(date_str: str, log: dict):
     """Read the official www.nba.com/games?date=<date> page.
 
@@ -797,6 +851,13 @@ def cards_for_date(date_str: str, log: dict):
         log["steps"].append({"step": "cards", "date": date_str, **meta,
                              "result": "INVALID", "error": str(exc)})
         return None, meta  # no silent dropping of bad rows or invented 0-game dates
+    if not rows and known_schedule_game_ids(date_str):
+        log["steps"].append({"step": "cardsVsSchedule", "date": date_str,
+                             "url": games_page_url(date_str), "result": "MISMATCH",
+                             "error": "NBA date page is empty, but published NBA schedule lists games"})
+        return None, meta
+    if not archive_year_calendar(date_str, props.get("allGamesInCurrentYear"), len(rows), meta, log):
+        return None, meta
     log["steps"].append({"step": "cards", "date": date_str, **meta, "result": "OK",
                          "gameCount": len(rows)})
     print(f"[cards] {date_str} cards={len(rows)}", flush=True)
@@ -816,13 +877,14 @@ def sync_date_digest(date_str: str, log: dict, season: str | None = None,
     path = os.path.join(DATA, "scoreboard", f"{date_str}.json")
     existing = load_json(path)
     scheduled = known_schedule_game_ids(date_str)
+    calendar_count = known_calendar_count(date_str)
     if not force and existing and isinstance(existing.get("games"), list):
         games = existing["games"]
-        # A schedule published later can reveal that an earlier zero-card fetch
+        # A later NBA schedule/year map can reveal that an earlier zero-card fetch
         # was incomplete. Do not freeze that apparent empty night forever.
-        if games and all(g.get("gameStatus") == 3 for g in games):
+        if games and all(g.get("gameStatus") == 3 for g in games) and (calendar_count is None or calendar_count == len(games)):
             return True
-        if not games and not scheduled:
+        if not games and not scheduled and not (calendar_count or 0):
             return True
     rows, meta = cards_for_date(date_str, log)
     if rows is None:
@@ -938,25 +1000,38 @@ def sync_archive_pending(log: dict, days: int, max_games: int = ARCHIVE_MAX_GAME
         verify_digest_against_boxscore(date_str, log)
 
 
-def backfill_history_step(log: dict, batch: int = 6) -> None:
-    """Walk backwards through the calendar a few dates per run.
+def backfill_history_step(log: dict, batch: int = BACKFILL_BATCH) -> None:
+    """Walk backwards through NBA dates without pretending sparse gaps are empty.
 
-    Every official date page is archived once, so the historical scoreboard grows
-    by itself with no manual work. Dates with no games are recorded too, which
-    stops us re-fetching them forever.
+    The official year map can explicitly record a zero; skip only those dates.
+    A missing map key is unknown and still requires its own official date page.
+    The cursor is advanced only after a validated read or explicit NBA zero.
     """
     cursor_path = os.path.join(DATA, "verification", "backfill-cursor.json")
     state = load_json(cursor_path) or {}
     cursor = state.get("nextDate") or (dt.datetime.now(dt.timezone.utc).date() - dt.timedelta(days=1)).isoformat()
     stop_before = state.get("earliestTarget") or "1946-11-01"  # BAA/NBA first season
-    fetched = 0
+    fetched = skipped_zero = 0
     while fetched < batch:
         if cursor < stop_before:
             print("[backfill] reached earliest target", flush=True)
             break
         path = os.path.join(DATA, "scoreboard", f"{cursor}.json")
         existing = load_json(path)
-        if existing and (existing.get("gameCount") != 0 or not known_schedule_game_ids(cursor)):
+        expected = known_calendar_count(cursor)
+        scheduled = known_schedule_game_ids(cursor)
+        if existing and isinstance(existing.get("games"), list):
+            rows = existing["games"]
+            complete = (rows and all(g.get("gameStatus") == 3 for g in rows)
+                        and (expected is None or expected == len(rows)))
+            empty_checked = not rows and not scheduled and not (expected or 0)
+            if complete or empty_checked:
+                cursor = (dt.date.fromisoformat(cursor) - dt.timedelta(days=1)).isoformat()
+                continue
+        if not existing and expected == 0 and not scheduled:
+            # A zero is an actual NBA.com map entry, NOT an inference from a
+            # missing key. The year calendar file is the reviewable evidence.
+            skipped_zero += 1
             cursor = (dt.date.fromisoformat(cursor) - dt.timedelta(days=1)).isoformat()
             continue
         if not sync_date_digest(cursor, log, force=True):
@@ -967,10 +1042,12 @@ def backfill_history_step(log: dict, batch: int = 6) -> None:
     state["nextDate"] = cursor
     state["earliestTarget"] = stop_before
     state["lastRunUtc"] = now_utc()
-    state["note"] = ("Progressive archive cursor: the pipeline walks backwards through "
-                     "the calendar, storing each official date page once.")
+    state["lastBatchFetched"] = fetched
+    state["lastBatchExplicitZeroSkips"] = skipped_zero
+    state["note"] = ("Progressive archive cursor: unarchived dates are unknown except "
+                     "when the published NBA year calendar explicitly records zero games.")
     write_json(cursor_path, state)
-    print(f"[backfill] fetched {fetched} dates, next={cursor}", flush=True)
+    print(f"[backfill] fetched {fetched} dates, explicit NBA zeros skipped {skipped_zero}, next={cursor}", flush=True)
 
 
 def prune_details(log: dict, budget_bytes: int = PBP_BUDGET_BYTES,
@@ -1072,6 +1149,7 @@ def build_index(log: dict) -> None:
         },
         "issues": heartbeat.get("issues") or [],
         "scoreboards": {},
+        "calendars": {},
         "games": {},
         "schedules": {},
         "standings": {},
@@ -1106,6 +1184,22 @@ def build_index(log: dict) -> None:
             "gameCount": payload.get("gameCount"),
             "source": payload["_sync"].get("source"),
         }
+    calendar_dir = os.path.join(DATA, "calendar")
+    if os.path.isdir(calendar_dir):
+        for name in sorted(os.listdir(calendar_dir)):
+            if not name.endswith(".json"):
+                continue
+            calendar = load_json(os.path.join(calendar_dir, name))
+            if not calendar:
+                continue
+            index["calendars"][name[:-5]] = {
+                "path": f"data/calendar/{name}",
+                "source": calendar["_sync"].get("source"),
+                "fetchedAtUtc": calendar["_sync"].get("fetchedAtUtc"),
+                "knownDates": len(calendar.get("dateCounts") or {}),
+                "gameDates": calendar.get("knownGameDates"),
+                "noGameDates": calendar.get("explicitNoGameDates"),
+            }
     games_dir = os.path.join(DATA, "games")
     if os.path.isdir(games_dir):
         for gid in sorted(os.listdir(games_dir)):
@@ -1145,7 +1239,8 @@ def build_index(log: dict) -> None:
         return
     write_json(path, index)
     print(f"[index] live={bool(index['live'])} dates={len(index['scoreboards'])} "
-          f"games={len(index['games'])} seasons={len(index['schedules'])}", flush=True)
+          f"calendars={len(index['calendars'])} games={len(index['games'])} "
+          f"seasons={len(index['schedules'])}", flush=True)
 
 
 def append_log(log: dict) -> bool:

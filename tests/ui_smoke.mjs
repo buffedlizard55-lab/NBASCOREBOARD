@@ -33,7 +33,7 @@ const wait = async (condition, label) => {
   }
   throw new Error(`Timed out: ${label}`);
 };
-let mockSnapshot = null, mockIndex = null, mockBox = null, mockPbp = null, directAllowed = false;
+let mockSnapshot = null, mockIndex = null, mockBox = null, mockPbp = null, mockCalendar = null, directAllowed = false;
 window.fetch = async (url) => {
   const target = String(url);
   const pathname = target.replace(/^https?:\/\/[^/]+\/NBASCOREBOARD\//, '').split('?')[0];
@@ -46,6 +46,7 @@ window.fetch = async (url) => {
     else return { ok: false, status: 404 };
   } else if (pathname === 'data/live/scoreboard.json' && mockSnapshot) data = mockSnapshot;
   else if (pathname === 'data/index.json' && mockIndex) data = mockIndex;
+  else if (pathname === 'data/calendar/1985.json' && mockCalendar) data = mockCalendar;
   else if (pathname === 'data/games/0022400154/boxscore.json' && mockBox) data = mockBox;
   else if (pathname === 'data/games/0022400154/playbyplay.json' && mockPbp) data = mockPbp;
   else {
@@ -87,6 +88,32 @@ check('unarchived date not mislabelled no games', /not been captured/.test(text(
 check('NBA.com review link for missing date', $('dateResult').innerHTML.includes('nba.com/games?date=1985-06-09'));
 check('path traversal / invalid calendar dates rejected', (await app.loadDate('../index')) === false
   && text('dateResult').includes('valid YYYY-MM-DD') && (await app.loadDate('2026-02-30')) === false);
+
+// NBA.com year calendar counts are sparse: explicit zero, positive count without
+// scorecards, and a missing key must have THREE different presentations.
+const calendarSource = 'https://www.nba.com/games?date=1985-12-01';
+mockCalendar = { year: '1985', dateCounts: { '1985-06-09': 0, '1985-06-10': 2 },
+  _sync: { source: calendarSource, fetchedAtUtc: new Date().toISOString() } };
+app.state.index = { ...index, calendars: { ...(index.calendars || {}), '1985': {
+  path: 'data/calendar/1985.json', source: calendarSource,
+  fetchedAtUtc: mockCalendar._sync.fetchedAtUtc, knownDates: 2, gameDates: 1, noGameDates: 1,
+} } };
+await app.loadDate('1985-06-09');
+check('explicit NBA calendar zero is distinct from an uncaptured date', app.state.dateKind === 'calendar-zero'
+  && text('dateResult').includes('explicitly records zero games') && text('gamesStrip').includes('zero games'));
+await app.loadDate('1985-06-10');
+check('NBA count alone cannot invent missing game scores', app.state.dateKind === 'calendar-known'
+  && text('dateResult').includes('2 games') && text('gamesStrip').includes('not been captured'));
+await app.loadDate('1985-06-11');
+check('missing NBA calendar key is unknown, never zero', app.state.dateKind === 'missing'
+  && text('dateResult').includes('not been captured') && !text('gamesStrip').includes('zero games'));
+mockCalendar.dateCounts['1985-06-09'] = -2;
+delete app.state.calendars['1985'];
+await app.loadDate('1985-06-09');
+check('invalid NBA calendar value cannot declare a no-game date', app.state.dateKind === 'missing'
+  && text('dateResult').includes('calendar unavailable'));
+mockCalendar = null;
+app.state.index = index;
 
 await app.loadDate('2024-11-04');
 check('15 archived NBA.com game cards rendered', $('gamesStrip').querySelectorAll('.game-row').length === archived.gameCount);

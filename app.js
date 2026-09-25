@@ -15,13 +15,15 @@ const OFFICIAL = Object.freeze({
 const PUBLISHED = Object.freeze({
   index: 'data/index.json', live: 'data/live/scoreboard.json',
   date: (d) => `data/scoreboard/${d}.json`,
+  calendar: (year) => `data/calendar/${year}.json`,
   box: (id) => `data/games/${id}/boxscore.json`,
   pbp: (id) => `data/games/${id}/playbyplay.json`,
   schedule: (s) => `data/schedule/${s}.json`,
 });
 const state = {
   index: null, live: null, schedule: null, season: null, date: null, dateResultGames: null,
-  dateKind: null, view: 'rows', sourceMode: 'snapshot', isStale: false, readError: null, indexError: null,
+  dateKind: null, calendarCount: null, calendars: {}, view: 'rows',
+  sourceMode: 'snapshot', isStale: false, readError: null, indexError: null,
   selectedGame: null, boxscore: null, playbyplay: null, detailSeq: 0, boardSeq: 0,
   orderDesc: true, timer: null, refreshing: null,
 };
@@ -263,7 +265,11 @@ function renderBoard() {
   const games = shownGames();
   const msg = state.date ? state.dateKind === 'archive'
     ? `The captured NBA.com game cards contained no games for ${esc(state.date)}. ${sourceLink(OFFICIAL.gamesPage(state.date), 'Check NBA.com')}`
-    : `No scoreboard is published here for ${esc(state.date)}. This does not confirm that no games occurred. ${sourceLink(OFFICIAL.gamesPage(state.date), 'Check NBA.com')}`
+    : state.dateKind === 'calendar-zero'
+      ? `NBA.com's year calendar explicitly lists zero games for ${esc(state.date)}. ${sourceLink(OFFICIAL.gamesPage(state.date), 'Check NBA.com')}`
+      : state.dateKind === 'calendar-known'
+        ? `NBA.com's year calendar lists ${esc(state.calendarCount)} games for ${esc(state.date)}, but this site's scoreboard for the date has not been captured. ${sourceLink(OFFICIAL.gamesPage(state.date), 'View scores on NBA.com')}`
+        : `No scoreboard is published here for ${esc(state.date)}. This does not confirm that no games occurred. ${sourceLink(OFFICIAL.gamesPage(state.date), 'Check NBA.com')}`
     : `The official NBA feed lists no games for ${esc(state.live?.feedDate || 'this date')}. ${sourceLink(OFFICIAL.gamesPage(state.live?.feedDate || nbaToday()), 'NBA.com games')}`;
   renderGames(games, msg);
   renderUpcoming();
@@ -332,6 +338,28 @@ async function testDirectAccess() {
 }
 function closeDetail() { ++state.detailSeq; state.selectedGame = null; el('gameDetail').classList.add('hidden'); }
 function showDateResult(text) { el('dateResult').innerHTML = text; }
+async function nbaYearCount(date) {
+  const year = date.slice(0, 4);
+  const manifest = state.index?.calendars?.[year];
+  if (!manifest || manifest.path !== PUBLISHED.calendar(year)) return null;
+  let calendar = state.calendars[year];
+  if (!calendar || calendar._sync?.fetchedAtUtc !== manifest.fetchedAtUtc) {
+    calendar = await getJSON(PUBLISHED.calendar(year), true);
+    const sourceDate = calendar._sync?.source?.match(/^https:\/\/www\.nba\.com\/games\?date=(\d{4}-\d{2}-\d{2})$/)?.[1];
+    if (calendar.year !== year || !validDate(sourceDate) || sourceDate.slice(0, 4) !== year
+        || manifest.source !== calendar._sync.source
+        || !calendar.dateCounts || typeof calendar.dateCounts !== 'object' || Array.isArray(calendar.dateCounts)
+        || Object.keys(calendar.dateCounts).length !== manifest.knownDates) {
+      throw new Error('Published NBA year calendar failed validation');
+    }
+    state.calendars[year] = calendar;
+  }
+  // NBA's year map is sparse. An absent key is unknown, NEVER a no-game date.
+  const count = calendar.dateCounts[date];
+  if (count == null) return null;
+  if (!Number.isInteger(count) || count < 0) throw new Error('Invalid NBA year calendar count');
+  return count;
+}
 async function loadDate(date) {
   if (!validDate(date)) {
     showDateResult('<span class="muted">Enter a valid YYYY-MM-DD calendar date.</span>');
@@ -341,6 +369,7 @@ async function loadDate(date) {
   const seq = ++state.boardSeq;
   state.date = date;
   state.dateKind = null;
+  state.calendarCount = null;
   state.dateResultGames = null;
   closeDetail();
   el('dateInput').value = date;
@@ -350,7 +379,7 @@ async function loadDate(date) {
   el('gamesStrip').innerHTML = '<div class="loading">Loading date…</div>';
   el('gamesGrid').innerHTML = '<div class="loading">Loading date…</div>';
   setStatus('loading', `Looking up ${date}…`);
-  let games = [], note;
+  let games = [], calendarCount = null, calendarError = null;
   const listed = state.index?.scoreboards?.[date];
   try {
     if (listed) {
@@ -359,26 +388,40 @@ async function loadDate(date) {
           || payload.games.length !== payload.gameCount || payload._sync?.source !== OFFICIAL.gamesPage(date)
           || payload.games.some((g) => !validId(g.gameId))) throw new Error('NBA date archive failed validation');
       games = payload.games.map(normCardGame);
-      note = `${games.length} game${games.length === 1 ? '' : 's'} captured from NBA.com on ${esc(payload._sync.fetchedAtUtc)}. ${sourceLink(OFFICIAL.gamesPage(date), 'Compare on NBA.com')}`;
     } else {
       games = (state.schedule?.games || []).filter((g) => g.dateEst === date);
-      if (games.length) note = `No captured date card yet. These ${games.length} scheduled matchups come from ${sourceLink(OFFICIAL.schedule, 'NBA’s published season schedule')}; times and status can change.`;
+      if (!games.length && date < nbaToday()) {
+        try { calendarCount = await nbaYearCount(date); }
+        catch (error) { calendarError = error; } // no count is safer than an invented zero
+      }
     }
     if (seq !== state.boardSeq) return false; // a newer date/today was selected
     state.dateResultGames = games;
-    state.dateKind = listed ? 'archive' : games.length ? 'schedule' : 'missing';
-    if (note) {
-      showDateResult(`<p>${note}</p><p class="note">Scores appear in the board above.</p>`);
-      setStatus('ok', `${games.length} ${listed ? 'NBA.com games captured for' : 'NBA-scheduled games for'} ${date}`, 'The historical board is a snapshot, not a live feed');
+    state.calendarCount = calendarCount;
+    state.dateKind = listed ? 'archive' : games.length ? 'schedule' : calendarCount === 0 ? 'calendar-zero'
+      : calendarCount > 0 ? 'calendar-known' : 'missing';
+    if (listed) {
+      showDateResult(`<p>${games.length} game${games.length === 1 ? '' : 's'} captured from NBA.com for ${date}. ${sourceLink(OFFICIAL.gamesPage(date), 'Compare on NBA.com')}</p>`);
+      setStatus('ok', `${games.length} NBA.com games captured for ${date}`, 'Historical snapshot, not a live feed');
+    } else if (games.length) {
+      showDateResult(`<p>No captured date cards yet. These ${games.length} matchups are in the ${sourceLink(OFFICIAL.schedule, 'NBA’s published season schedule')}; scores and times can change.</p>`);
+      setStatus('ok', `${games.length} NBA-scheduled games for ${date}`, 'The schedule is not a result or live feed');
+    } else if (calendarCount === 0) {
+      showDateResult(`<p>NBA.com's year calendar explicitly records zero games for ${date}; the full date card was not captured here. ${sourceLink(OFFICIAL.gamesPage(date), 'Verify on NBA.com')}</p>`);
+      setStatus('ok', `NBA calendar: no games on ${date}`, 'Explicit date count; missing year-map entries stay unknown');
+    } else if (calendarCount > 0) {
+      showDateResult(`<p>NBA.com's year calendar lists ${calendarCount} game${calendarCount === 1 ? '' : 's'} for ${date}, but no date scoreboard is archived here yet. ${sourceLink(OFFICIAL.gamesPage(date), 'See scores on NBA.com')}</p>`);
+      setStatus('warn', `${date}: ${calendarCount} NBA games, scores not archived`, 'Do not infer results from the count');
     } else {
-      showDateResult(`<p>This date has not been captured. That does <strong>not</strong> mean no games were played. ${sourceLink(OFFICIAL.gamesPage(date), 'Check NBA.com for this date')}</p>`);
-      setStatus('warn', `${date} is not archived`, 'Follow the NBA.com link to review the date');
+      showDateResult(`<p>This date has not been captured. That does <strong>not</strong> mean no games were played. ${sourceLink(OFFICIAL.gamesPage(date), 'Check NBA.com for this date')}</p>${calendarError ? `<p class="note">NBA year calendar unavailable: ${esc(calendarError.message)}</p>` : ''}`);
+      setStatus('warn', `${date} is not archived`, 'No official game count or score is available here');
     }
     el('liveNote').textContent = listed ? `Historical NBA.com snapshot for ${date}; click a game for available detail.`
-      : 'Scheduled matchups come from the NBA’s published season schedule; they may change.';
+      : games.length ? 'Scheduled matchups, not verified scores.'
+        : 'NBA year counts are sparse; no game is invented for an uncaptured date.';
     renderBoard();
     el('live').scrollIntoView?.({ behavior: 'smooth', block: 'start' });
-    return !!note;
+    return !!listed || !!games.length || calendarCount === 0;
   } catch (error) {
     if (seq !== state.boardSeq) return false;
     state.dateResultGames = [];
@@ -395,6 +438,7 @@ function backToLive() {
   closeDetail();
   state.date = null;
   state.dateKind = null;
+  state.calendarCount = null;
   state.dateResultGames = null;
   el('viewDatePill').textContent = `${state.live?.feedDate || nbaToday()} (ET)`;
   el('liveNote').textContent = 'Official NBA scores and quarters. Captures may lag a live game; check the time above.';
@@ -609,7 +653,8 @@ function populateIndex() {
   if (state.season) select.value = state.season;
   const entries = Object.entries(state.index?.scoreboards || {});
   const gameDates = entries.filter(([, v]) => v.gameCount > 0).sort((a, b) => b[0].localeCompare(a[0]));
-  el('archiveCount').textContent = `${gameDates.length} captured game dates · ${entries.length - gameDates.length} no-game dates`;
+  const knownGames = Object.values(state.index?.calendars || {}).reduce((sum, year) => sum + (year.gameDates || 0), 0);
+  el('archiveCount').textContent = `${gameDates.length} captured game dates · ${entries.length - gameDates.length} checked no-game dates${knownGames ? ` · ${knownGames} NBA calendar game dates (counts only)` : ''}`;
   el('archiveList').innerHTML = gameDates.slice(0, 80).map(([d, meta]) => `<button type="button" class="chip" data-date="${esc(d)}">${esc(d)} · ${esc(meta.gameCount)} ${meta.gameCount === 1 ? 'game' : 'games'}</button>`).join('')
     || '<span class="muted">No historical dates have been published yet.</span>';
 }
