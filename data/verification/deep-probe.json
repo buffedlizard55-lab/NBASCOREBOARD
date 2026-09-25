@@ -1,0 +1,681 @@
+{
+ "generatedAtUtc": "2026-09-25T19:39:55.700626+00:00",
+ "note": "Every value below is a measured response, not an assumption.",
+ "cdnHeaderSensitivity": [
+  {
+   "variant": "full-browser-set",
+   "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json",
+   "requestHeaderNames": [
+    "Accept",
+    "Accept-Encoding",
+    "Accept-Language",
+    "Connection",
+    "Origin",
+    "Priority",
+    "Referer",
+    "Sec-Fetch-Dest",
+    "Sec-Fetch-Mode",
+    "Sec-Fetch-Site",
+    "User-Agent",
+    "sec-ch-ua",
+    "sec-ch-ua-mobile",
+    "sec-ch-ua-platform"
+   ],
+   "ok": true,
+   "httpStatus": 200,
+   "bytes": 376,
+   "acao": "https://www.nba.com",
+   "cacheControl": null,
+   "contentType": "text/plain",
+   "bodyPrefix": "{\r\n  \"meta\": {\r\n    \"version\": 1,\r\n    \"request\": \"https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json\",",
+   "json": {
+    "meta": {
+     "version": 1,
+     "request": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json",
+     "time": "2026-09-25 03:39:47.3947",
+     "code": 200
+    },
+    "scoreboard": {
+     "gameDate": "2026-09-25",
+     "leagueId": "00",
+     "leagueName": "National Basketball Association",
+     "games": []
+    }
+   }
+  },
+  {
+   "variant": "drop-Sec-Fetch-Dest",
+   "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json",
+   "requestHeaderNames": [
+    "Accept",
+    "Accept-Encoding",
+    "Accept-Language",
+    "Connection",
+    "Origin",
+    "Priority",
+    "Referer",
+    "Sec-Fetch-Mode",
+    "Sec-Fetch-Site",
+    "User-Agent",
+    "sec-ch-ua",
+    "sec-ch-ua-mobile",
+    "sec-ch-ua-platform"
+   ],
+   "ok": true,
+   "httpStatus": 200,
+   "bytes": 376,
+   "acao": "https://www.nba.com",
+   "cacheControl": null,
+   "contentType": "text/plain",
+   "bodyPrefix": "{\r\n  \"meta\": {\r\n    \"version\": 1,\r\n    \"request\": \"https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json\",",
+   "json": {
+    "meta": {
+     "version": 1,
+     "request": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json",
+     "time": "2026-09-25 03:39:47.3947",
+     "code": 200
+    },
+    "scoreboard": {
+     "gameDate": "2026-09-25",
+     "leagueId": "00",
+     "leagueName": "National Basketball Association",
+     "games": []
+    }
+   }
+  },
+  {
+   "variant": "drop-Sec-Fetch-Mode",
+   "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json",
+   "requestHeaderNames": [
+    "Accept",
+    "Accept-Encoding",
+    "Accept-Language",
+    "Connection",
+    "Origin",
+    "Priority",
+    "Referer",
+    "Sec-Fetch-Dest",
+    "Sec-Fetch-Site",
+    "User-Agent",
+    "sec-ch-ua",
+    "sec-ch-ua-mobile",
+    "sec-ch-ua-platform"
+   ],
+   "ok": true,
+   "httpStatus": 200,
+   "bytes": 376,
+   "acao": "https://www.nba.com",
+   "cacheControl": null,
+   "contentType": "text/plain",
+   "bodyPrefix": "{\r\n  \"meta\": {\r\n    \"version\": 1,\r\n    \"request\": \"https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json\",",
+   "json": {
+    "meta": {
+     "version": 1,
+     "request": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json",
+     "time": "2026-09-25 03:39:47.3947",
+     "code": 200
+    },
+    "scoreboard": {
+     "gameDate": "2026-09-25",
+     "leagueId": "00",
+     "leagueName": "National Basketball Association",
+     "games": []
+    }
+   }
+  },
+  {
+   "variant": "drop-Sec-Fetch-Site",
+   "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json",
+   "requestHeaderNames": [
+    "Accept",
+    "Accept-Encoding",
+    "Accept-Language",
+    "Connection",
+    "Origin",
+    "Priority",
+    "Referer",
+    "Sec-Fetch-Dest",
+    "Sec-Fetch-Mode",
+    "User-Agent",
+    "sec-ch-ua",
+    "sec-ch-ua-mobile",
+    "sec-ch-ua-platform"
+   ],
+   "ok": true,
+   "httpStatus": 200,
+   "bytes": 376,
+   "acao": "https://www.nba.com",
+   "cacheControl": null,
+   "contentType": "text/plain",
+   "bodyPrefix": "{\r\n  \"meta\": {\r\n    \"version\": 1,\r\n    \"request\": \"https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json\",",
+   "json": {
+    "meta": {
+     "version": 1,
+     "request": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json",
+     "time": "2026-09-25 03:39:47.3947",
+     "code": 200
+    },
+    "scoreboard": {
+     "gameDate": "2026-09-25",
+     "leagueId": "00",
+     "leagueName": "National Basketball Association",
+     "games": []
+    }
+   }
+  },
+  {
+   "variant": "drop-sec-ch-ua",
+   "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json",
+   "requestHeaderNames": [
+    "Accept",
+    "Accept-Encoding",
+    "Accept-Language",
+    "Connection",
+    "Origin",
+    "Priority",
+    "Referer",
+    "Sec-Fetch-Dest",
+    "Sec-Fetch-Mode",
+    "Sec-Fetch-Site",
+    "User-Agent",
+    "sec-ch-ua-mobile",
+    "sec-ch-ua-platform"
+   ],
+   "ok": true,
+   "httpStatus": 200,
+   "bytes": 376,
+   "acao": "https://www.nba.com",
+   "cacheControl": null,
+   "contentType": "text/plain",
+   "bodyPrefix": "{\r\n  \"meta\": {\r\n    \"version\": 1,\r\n    \"request\": \"https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json\",",
+   "json": {
+    "meta": {
+     "version": 1,
+     "request": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json",
+     "time": "2026-09-25 03:39:47.3947",
+     "code": 200
+    },
+    "scoreboard": {
+     "gameDate": "2026-09-25",
+     "leagueId": "00",
+     "leagueName": "National Basketball Association",
+     "games": []
+    }
+   }
+  },
+  {
+   "variant": "drop-Priority",
+   "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json",
+   "requestHeaderNames": [
+    "Accept",
+    "Accept-Encoding",
+    "Accept-Language",
+    "Connection",
+    "Origin",
+    "Referer",
+    "Sec-Fetch-Dest",
+    "Sec-Fetch-Mode",
+    "Sec-Fetch-Site",
+    "User-Agent",
+    "sec-ch-ua",
+    "sec-ch-ua-mobile",
+    "sec-ch-ua-platform"
+   ],
+   "ok": true,
+   "httpStatus": 200,
+   "bytes": 376,
+   "acao": "https://www.nba.com",
+   "cacheControl": null,
+   "contentType": "text/plain",
+   "bodyPrefix": "{\r\n  \"meta\": {\r\n    \"version\": 1,\r\n    \"request\": \"https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json\",",
+   "json": {
+    "meta": {
+     "version": 1,
+     "request": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json",
+     "time": "2026-09-25 03:39:47.3947",
+     "code": 200
+    },
+    "scoreboard": {
+     "gameDate": "2026-09-25",
+     "leagueId": "00",
+     "leagueName": "National Basketball Association",
+     "games": []
+    }
+   }
+  },
+  {
+   "variant": "drop-Accept-Language",
+   "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json",
+   "requestHeaderNames": [
+    "Accept",
+    "Accept-Encoding",
+    "Connection",
+    "Origin",
+    "Priority",
+    "Referer",
+    "Sec-Fetch-Dest",
+    "Sec-Fetch-Mode",
+    "Sec-Fetch-Site",
+    "User-Agent",
+    "sec-ch-ua",
+    "sec-ch-ua-mobile",
+    "sec-ch-ua-platform"
+   ],
+   "ok": true,
+   "httpStatus": 200,
+   "bytes": 376,
+   "acao": "https://www.nba.com",
+   "cacheControl": null,
+   "contentType": "text/plain",
+   "bodyPrefix": "{\r\n  \"meta\": {\r\n    \"version\": 1,\r\n    \"request\": \"https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json\",",
+   "json": {
+    "meta": {
+     "version": 1,
+     "request": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json",
+     "time": "2026-09-25 03:39:47.3947",
+     "code": 200
+    },
+    "scoreboard": {
+     "gameDate": "2026-09-25",
+     "leagueId": "00",
+     "leagueName": "National Basketball Association",
+     "games": []
+    }
+   }
+  },
+  {
+   "variant": "drop-Accept-Encoding",
+   "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json",
+   "requestHeaderNames": [
+    "Accept",
+    "Accept-Language",
+    "Connection",
+    "Origin",
+    "Priority",
+    "Referer",
+    "Sec-Fetch-Dest",
+    "Sec-Fetch-Mode",
+    "Sec-Fetch-Site",
+    "User-Agent",
+    "sec-ch-ua",
+    "sec-ch-ua-mobile",
+    "sec-ch-ua-platform"
+   ],
+   "ok": true,
+   "httpStatus": 200,
+   "bytes": 376,
+   "acao": "https://www.nba.com",
+   "cacheControl": null,
+   "contentType": "text/plain",
+   "bodyPrefix": "{\r\n  \"meta\": {\r\n    \"version\": 1,\r\n    \"request\": \"https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json\",",
+   "json": {
+    "meta": {
+     "version": 1,
+     "request": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json",
+     "time": "2026-09-25 03:39:47.3947",
+     "code": 200
+    },
+    "scoreboard": {
+     "gameDate": "2026-09-25",
+     "leagueId": "00",
+     "leagueName": "National Basketball Association",
+     "games": []
+    }
+   }
+  },
+  {
+   "variant": "ua-referer-origin-only",
+   "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json",
+   "requestHeaderNames": [
+    "Accept",
+    "Origin",
+    "Referer",
+    "User-Agent"
+   ],
+   "ok": false,
+   "httpStatus": 403,
+   "bytes": 445,
+   "error": "HTTPError 403",
+   "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;cdn&#46;nba&#46;com&#47"
+  },
+  {
+   "variant": "ua-referer-only",
+   "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json",
+   "requestHeaderNames": [
+    "Accept",
+    "Referer",
+    "User-Agent"
+   ],
+   "ok": false,
+   "httpStatus": 403,
+   "bytes": 445,
+   "error": "HTTPError 403",
+   "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;cdn&#46;nba&#46;com&#47"
+  },
+  {
+   "variant": "accept-json-content-type",
+   "url": "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json",
+   "requestHeaderNames": [
+    "Accept",
+    "Accept-Encoding",
+    "Accept-Language",
+    "Connection",
+    "Origin",
+    "Priority",
+    "Referer",
+    "Sec-Fetch-Dest",
+    "Sec-Fetch-Mode",
+    "Sec-Fetch-Site",
+    "User-Agent",
+    "sec-ch-ua",
+    "sec-ch-ua-mobile",
+    "sec-ch-ua-platform"
+   ],
+   "ok": true,
+   "httpStatus": 200,
+   "bytes": 376,
+   "acao": "https://www.nba.com",
+   "cacheControl": null,
+   "contentType": "text/plain",
+   "bodyPrefix": "{\r\n  \"meta\": {\r\n    \"version\": 1,\r\n    \"request\": \"https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json\",",
+   "json": {
+    "meta": {
+     "version": 1,
+     "request": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json",
+     "time": "2026-09-25 03:39:47.3947",
+     "code": 200
+    },
+    "scoreboard": {
+     "gameDate": "2026-09-25",
+     "leagueId": "00",
+     "leagueName": "National Basketball Association",
+     "games": []
+    }
+   }
+  }
+ ],
+ "statsRecipes": [
+  {
+   "recipe": "community-recipe",
+   "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=2025-11-04&LeagueID=00",
+   "requestHeaderNames": [
+    "Accept",
+    "Accept-Encoding",
+    "Accept-Language",
+    "Connection",
+    "Host",
+    "Origin",
+    "Referer",
+    "Sec-Fetch-Dest",
+    "Sec-Fetch-Mode",
+    "Sec-Fetch-Site",
+    "User-Agent",
+    "x-nba-stats-origin",
+    "x-nba-stats-token"
+   ],
+   "ok": false,
+   "error": "TimeoutError: The read operation timed out"
+  },
+  {
+   "recipe": "www-referer",
+   "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=2025-11-04&LeagueID=00",
+   "requestHeaderNames": [
+    "Accept",
+    "Referer",
+    "User-Agent",
+    "x-nba-stats-origin",
+    "x-nba-stats-token"
+   ],
+   "ok": false,
+   "error": "TimeoutError: The read operation timed out"
+  },
+  {
+   "recipe": "browser-full-on-stats",
+   "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=2025-11-04&LeagueID=00",
+   "requestHeaderNames": [
+    "Accept",
+    "Accept-Encoding",
+    "Accept-Language",
+    "Connection",
+    "Origin",
+    "Priority",
+    "Referer",
+    "Sec-Fetch-Dest",
+    "Sec-Fetch-Mode",
+    "Sec-Fetch-Site",
+    "User-Agent",
+    "sec-ch-ua",
+    "sec-ch-ua-mobile",
+    "sec-ch-ua-platform"
+   ],
+   "ok": false,
+   "error": "TimeoutError: The read operation timed out"
+  },
+  {
+   "recipe": "ubuntu-curl-minimal",
+   "url": "https://stats.nba.com/stats/scoreboardv3?GameDate=2025-11-04&LeagueID=00",
+   "requestHeaderNames": [
+    "User-Agent"
+   ],
+   "ok": false,
+   "error": "TimeoutError: The read operation timed out"
+  }
+ ],
+ "scheduleFiles": [
+  {
+   "url": "https://cdn.nba.com/static/json/staticData/scheduleLeagueV2_1.json",
+   "httpStatus": 200,
+   "bytes": 4710986,
+   "ok": true,
+   "error": null,
+   "acao": "https://www.nba.com",
+   "cacheControl": null,
+   "topLevelKeys": [
+    "meta",
+    "leagueSchedule"
+   ],
+   "leagueKeys": [
+    "seasonYear",
+    "leagueId",
+    "gameDates",
+    "weeks",
+    "broadcasterList"
+   ],
+   "seasonYear": "2026-27",
+   "gameDateCount": 174,
+   "firstGameDate": "10/03/2026 00:00:00",
+   "lastGameDate": "04/11/2027 00:00:00",
+   "gameCount": 1274,
+   "firstGameKeys": [
+    "gameId",
+    "gameCode",
+    "gameStatus",
+    "gameStatusText",
+    "gameSequence",
+    "gameDateEst",
+    "gameTimeEst",
+    "gameDateTimeEst",
+    "gameDateUTC",
+    "gameTimeUTC",
+    "gameDateTimeUTC",
+    "awayTeamTime",
+    "homeTeamTime",
+    "day",
+    "monthNum",
+    "weekNumber",
+    "weekName",
+    "ifNecessary",
+    "seriesGameNumber",
+    "gameLabel",
+    "gameSubLabel",
+    "seriesText",
+    "arenaName",
+    "arenaState",
+    "arenaCity",
+    "postponedStatus",
+    "branchLink",
+    "gameSubtype",
+    "isNeutral",
+    "broadcasters",
+    "homeTeam",
+    "awayTeam",
+    "pointsLeaders"
+   ],
+   "firstGameId": "0012600009",
+   "firstGameDateEst": "2026-10-03T00:00:00Z",
+   "homeTeamKeys": [
+    "teamId",
+    "teamName",
+    "teamCity",
+    "teamTricode",
+    "teamSlug",
+    "wins",
+    "losses",
+    "score",
+    "seed"
+   ]
+  },
+  {
+   "url": "https://cdn.nba.com/static/json/staticData/scheduleLeagueV2.json",
+   "httpStatus": 200,
+   "bytes": 4553463,
+   "ok": true,
+   "error": null,
+   "acao": "https://www.nba.com",
+   "cacheControl": null,
+   "topLevelKeys": [
+    "meta",
+    "leagueSchedule"
+   ],
+   "leagueKeys": [
+    "seasonYear",
+    "leagueId",
+    "gameDates",
+    "weeks"
+   ],
+   "seasonYear": "2026-27",
+   "gameDateCount": 174,
+   "firstGameDate": "10/03/2026 00:00:00",
+   "lastGameDate": "04/11/2027 00:00:00",
+   "gameCount": 1274,
+   "firstGameKeys": [
+    "gameId",
+    "gameCode",
+    "gameStatus",
+    "gameStatusText",
+    "gameSequence",
+    "gameDateEst",
+    "gameTimeEst",
+    "gameDateTimeEst",
+    "gameDateUTC",
+    "gameTimeUTC",
+    "gameDateTimeUTC",
+    "awayTeamTime",
+    "homeTeamTime",
+    "day",
+    "monthNum",
+    "weekNumber",
+    "weekName",
+    "ifNecessary",
+    "seriesGameNumber",
+    "gameLabel",
+    "gameSubLabel",
+    "seriesText",
+    "arenaName",
+    "arenaState",
+    "arenaCity",
+    "postponedStatus",
+    "branchLink",
+    "gameSubtype",
+    "isNeutral",
+    "broadcasters",
+    "homeTeam",
+    "awayTeam",
+    "pointsLeaders"
+   ],
+   "firstGameId": "0012600009",
+   "firstGameDateEst": "2026-10-03T00:00:00Z",
+   "homeTeamKeys": [
+    "teamId",
+    "teamName",
+    "teamCity",
+    "teamTricode",
+    "teamSlug",
+    "wins",
+    "losses",
+    "score",
+    "seed"
+   ]
+  }
+ ],
+ "cdnCoverage": [
+  {
+   "gameId": "0012600009",
+   "kind": "boxscore",
+   "httpStatus": 403,
+   "bytes": 243,
+   "error": "HTTPError 403"
+  },
+  {
+   "gameId": "0012600009",
+   "kind": "playbyplay",
+   "httpStatus": 403,
+   "bytes": 243,
+   "error": "HTTPError 403"
+  },
+  {
+   "gameId": "0022600001",
+   "kind": "boxscore",
+   "httpStatus": 403,
+   "bytes": 243,
+   "error": "HTTPError 403"
+  },
+  {
+   "gameId": "0022600001",
+   "kind": "playbyplay",
+   "httpStatus": 403,
+   "bytes": 243,
+   "error": "HTTPError 403"
+  },
+  {
+   "gameId": "0062600001",
+   "kind": "boxscore",
+   "httpStatus": 403,
+   "bytes": 243,
+   "error": "HTTPError 403"
+  },
+  {
+   "gameId": "0062600001",
+   "kind": "playbyplay",
+   "httpStatus": 403,
+   "bytes": 263,
+   "error": "HTTPError 403"
+  }
+ ],
+ "staticCandidates": [
+  {
+   "url": "https://cdn.nba.com/static/json/staticData/standings/standings.json",
+   "httpStatus": 403,
+   "bytes": 243,
+   "error": "HTTPError 403"
+  },
+  {
+   "url": "https://cdn.nba.com/static/json/liveData/standings/standings.json",
+   "httpStatus": 403,
+   "bytes": 243,
+   "error": "HTTPError 403"
+  },
+  {
+   "url": "https://cdn.nba.com/static/json/staticData/leagueStandings.json",
+   "httpStatus": 403,
+   "bytes": 263,
+   "error": "HTTPError 403"
+  },
+  {
+   "url": "https://cdn.nba.com/static/json/staticData/scheduleLeagueV2_2024_25.json",
+   "httpStatus": 403,
+   "bytes": 243,
+   "error": "HTTPError 403"
+  }
+ ]
+}

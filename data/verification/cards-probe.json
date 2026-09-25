@@ -1,0 +1,2312 @@
+{
+ "generatedAtUtc": "2026-09-25T19:46:06.750556+00:00",
+ "dates": [
+  {
+   "date": "2024-11-04",
+   "htmlBytes": 727587,
+   "cardCount": 15,
+   "cardKeys": [
+    "cardData",
+    "cardType",
+    "cardId"
+   ],
+   "firstCard": {
+    "cardData": {
+     "heroConfiguration": {
+      "headline": "Garland lifts Cavs to 8-0",
+      "subhead": "",
+      "image": {
+       "imageUrl": "https://cdn.nba.com/manage/2024/11/GettyImages-2182959234-1.jpg"
+      },
+      "video": null,
+      "gameRecap": {
+       "videoId": "1474065",
+       "mediakindExternalProgramId": "1578fa6fcf782a620c232c5baa30c309",
+       "slug": "game-recap-cavaliers-116-bucks-114",
+       "title": "Game Recap: Cavaliers 116, Bucks 114",
+       "subTitle": "The Cavaliers improve to 8-0 to tie their best start in franchise history as they defeated the Bucks, 116-114. Darius Garland led the way for the Cavaliers with 39 points (7-11 3pt. FG) and eight assists, while Jarrett Allen added 14 points, 15 rebounds, and six assists for the Cavaliers in the victory. Damian Lillard tallied 36 points (5-9 3pt. FG) and seven assists for the Bucks in the losing effort. The Bucks fall to 1-6 on the season.",
+       "shortTitle": null,
+       "shareUrl": "https://www.nba.com/watch/video/game-recap-cavaliers-116-bucks-114",
+       "videoDuration": "2:42",
+       "adMetaData": {
+        "cType": "gameRecaps",
+        "caid": "nba-manage-prod-1-1474065",
+        "showPreviewAds": false,
+        "adfuelTarget": ""
+       },
+       "taxonomy": {
+        "categories": {
+         "game-recap": "Game Recap"
+        },
+        "tags": {
+         "cleveland-cavaliers": "Cleveland Cavaliers",
+         "damian-lillard": "Damian Lillard",
+         "darius-garland": "Darius Garland",
+         "game-recap": "game recap",
+         "highlights": "highlights",
+         "jarrett-allen": "Jarrett Allen",
+         "milwaukee-bucks": "milwaukee bucks",
+         "recap": "recap"
+        },
+        "games": {
+         "0022400154": "MIL @ CLE (0022400154)"
+        },
+        "teams": {
+         "1610612739": "Cleveland Cavaliers",
+         "1610612749": "Milwaukee Bucks"
+        },
+        "players": {},
+        "videoFranchises": {
+         "game-recap": "Game Recap"
+        },
+        "videoFranchisesName": {
+         "2-min-game-recap": "2 Minute Game Recap"
+        },
+        "videoCategories": {
+         "recaps": "Recaps"
+        },
+        "videoTypes": {
+         "highlights": "Highlights"
+        },
+        "videoNumPlays": 0,
+        "videoPlayTypes": {},
+        "videoFrequency": {
+         "game": "Game"
+        },
+        "videoPublisher": {
+         "nbae": "NBAE"
+        }
+       },
+       "image": {
+        "imageUrl": "https://cdn.nba.com/manage/2024/11/MIL_CLE_RECAP-1.png"
+       }
+      },
+      "headlineNoSpoilers": "Bucks @ Cavaliers"
+     },
+     "gameId": "0022400154",
+     "leagueId": "00",
+     "seasonYear": "2024-25",
+     "seasonType": "Regular Season",
+     "dailyGameRank": "3",
+     "period": 4,
+     "homeTeam": {
+      "teamId": 1610612739,
+      "teamName": "Cavaliers",
+      "wins": 8,
+      "losses": 0,
+      "teamSubtitle": "8-0",
+      "score": 116,
+      "timeoutsRemaining": 1,
+      "inBonus": false,
+      "teamTricode": "CLE",
+      "teamSlug": "cavaliers",
+      "specialInfoPrefix": null,
+      "marqueePlayer": "",
+      "periods": [
+       {
+        "period": 1,
+        "score": 35
+       },
+       {
+        "period": 2,
+        "score": 38
+       },
+       {
+        "period": 3,
+        "score": 16
+       },
+       {
+        "period": 4,
+        "score": 27
+       }
+      ],
+      "teamLeader": {
+       "personId": 1629636,
+       "name": "Darius Garland",
+       "jerseyNum": "10",
+       "position": "PG",
+       "teamTricode": "CLE",
+       "playerSlug": "darius-garland",
+       "points": "39",
+       "rebounds": "2",
+       "assists": "8",
+       "blocks": "0",
+       "steals": "0"
+      }
+     },
+     "awayTeam": {
+      "teamId": 1610612749,
+      "teamName": "Bucks",
+      "wins": 1,
+      "losses": 6,
+      "teamSubtitle": "1-6",
+      "score": 114,
+      "timeoutsRemaining": 0,
+      "inBonus": false,
+      "teamTricode": "MIL",
+      "teamSlug": "bucks",
+      "specialInfoPrefix": null,
+      "marqueePlayer": "",
+      "periods": [
+       {
+        "period": 1,
+        "score": 31
+       },
+       {
+        "period": 2,
+        "score": 29
+       },
+       {
+        "period": 3,
+        "score": 31
+       },
+       {
+        "period": 4,
+        "score": 23
+       }
+      ],
+      "teamLeader": {
+       "personId": 203081,
+       "name": "Damian Lillard",
+       "jerseyNum": "0",
+       "position": "PG",
+       "teamTricode": "MIL",
+       "playerSlug": "damian-lillard",
+       "points": "36",
+       "rebounds": "2",
+       "assists": "7",
+       "blocks": "0",
+       "steals": "0"
+      }
+     },
+     "seasonLeadersFlag": 0,
+     "gameClock": "PT00M00.00S",
+     "gameStatus": 3,
+     "gameStatusText": "Final",
+     "gameBreakStatus": "",
+     "gameState": 3,
+     "duration": 0,
+     "gameTimeEastern": "2024-11-04T19:00:00Z",
+     "gameTimeUtc": "2024-11-05T00:00:00Z",
+     "info": "",
+     "subInfo": "",
+     "gameDetailsHeader": {
+      "spoilerHeader": "",
+      "nonSpoilerHeader": ""
+     },
+     "actions": [
+      {
+       "title": "Watch",
+       "resourceLocator": {
+        "resourceUrl": "/game/mil-vs-cle-0022400154?watch",
+        "resourceId": "0022400154",
+        "resourceType": "game"
+       }
+      },
+      {
+       "title": "Box Score",
+       "resourceLocator": {
+        "resourceUrl": "/game/mil-vs-cle-0022400154/box-score",
+        "resourceId": "0022400154",
+        "resourceType": "game"
+       }
+      },
+      {
+       "title": "Game Details",
+       "resourceLocator": {
+        "resourceUrl": "/game/mil-vs-cle-0022400154",
+        "resourceId": "0022400154",
+        "resourceType": "game"
+       }
+      }
+     ],
+     "images": {
+      "1920x1080": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/mil-cle/1920x1080.png",
+      "1280x720": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/mil-cle/1280x720.png",
+      "640x360": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/mil-cle/640x360.png",
+      "480x270": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/mil-cle/480x270.png",
+      "320x180": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/mil-cle/320x180.png",
+      "160x90": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/mil-cle/160x90.png"
+     },
+     "ifNecessary": false,
+     "cardId": "",
+     "contentAccess": {
+      "isMemberGated": false,
+      "isVivoContent": false,
+      "cmsEntitlement": null,
+      "isNikeGated": false
+     },
+     "shareUrl": "https://www.nba.com/game/mil-vs-cle-0022400154",
+     "ticketUrl": null,
+     "isTntOT": false,
+     "cardHat": null,
+     "broadcasters": {
+      "nationalBroadcasters": [
+       {
+        "broadcasterId": 7,
+        "broadcasterScope": null,
+        "broadcasterDisplayName": "NBA TV",
+        "broadcasterLogoUrl": null,
+        "broadcasterVideoLink": "",
+        "broadcasterDescription": "",
+        "broadcasterTeamId": null,
+        "broadcasterRanking": null,
+        "broadcasterLocalizationRegion": "",
+        "broadcasterLogoUrlDarkLg": "https://cdn.nba.com/logos/nba/broadcast_logos/D/120h/nbatv.png",
+        "broadcasterLogoUrlLightLg": "https://cdn.nba.com/logos/nba/broadcast_logos/L/120h/nbatv.png",
+        "broadcasterLogoUrlDarkSm": "https://cdn.nba.com/logos/nba/broadcast_logos/D/40h/nbatv.png",
+        "broadcasterLogoUrlLightSm": "https://cdn.nba.com/logos/nba/broadcast_logos/L/40h/nbatv.png",
+        "broadcasterLogoUrlLightSvg": "https://cdn.nba.com/logos/nba/broadcast_logos/L/120h/nbatv.svg",
+        "broadcasterLogoUrlDarkSvg": "https://cdn.nba.com/logos/nba/broadcast_logos/D/120h/nbatv.svg",
+        "broadcasterLogoIcon1x1": "https://cdn.nba.com/logos/nba/broadcast_logos/D/dtc-icons/square/nbatv.png",
+        "broadcasterLogoIcon1x1Svg": "https://cdn.nba.com/logos/nba/broadcast_logos/D/dtc-icons/square/nbatv.svg",
+        "broadcasterLogoIcon16x9": "https://cdn.nba.com/logos/nba/broadcast_logos/D/dtc-icons/16x9/nbatv.png",
+        "broadcasterLogoIcon16x9Svg": "https://cdn.nba.com/logos/nba/broadcast_logos/D/dtc-icons/16x9/nbatv.svg"
+       }
+      ],
+      "homeTvBroadcasters": [],
+      "homeRadioBroadcasters": [
+       {
+        "broadcasterId": 1040,
+        "broadcasterScope": null,
+        "broadcasterDisplayName": "WTAM/WMMS",
+        "broadcasterLogoUrl": null,
+        "broadcasterVideoLink": "",
+        "broadcasterDescription": "",
+        "broadcasterTeamId": 1610612739,
+        "broadcasterRanking": null,
+        "broadcasterLocalizationRegion": ""
+       }
+      ],
+      "awayTvBroadcasters": [],
+      "awayRadioBroadcasters": [
+       {
+        "broadcasterId": 1697,
+        "broadcasterScope": null,
+        "broadcasterDisplayName": "620 AM/103.3 FM WTMJ",
+        "broadcasterLogoUrl": null,
+        "broadcasterVideoLink": "",
+        "broadcasterDescription": "",
+        "broadcasterTeamId": 1610612749,
+        "broadcasterRanking": null,
+        "broadcasterLocalizationRegion": ""
+       }
+      ],
+      "intlRadioBroadcasters": [],
+      "intlTvBroadcasters": [],
+      "homeOttBroadcasters": [],
+      "awayOttBroadcasters": [],
+      "intlOttBroadcasters": [],
+      "nationalOttBroadcasters": [],
+      "nationalRadioBroadcasters": [],
+      "subscriptionBroadcasters": []
+     },
+     "showPostGameBroadcasters": true,
+     "streamOrder": [
+      {
+       "rank": 0,
+       "type": "production",
+       "productionId": "g0022400154mil1000390cle",
+       "mediaKindVideoId": null,
+       "uniqueName": "NSS-NBA TV",
+       "status": "Over",
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": "https://cdn.nba.com/logos/nba/streams/L/nss-nba_tv.png",
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-nba_tv.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-nba_tv.png"
+       },
+       "title": "NBA TV (In-Arena)",
+       "description": "Follow in-arena action during halftime and game breaks",
+       "categoryData": {
+        "categoryId": 44560,
+        "categoryName": "Broadcasts",
+        "categoryRank": 1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/nss-nba_tv.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/nss-nba_tv.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": null
+      },
+      {
+       "rank": 1,
+       "type": "production",
+       "productionId": "g0022400154mil1000453cle",
+       "mediaKindVideoId": null,
+       "uniqueName": "NSS-Team-CLE",
+       "status": "Over",
+       "isRadio": false,
+       "inMarketTeamTricode": "CLE",
+       "logoMapping": "https://cdn.nba.com/logos/nba/streams/L/nss-team-cle.png",
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-team-cle.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-team-cle.png"
+       },
+       "title": "Cavaliers (In-Arena)",
+       "description": "Local broadcast with home arena game breaks",
+       "categoryData": {
+        "categoryId": 44560,
+        "categoryName": "Broadcasts",
+        "categoryRank": 1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": 1610612739,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/nss-team-cle.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/nss-team-cle.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": null
+      },
+      {
+       "rank": 2,
+       "type": "production",
+       "productionId": "g0022400154mil1000464cle",
+       "mediaKindVideoId": null,
+       "uniqueName": "NSS-Team-MIL",
+       "status": "Over",
+       "isRadio": false,
+       "inMarketTeamTricode": "MIL",
+       "logoMapping": "https://cdn.nba.com/logos/nba/streams/L/nss-team-mil.png",
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-team-mil.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-team-mil.png"
+       },
+       "title": "Bucks (In-Arena)",
+       "description": "Local broadcast with home arena game breaks",
+       "categoryData": {
+        "categoryId": 44560,
+        "categoryName": "Broadcasts",
+        "categoryRank": 1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": 1610612749,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/nss-team-mil.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/nss-team-mil.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": null
+      },
+      {
+       "rank": 3,
+       "type": "production",
+       "productionId": "g0022400154mil1000792cle",
+       "mediaKindVideoId": null,
+       "uniqueName": "NSS-CLE-Studio",
+       "status": "Over",
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": "https://cdn.nba.com/logos/nba/streams/L/nss-cle-studio.png",
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-cle-studio.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-cle-studio.png"
+       },
+       "title": "Cavaliers (Studio Show)",
+       "description": "Local broadcast with pre, post, and halftime analysis",
+       "categoryData": {
+        "categoryId": 44560,
+        "categoryName": "Broadcasts",
+        "categoryRank": 1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/nss-cle-studio.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/nss-cle-studio.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": null
+      },
+      {
+       "rank": 4,
+       "type": "production",
+       "productionId": "g0022400154mil1000803cle",
+       "mediaKindVideoId": null,
+       "uniqueName": "NSS-MIL-Studio",
+       "status": "Over",
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": "https://cdn.nba.com/logos/nba/streams/L/nss-mil-studio.png",
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-mil-studio.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-mil-studio.png"
+       },
+       "title": "Bucks (Studio Show)",
+       "description": "Local broadcast with pre, post, and halftime analysis",
+       "categoryData": {
+        "categoryId": 44560,
+        "categoryName": "Broadcasts",
+        "categoryRank": 1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/nss-mil-studio.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/nss-mil-studio.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": null
+      },
+      {
+       "rank": 5,
+       "type": "production",
+       "productionId": "g0022400154mil1000444cle",
+       "mediaKindVideoId": null,
+       "uniqueName": "NSS-Mobile-View",
+       "status": "Over",
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": "https://cdn.nba.com/logos/nba/streams/L/nss-mobile-view.png",
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-mobile-view.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-mobile-view.png"
+       },
+       "title": "Mobile View (In-Arena)",
+       "description": "Optimized viewing experience, focused on close up action",
+       "categoryData": {
+        "categoryId": 44560,
+        "categoryName": "Broadcasts",
+        "categoryRank": 1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/nss-mobile-view.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/nss-mobile-view.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": null
+      },
+      {
+       "rank": 6,
+       "type": "production",
+       "productionId": "g0022400154mil1000755cle",
+       "mediaKindVideoId": null,
+       "uniqueName": "NSS-Radio-Team-CLE",
+       "status": "Over",
+       "isRadio": true,
+       "inMarketTeamTricode": null,
+       "logoMapping": "https://cdn.nba.com/logos/nba/streams/L/nss-radio-team-cle.png",
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-radio-team-cle.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-radio-team-cle.png"
+       },
+       "title": "Cavaliers Radio",
+       "description": "",
+       "categoryData": {
+        "categoryId": 44596,
+        "categoryName": "Audio",
+        "categoryRank": 5,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/nss-radio-team-cle.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/nss-radio-team-cle.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": null
+      },
+      {
+       "rank": 7,
+       "type": "production",
+       "productionId": "g0022400154mil1000766cle",
+       "mediaKindVideoId": null,
+       "uniqueName": "NSS-Radio-Team-MIL",
+       "status": "Over",
+       "isRadio": true,
+       "inMarketTeamTricode": null,
+       "logoMapping": "https://cdn.nba.com/logos/nba/streams/L/nss-radio-team-mil.png",
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-radio-team-mil.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-radio-team-mil.png"
+       },
+       "title": "Bucks Radio",
+       "description": "",
+       "categoryData": {
+        "categoryId": 44596,
+        "categoryName": "Audio",
+        "categoryRank": 5,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/nss-radio-team-mil.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/nss-radio-team-mil.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": null
+      },
+      {
+       "rank": 0,
+       "type": "l2v",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_g0022400154mil1000390cleV",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-nba_tv.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-nba_tv.png"
+       },
+       "title": "NBA TV",
+       "description": "",
+       "categoryData": {
+        "categoryId": -1,
+        "categoryName": "Full Games",
+        "categoryRank": -1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/nss-nba_tv.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/nss-nba_tv.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": "national-broadcast"
+      },
+      {
+       "rank": 5,
+       "type": "l2v",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_g0022400154mil1000444cleV",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-mobile-view.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-mobile-view.png"
+       },
+       "title": "Mobile View",
+       "description": "Optimized viewing experience, focused on close up action",
+       "categoryData": {
+        "categoryId": -1,
+        "categoryName": "Full Games",
+        "categoryRank": -1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/nss-mobile-view.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/nss-mobile-view.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": "mobile-broadcast"
+      },
+      {
+       "rank": 1,
+       "type": "l2v",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_g0022400154mil1000453cleV",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-team-cle.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-team-cle.png"
+       },
+       "title": "Cavaliers",
+       "description": "",
+       "categoryData": {
+        "categoryId": -1,
+        "categoryName": "Full Games",
+        "categoryRank": -1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/nss-team-cle.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/nss-team-cle.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": "local-home-broadcast"
+      },
+      {
+       "rank": 2,
+       "type": "l2v",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_g0022400154mil1000464cleV",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-team-mil.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-team-mil.png"
+       },
+       "title": "Bucks",
+       "description": "",
+       "categoryData": {
+        "categoryId": -1,
+        "categoryName": "Full Games",
+        "categoryRank": -1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/nss-team-mil.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/nss-team-mil.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": "local-away-broadcast"
+      },
+      {
+       "rank": 1,
+       "type": "vod",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_202411042231NBA_____VIDEOS__NBAE_2777708",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/game-recap.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/game-recap.png"
+       },
+       "title": "Game Recap",
+       "description": "Highlights with commentary",
+       "categoryData": {
+        "categoryId": -2,
+        "categoryName": "Recaps",
+        "categoryRank": -2,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/manage/2024/11/MIL_CLE_RECAP-1.png",
+        "thumbnailSmall": "https://cdn.nba.com/manage/2024/11/MIL_CLE_RECAP-1.png"
+       },
+       "featuredImage": "https://cdn.nba.com/manage/2024/11/MIL_CLE_RECAP-1.png",
+       "videoDuration": "2:42",
+       "videoFranchisesName": "2-min-game-recap"
+      },
+      {
+       "rank": 4,
+       "type": "vod",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_B876E463B2689AE81D322509826178EED5B5A0CA",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/all-possessions.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/all-possessions.png"
+       },
+       "title": "All Possessions",
+       "description": "All plays without game breaks or commercials",
+       "categoryData": {
+        "categoryId": -2,
+        "categoryName": "Recaps",
+        "categoryRank": -2,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/all-possessions.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/all-possessions.png"
+       },
+       "featuredImage": "",
+       "videoDuration": "37:31",
+       "videoFranchisesName": "all-possessions-cg"
+      },
+      {
+       "rank": 6,
+       "type": "vod",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_F99184F9A306B24B3D91A81F53CB4800FE1DF111",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/mil-condensed.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/mil-condensed.png"
+       },
+       "title": "Bucks Condensed",
+       "description": "Extended away team highlights",
+       "categoryData": {
+        "categoryId": -2,
+        "categoryName": "Recaps",
+        "categoryRank": -2,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/mil-condensed.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/mil-condensed.png"
+       },
+       "featuredImage": "",
+       "videoDuration": "4:58",
+       "videoFranchisesName": "away-best-plays"
+      },
+      {
+       "rank": 5,
+       "type": "vod",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_FFC5F9E4984548F13F1273F865D9A66B2EB84D67",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/cle-condensed.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/cle-condensed.png"
+       },
+       "title": "Cavaliers Condensed",
+       "description": "Extended home team highlights",
+       "categoryData": {
+        "categoryId": -2,
+        "categoryName": "Recaps",
+        "categoryRank": -2,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/cle-condensed.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/cle-condensed.png"
+       },
+       "featuredImage": "",
+       "videoDuration": "4:56",
+       "videoFranchisesName": "home-best-plays"
+      },
+      {
+       "rank": 3,
+       "type": "vod",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_0773EC76C50F6987E84BA6D251281E0CAF18E251",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/10-minute.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/10-minute.png"
+       },
+       "title": "Condensed Game",
+       "description": "Extended game highlights",
+       "categoryData": {
+        "categoryId": -2,
+        "categoryName": "Recaps",
+        "categoryRank": -2,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/10-minute.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/10-minute.png"
+       },
+       "featuredImage": "",
+       "videoDuration": "9:15",
+       "videoFranchisesName": "full-game-highlights"
+      },
+      {
+       "rank": 2,
+       "type": "vod",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_EA445BDF0FE29D3B2B6580DE6E80BA0F919D2F06",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/key-highlights.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/key-highlights.png"
+       },
+       "title": "Key Highlights",
+       "description": "Key plays with broadcast audio",
+       "categoryData": {
+        "categoryId": -2,
+        "categoryName": "Recaps",
+        "categoryRank": -2,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/key-highlights.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/key-highlights.png"
+       },
+       "featuredImage": "https://cdn.nba.com/manage/2024/11/MIL_vs__CLE_Highlights_2024_11_05T02_27_32.jpg",
+       "videoDuration": "2:02",
+       "videoFranchisesName": "wsc-key-highlights"
+      }
+     ],
+     "extraMoreMenuItems": null,
+     "gameSubtype": "",
+     "isNeutral": false,
+     "scoreStripHeader": {
+      "scoreStripSpoilerHeader": "",
+      "scoreStripNonSpoilerHeader": ""
+     },
+     "isTabletopGame": false,
+     "actualStartTimeUTC": "2024-11-05T00:00:39Z",
+     "actualEndTimeUTC": "2024-11-05T02:03:44Z",
+     "gameDurationSeconds": 7385,
+     "immersiveExperiences": null
+    },
+    "cardType": "game",
+    "cardId": "4ecbfa99-538d-0d8e-dc43-98abc1c5abe6"
+   },
+   "cardDataKeys": [
+    "heroConfiguration",
+    "gameId",
+    "leagueId",
+    "seasonYear",
+    "seasonType",
+    "dailyGameRank",
+    "period",
+    "homeTeam",
+    "awayTeam",
+    "seasonLeadersFlag",
+    "gameClock",
+    "gameStatus",
+    "gameStatusText",
+    "gameBreakStatus",
+    "gameState",
+    "duration",
+    "gameTimeEastern",
+    "gameTimeUtc",
+    "info",
+    "subInfo",
+    "gameDetailsHeader",
+    "actions",
+    "images",
+    "ifNecessary",
+    "cardId",
+    "contentAccess",
+    "shareUrl",
+    "ticketUrl",
+    "isTntOT",
+    "cardHat",
+    "broadcasters",
+    "showPostGameBroadcasters",
+    "streamOrder",
+    "extraMoreMenuItems",
+    "gameSubtype",
+    "isNeutral",
+    "scoreStripHeader",
+    "isTabletopGame",
+    "actualStartTimeUTC",
+    "actualEndTimeUTC",
+    "gameDurationSeconds",
+    "immersiveExperiences"
+   ],
+   "gameIdsFound": [
+    "0022400154",
+    "0022400155",
+    "0022400156",
+    "0022400157",
+    "0022400158",
+    "0022400159",
+    "0022400160",
+    "0022400161",
+    "0022400162",
+    "0022400163"
+   ],
+   "gameCodeSample": []
+  },
+  {
+   "date": "2019-10-22",
+   "htmlBytes": 321979,
+   "cardCount": 2,
+   "cardKeys": [
+    "cardData",
+    "cardType",
+    "cardId"
+   ],
+   "firstCard": {
+    "cardData": {
+     "heroConfiguration": {
+      "headline": "Pelicans @ Raptors",
+      "subhead": "",
+      "image": {
+       "imageUrl": "https://cdn.nba.com/manage/2020/10/NOP_TOR_10-22.jpg"
+      },
+      "video": null,
+      "gameRecap": {
+       "videoId": "69697",
+       "mediakindExternalProgramId": "5865111c1fde9d2f95d56bf2aa3313dc",
+       "slug": "game-recap-raptors-130-pelicans-122-ukjed2",
+       "title": "GAME RECAP: Raptors 130, Pelicans 122",
+       "subTitle": "Pascal Siakam scores 34 points and grabs 18 rebounds to lead Toronto past New Orleans on Tuesday night.",
+       "shortTitle": null,
+       "shareUrl": "https://www.nba.com/watch/video/game-recap-raptors-130-pelicans-122-ukjed2",
+       "videoDuration": "2:46",
+       "adMetaData": {
+        "cType": "gameRecaps",
+        "caid": "nba-manage-prod-1-69697",
+        "showPreviewAds": false,
+        "adfuelTarget": ""
+       },
+       "taxonomy": {
+        "categories": {
+         "top-video": "Top Video"
+        },
+        "tags": {},
+        "games": {
+         "0021900001": "NOP @ TOR (0021900001)"
+        },
+        "teams": {
+         "1610612740": "New Orleans Pelicans",
+         "1610612761": "Toronto Raptors"
+        },
+        "players": {
+         "200755": "JJ Redick",
+         "200768": "Kyle Lowry",
+         "201188": "Marc Gasol",
+         "201950": "Jrue Holiday",
+         "202324": "Derrick Favors",
+         "1627742": "Brandon Ingram",
+         "1627783": "Pascal Siakam",
+         "1627832": "Fred VanVleet",
+         "1628366": "Lonzo Ball",
+         "1628384": "OG Anunoby"
+        },
+        "videoFranchises": {
+         "game-recap": "Game Recap"
+        },
+        "videoFranchisesName": {
+         "2-min-game-recap": "2 Minute Game Recap"
+        },
+        "videoCategories": {
+         "recaps": "Recaps"
+        },
+        "videoTypes": {
+         "highlights": "Highlights"
+        },
+        "videoNumPlays": 0,
+        "videoPlayTypes": {},
+        "videoFrequency": {},
+        "videoPublisher": {}
+       },
+       "image": {
+        "imageUrl": "https://cdn.nba.com/manage/2019/10/siakam-layup-scaled.jpg"
+       }
+      },
+      "headlineNoSpoilers": "Pelicans @ Raptors"
+     },
+     "gameId": "0021900001",
+     "leagueId": "00",
+     "seasonYear": "2019-20",
+     "seasonType": "Regular Season",
+     "dailyGameRank": null,
+     "period": 5,
+     "homeTeam": {
+      "teamId": 1610612761,
+      "teamName": "Raptors",
+      "wins": 1,
+      "losses": 0,
+      "teamSubtitle": "1-0",
+      "score": 130,
+      "timeoutsRemaining": 1,
+      "inBonus": false,
+      "teamTricode": "TOR",
+      "teamSlug": "raptors",
+      "specialInfoPrefix": null,
+      "marqueePlayer": "1630567",
+      "periods": [
+       {
+        "period": 1,
+        "score": 27
+       },
+       {
+        "period": 2,
+        "score": 29
+       },
+       {
+        "period": 3,
+        "score": 32
+       },
+       {
+        "period": 4,
+        "score": 29
+       },
+       {
+        "period": 5,
+        "score": 13
+       }
+      ],
+      "teamLeader": {
+       "personId": 1627783,
+       "name": "Pascal Siakam",
+       "jerseyNum": "43",
+       "position": "PF",
+       "teamTricode": "TOR",
+       "playerSlug": "pascal-siakam",
+       "points": "34",
+       "rebounds": "18",
+       "assists": "5",
+       "blocks": "1",
+       "steals": "0"
+      }
+     },
+     "awayTeam": {
+      "teamId": 1610612740,
+      "teamName": "Pelicans",
+      "wins": 0,
+      "losses": 1,
+      "teamSubtitle": "0-1",
+      "score": 122,
+      "timeoutsRemaining": 0,
+      "inBonus": false,
+      "teamTricode": "NOP",
+      "teamSlug": "pelicans",
+      "specialInfoPrefix": null,
+      "marqueePlayer": "1629627",
+      "periods": [
+       {
+        "period": 1,
+        "score": 30
+       },
+       {
+        "period": 2,
+        "score": 31
+       },
+       {
+        "period": 3,
+        "score": 25
+       },
+       {
+        "period": 4,
+        "score": 31
+       },
+       {
+        "period": 5,
+        "score": 5
+       }
+      ],
+      "teamLeader": {
+       "personId": 1627742,
+       "name": "Brandon Ingram",
+       "jerseyNum": "14",
+       "position": "PF",
+       "teamTricode": "NOP",
+       "playerSlug": "brandon-ingram",
+       "points": "22",
+       "rebounds": "5",
+       "assists": "5",
+       "blocks": "2",
+       "steals": "1"
+      }
+     },
+     "seasonLeadersFlag": 0,
+     "gameClock": "PT00M00.00S",
+     "gameStatus": 3,
+     "gameStatusText": "Final/OT",
+     "gameBreakStatus": "Final",
+     "gameState": 3,
+     "duration": 0,
+     "gameTimeEastern": "2019-10-22T20:01:00Z",
+     "gameTimeUtc": "2019-10-23T00:01:00Z",
+     "info": "",
+     "subInfo": "",
+     "gameDetailsHeader": {
+      "spoilerHeader": "",
+      "nonSpoilerHeader": ""
+     },
+     "actions": [
+      {
+       "title": "Watch",
+       "resourceLocator": {
+        "resourceUrl": "/game/nop-vs-tor-0021900001?watch",
+        "resourceId": "0021900001",
+        "resourceType": "game"
+       }
+      },
+      {
+       "title": "Box Score",
+       "resourceLocator": {
+        "resourceUrl": "/game/nop-vs-tor-0021900001/box-score",
+        "resourceId": "0021900001",
+        "resourceType": "game"
+       }
+      },
+      {
+       "title": "Game Details",
+       "resourceLocator": {
+        "resourceUrl": "/game/nop-vs-tor-0021900001",
+        "resourceId": "0021900001",
+        "resourceType": "game"
+       }
+      }
+     ],
+     "images": {
+      "1920x1080": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/nop-tor/1920x1080.png",
+      "1280x720": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/nop-tor/1280x720.png",
+      "640x360": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/nop-tor/640x360.png",
+      "480x270": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/nop-tor/480x270.png",
+      "320x180": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/nop-tor/320x180.png",
+      "160x90": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/nop-tor/160x90.png"
+     },
+     "ifNecessary": false,
+     "cardId": "",
+     "contentAccess": {
+      "isMemberGated": false,
+      "isVivoContent": false,
+      "cmsEntitlement": null,
+      "isNikeGated": false
+     },
+     "shareUrl": "https://www.nba.com/game/nop-vs-tor-0021900001",
+     "ticketUrl": null,
+     "isTntOT": false,
+     "cardHat": "Emirates NBA Cup",
+     "broadcasters": {
+      "nationalBroadcasters": [
+       {
+        "broadcasterId": 1,
+        "broadcasterScope": null,
+        "broadcasterDisplayName": "ABC",
+        "broadcasterLogoUrl": null,
+        "broadcasterVideoLink": "",
+        "broadcasterDescription": "",
+        "broadcasterTeamId": null,
+        "broadcasterRanking": "1",
+        "broadcasterLocalizationRegion": "",
+        "broadcasterLogoUrlDarkLg": "https://cdn.nba.com/logos/nba/broadcast_logos/D/120h/abc.png",
+        "broadcasterLogoUrlLightLg": "https://cdn.nba.com/logos/nba/broadcast_logos/L/120h/abc.png",
+        "broadcasterLogoUrlDarkSm": "https://cdn.nba.com/logos/nba/broadcast_logos/D/40h/abc.png",
+        "broadcasterLogoUrlLightSm": "https://cdn.nba.com/logos/nba/broadcast_logos/L/40h/abc.png",
+        "broadcasterLogoUrlLightSvg": "https://cdn.nba.com/logos/nba/broadcast_logos/L/120h/abc.svg",
+        "broadcasterLogoUrlDarkSvg": "https://cdn.nba.com/logos/nba/broadcast_logos/D/120h/abc.svg",
+        "broadcasterLogoIcon1x1": "https://cdn.nba.com/logos/nba/broadcast_logos/L/dtc-icons/square/abc.png",
+        "broadcasterLogoIcon1x1Svg": "https://cdn.nba.com/logos/nba/broadcast_logos/L/dtc-icons/square/abc.svg",
+        "broadcasterLogoIcon16x9": "https://cdn.nba.com/logos/nba/broadcast_logos/L/dtc-icons/16x9/abc.png",
+        "broadcasterLogoIcon16x9Svg": "https://cdn.nba.com/logos/nba/broadcast_logos/L/dtc-icons/16x9/abc.svg"
+       },
+       {
+        "broadcasterId": 2,
+        "broadcasterScope": null,
+        "broadcasterDisplayName": "ESPN",
+        "broadcasterLogoUrl": null,
+        "broadcasterVideoLink": "",
+        "broadcasterDescription": "",
+        "broadcasterTeamId": null,
+        "broadcasterRanking": "2",
+        "broadcasterLocalizationRegion": "",
+        "broadcasterLogoUrlDarkLg": "https://cdn.nba.com/logos/nba/broadcast_logos/D/120h/espn.png",
+        "broadcasterLogoUrlLightLg": "https://cdn.nba.com/logos/nba/broadcast_logos/L/120h/espn.png",
+        "broadcasterLogoUrlDarkSm": "https://cdn.nba.com/logos/nba/broadcast_logos/D/40h/espn.png",
+        "broadcasterLogoUrlLightSm": "https://cdn.nba.com/logos/nba/broadcast_logos/L/40h/espn.png",
+        "broadcasterLogoUrlLightSvg": "https://cdn.nba.com/logos/nba/broadcast_logos/L/120h/espn.svg",
+        "broadcasterLogoUrlDarkSvg": "https://cdn.nba.com/logos/nba/broadcast_logos/D/120h/espn.svg",
+        "broadcasterLogoIcon1x1": "https://cdn.nba.com/logos/nba/broadcast_logos/L/dtc-icons/square/espn.png",
+        "broadcasterLogoIcon1x1Svg": "https://cdn.nba.com/logos/nba/broadcast_logos/L/dtc-icons/square/espn.svg",
+        "broadcasterLogoIcon16x9": "https://cdn.nba.com/logos/nba/broadcast_logos/L/dtc-icons/16x9/espn.png",
+        "broadcasterLogoIcon16x9Svg": "https://cdn.nba.com/logos/nba/broadcast_logos/L/dtc-icons/16x9/espn.svg"
+       },
+       {
+        "broadcasterId": 127,
+        "broadcasterScope": null,
+        "broadcasterDisplayName": "ESPN2",
+        "broadcasterLogoUrl": null,
+        "broadcasterVideoLink": "",
+        "broadcasterDescription": "",
+        "broadcasterTeamId": null,
+        "broadcasterRanking": "6",
+        "broadcasterLocalizationRegion": ""
+       },
+       {
+        "broadcasterId": 1001178,
+        "broadcasterScope": null,
+        "broadcasterDisplayName": "Disney+",
+        "broadcasterLogoUrl": null,
+        "broadcasterVideoLink": "",
+        "broadcasterDescription": "",
+        "broadcasterTeamId": null,
+        "broadcasterRanking": "9",
+        "broadcasterLocalizationRegion": ""
+       },
+       {
+        "broadcasterId": 1001588,
+        "broadcasterScope": null,
+        "broadcasterDisplayName": "Disney Channel",
+        "broadcasterLogoUrl": null,
+        "broadcasterVideoLink": "",
+        "broadcasterDescription": "",
+        "broadcasterTeamId": null,
+        "broadcasterRanking": "14",
+        "broadcasterLocalizationRegion": ""
+       },
+       {
+        "broadcasterId": 1001589,
+        "broadcasterScope": null,
+        "broadcasterDisplayName": "Disney XD",
+        "broadcasterLogoUrl": null,
+        "broadcasterVideoLink": "",
+        "broadcasterDescription": "",
+        "broadcasterTeamId": null,
+        "broadcasterRanking": "15",
+        "broadcasterLocalizationRegion": ""
+       }
+      ],
+      "homeTvBroadcasters": [],
+      "homeRadioBroadcasters": [],
+      "awayTvBroadcasters": [],
+      "awayRadioBroadcasters": [],
+      "intlRadioBroadcasters": [],
+      "intlTvBroadcasters": [],
+      "homeOttBroadcasters": [],
+      "awayOttBroadcasters": [],
+      "intlOttBroadcasters": [],
+      "nationalOttBroadcasters": [],
+      "nationalRadioBroadcasters": [],
+      "subscriptionBroadcasters": []
+     },
+     "showPostGameBroadcasters": true,
+     "streamOrder": [
+      {
+       "rank": 0,
+       "type": "l2v",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_endeavor-0021900001-sap_PACKAGE",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-league-pass.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-league-pass.png"
+       },
+       "title": "Spanish Broadcast",
+       "description": "",
+       "categoryData": {
+        "categoryId": -1,
+        "categoryName": "Full Games",
+        "categoryRank": -1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/fallback/1280x720.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/fallback/480x270.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": "spanish-broadcast"
+      },
+      {
+       "rank": 1,
+       "type": "l2v",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_endeavor-0021900001-tnt_PACKAGE",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-league-pass.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-league-pass.png"
+       },
+       "title": "National Broadcast",
+       "description": "",
+       "categoryData": {
+        "categoryId": -1,
+        "categoryName": "Full Games",
+        "categoryRank": -1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/fallback/1280x720.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/fallback/480x270.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": "national-broadcast"
+      },
+      {
+       "rank": 2,
+       "type": "l2v",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_endeavor-0021900001-spotv_PACKAGE",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-league-pass.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-league-pass.png"
+       },
+       "title": "Korean Broadcast",
+       "description": "",
+       "categoryData": {
+        "categoryId": -1,
+        "categoryName": "Full Games",
+        "categoryRank": -1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/fallback/1280x720.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/fallback/480x270.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": "korean-broadcast"
+      },
+      {
+       "rank": 3,
+       "type": "l2v",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_endeavor-0021900001-sportvgb_PACKAGE",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-league-pass.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-league-pass.png"
+       },
+       "title": "Portuguese Broadcast",
+       "description": "",
+       "categoryData": {
+        "categoryId": -1,
+        "categoryName": "Full Games",
+        "categoryRank": -1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/fallback/1280x720.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/fallback/480x270.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": "portuguese-broadcast"
+      },
+      {
+       "rank": 4,
+       "type": "l2v",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_endeavor-0021900001-mobile_PACKAGE",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-league-pass.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-league-pass.png"
+       },
+       "title": "Mobile Broadcast",
+       "description": "",
+       "categoryData": {
+        "categoryId": -1,
+        "categoryName": "Full Games",
+        "categoryRank": -1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/fallback/1280x720.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/fallback/480x270.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": "mobile-broadcast"
+      },
+      {
+       "rank": 5,
+       "type": "l2v",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_endeavor-0021900001-spanmovistar_PACKAGE",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-league-pass.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-league-pass.png"
+       },
+       "title": "Spanish Broadcast",
+       "description": "",
+       "categoryData": {
+        "categoryId": -1,
+        "categoryName": "Full Games",
+        "categoryRank": -1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/fallback/1280x720.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/fallback/480x270.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": "spanish-broadcast"
+      },
+      {
+       "rank": 6,
+       "type": "l2v",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_endeavor-0021900001-b_PACKAGE",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-league-pass.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-league-pass.png"
+       },
+       "title": "Local Home Broadcast",
+       "description": "",
+       "categoryData": {
+        "categoryId": -1,
+        "categoryName": "Full Games",
+        "categoryRank": -1,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/fallback/1280x720.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/fallback/480x270.png"
+       },
+       "featuredImage": null,
+       "videoDuration": null,
+       "videoFranchisesName": "local-home-broadcast"
+      },
+      {
+       "rank": 6,
+       "type": "vod",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_endeavor-0021900001-condensed_away_PACKAGE",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-league-pass.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-league-pass.png"
+       },
+       "title": "Away Condensed",
+       "description": "Extended away team highlights",
+       "categoryData": {
+        "categoryId": -2,
+        "categoryName": "Recaps",
+        "categoryRank": -2,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/fallback/1280x720.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/fallback/480x270.png"
+       },
+       "featuredImage": "",
+       "videoDuration": "5:00",
+       "videoFranchisesName": "away-best-plays"
+      },
+      {
+       "rank": 3,
+       "type": "vod",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_endeavor-0021900001-condensed_fullgame_PACKAGE",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/10-minute.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/10-minute.png"
+       },
+       "title": "Condensed Game",
+       "description": "Extended game highlights",
+       "categoryData": {
+        "categoryId": -2,
+        "categoryName": "Recaps",
+        "categoryRank": -2,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/10-minute.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/10-minute.png"
+       },
+       "featuredImage": "",
+       "videoDuration": "9:33",
+       "videoFranchisesName": "full-game-highlights"
+      },
+      {
+       "rank": 5,
+       "type": "vod",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_endeavor-0021900001-condensed_home_PACKAGE",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/nss-league-pass.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/nss-league-pass.png"
+       },
+       "title": "Home Condensed",
+       "description": "Extended home team highlights",
+       "categoryData": {
+        "categoryId": -2,
+        "categoryName": "Recaps",
+        "categoryRank": -2,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/fallback/1280x720.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/fallback/480x270.png"
+       },
+       "featuredImage": "",
+       "videoDuration": "5:01",
+       "videoFranchisesName": "home-best-plays"
+      },
+      {
+       "rank": 4,
+       "type": "vod",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_endeavor-0021900001-condensed_allposs_PACKAGE",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/all-possessions.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/all-possessions.png"
+       },
+       "title": "All Possessions",
+       "description": "All plays without game breaks or commercials",
+       "categoryData": {
+        "categoryId": -2,
+        "categoryName": "Recaps",
+        "categoryRank": -2,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/logos/nba/streams/T/large/all-possessions.png",
+        "thumbnailSmall": "https://cdn.nba.com/logos/nba/streams/T/small/all-possessions.png"
+       },
+       "featuredImage": "",
+       "videoDuration": "38:45",
+       "videoFranchisesName": "all-possessions-cg"
+      },
+      {
+       "rank": 1,
+       "type": "vod",
+       "productionId": null,
+       "mediaKindVideoId": "NBA_6efef594-638d-49a7-9385-896133aa2a1d.nba_2851134_1920x1080_5904",
+       "uniqueName": null,
+       "status": null,
+       "isRadio": false,
+       "inMarketTeamTricode": null,
+       "logoMapping": null,
+       "logoMap": {
+        "logoMappingDark": "https://cdn.nba.com/logos/nba/streams/D/game-recap.png",
+        "logoMappingLight": "https://cdn.nba.com/logos/nba/streams/L/game-recap.png"
+       },
+       "title": "Game Recap",
+       "description": "Highlights with commentary",
+       "categoryData": {
+        "categoryId": -2,
+        "categoryName": "Recaps",
+        "categoryRank": -2,
+        "isFeatureCategory": false
+       },
+       "isLocalAccess": false,
+       "teamId": null,
+       "thumbnails": {
+        "thumbnailLarge": "https://cdn.nba.com/manage/2019/10/siakam-layup-scaled.jpg",
+        "thumbnailSmall": "https://cdn.nba.com/manage/2019/10/siakam-layup-scaled.jpg"
+       },
+       "featuredImage": "https://cdn.nba.com/manage/2019/10/siakam-layup-scaled.jpg",
+       "videoDuration": "2:46",
+       "videoFranchisesName": "2-min-game-recap"
+      }
+     ],
+     "extraMoreMenuItems": null,
+     "gameSubtype": "in-season-knockout",
+     "isNeutral": false,
+     "scoreStripHeader": {
+      "scoreStripSpoilerHeader": "",
+      "scoreStripNonSpoilerHeader": ""
+     },
+     "isTabletopGame": false,
+     "actualStartTimeUTC": "2019-10-23T00:03:39Z",
+     "actualEndTimeUTC": "2019-10-23T02:53:32Z",
+     "gameDurationSeconds": 10193,
+     "immersiveExperiences": null
+    },
+    "cardType": "game",
+    "cardId": "9a849b0d-4a45-dedb-e7d7-35e939b26f76"
+   },
+   "cardDataKeys": [
+    "heroConfiguration",
+    "gameId",
+    "leagueId",
+    "seasonYear",
+    "seasonType",
+    "dailyGameRank",
+    "period",
+    "homeTeam",
+    "awayTeam",
+    "seasonLeadersFlag",
+    "gameClock",
+    "gameStatus",
+    "gameStatusText",
+    "gameBreakStatus",
+    "gameState",
+    "duration",
+    "gameTimeEastern",
+    "gameTimeUtc",
+    "info",
+    "subInfo",
+    "gameDetailsHeader",
+    "actions",
+    "images",
+    "ifNecessary",
+    "cardId",
+    "contentAccess",
+    "shareUrl",
+    "ticketUrl",
+    "isTntOT",
+    "cardHat",
+    "broadcasters",
+    "showPostGameBroadcasters",
+    "streamOrder",
+    "extraMoreMenuItems",
+    "gameSubtype",
+    "isNeutral",
+    "scoreStripHeader",
+    "isTabletopGame",
+    "actualStartTimeUTC",
+    "actualEndTimeUTC",
+    "gameDurationSeconds",
+    "immersiveExperiences"
+   ],
+   "gameIdsFound": [
+    "0021900001",
+    "0021900002"
+   ],
+   "gameCodeSample": []
+  },
+  {
+   "date": "1996-06-16",
+   "htmlBytes": 287569,
+   "cardCount": 1,
+   "cardKeys": [
+    "cardData",
+    "cardType",
+    "cardId"
+   ],
+   "firstCard": {
+    "cardData": {
+     "heroConfiguration": {
+      "headline": "SuperSonics @ Bulls",
+      "subhead": "",
+      "image": {
+       "imageUrl": ""
+      },
+      "video": null,
+      "gameRecap": null,
+      "headlineNoSpoilers": "SuperSonics @ Bulls"
+     },
+     "gameId": "0049500068",
+     "leagueId": "00",
+     "seasonYear": "1995-96",
+     "seasonType": "Playoffs",
+     "dailyGameRank": null,
+     "period": 4,
+     "homeTeam": {
+      "teamId": 1610612741,
+      "teamName": "Bulls",
+      "wins": 4,
+      "losses": 2,
+      "teamSubtitle": null,
+      "score": 87,
+      "timeoutsRemaining": 0,
+      "inBonus": false,
+      "teamTricode": "CHI",
+      "teamSlug": "bulls",
+      "specialInfoPrefix": "1",
+      "marqueePlayer": "",
+      "periods": [
+       {
+        "period": 1,
+        "score": 24
+       },
+       {
+        "period": 2,
+        "score": 21
+       },
+       {
+        "period": 3,
+        "score": 22
+       },
+       {
+        "period": 4,
+        "score": 20
+       }
+      ],
+      "teamLeader": {
+       "personId": 0,
+       "name": null,
+       "jerseyNum": null,
+       "position": null,
+       "teamTricode": null,
+       "playerSlug": null,
+       "points": "0",
+       "rebounds": "0",
+       "assists": "0",
+       "blocks": "0",
+       "steals": "0"
+      }
+     },
+     "awayTeam": {
+      "teamId": 1610612760,
+      "teamName": "SuperSonics",
+      "wins": 2,
+      "losses": 4,
+      "teamSubtitle": null,
+      "score": 75,
+      "timeoutsRemaining": 0,
+      "inBonus": false,
+      "teamTricode": "SEA",
+      "teamSlug": "supersonics",
+      "specialInfoPrefix": "1",
+      "marqueePlayer": "",
+      "periods": [
+       {
+        "period": 1,
+        "score": 18
+       },
+       {
+        "period": 2,
+        "score": 20
+       },
+       {
+        "period": 3,
+        "score": 20
+       },
+       {
+        "period": 4,
+        "score": 17
+       }
+      ],
+      "teamLeader": {
+       "personId": 0,
+       "name": null,
+       "jerseyNum": null,
+       "position": null,
+       "teamTricode": null,
+       "playerSlug": null,
+       "points": "0",
+       "rebounds": "0",
+       "assists": "0",
+       "blocks": "0",
+       "steals": "0"
+      }
+     },
+     "seasonLeadersFlag": 0,
+     "gameClock": "PT00M00.00S",
+     "gameStatus": 3,
+     "gameStatusText": "Final",
+     "gameBreakStatus": "",
+     "gameState": 3,
+     "duration": 0,
+     "gameTimeEastern": "1996-06-16T20:00:00Z",
+     "gameTimeUtc": "1996-06-17T00:00:00Z",
+     "info": "Game 6",
+     "subInfo": "CHI wins 4-2",
+     "gameDetailsHeader": {
+      "spoilerHeader": "Game 6: CHI wins 4-2",
+      "nonSpoilerHeader": "NBA Finals"
+     },
+     "actions": [
+      {
+       "title": "Watch",
+       "resourceLocator": {
+        "resourceUrl": "/game/sea-vs-chi-0049500068?watch",
+        "resourceId": "0049500068",
+        "resourceType": "game"
+       }
+      },
+      {
+       "title": "Box Score",
+       "resourceLocator": {
+        "resourceUrl": "/game/sea-vs-chi-0049500068/box-score",
+        "resourceId": "0049500068",
+        "resourceType": "game"
+       }
+      },
+      {
+       "title": "Game Details",
+       "resourceLocator": {
+        "resourceUrl": "/game/sea-vs-chi-0049500068",
+        "resourceId": "0049500068",
+        "resourceType": "game"
+       }
+      }
+     ],
+     "images": {
+      "1920x1080": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/sea-chi/1920x1080.png",
+      "1280x720": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/sea-chi/1280x720.png",
+      "640x360": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/sea-chi/640x360.png",
+      "480x270": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/sea-chi/480x270.png",
+      "320x180": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/sea-chi/320x180.png",
+      "160x90": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/sea-chi/160x90.png"
+     },
+     "ifNecessary": false,
+     "cardId": "",
+     "contentAccess": {
+      "isMemberGated": false,
+      "isVivoContent": false,
+      "cmsEntitlement": null,
+      "isNikeGated": false
+     },
+     "shareUrl": "https://www.nba.com/game/sea-vs-chi-0049500068",
+     "ticketUrl": null,
+     "isTntOT": false,
+     "cardHat": "NBA Finals",
+     "broadcasters": {
+      "nationalBroadcasters": [],
+      "homeTvBroadcasters": [],
+      "homeRadioBroadcasters": [],
+      "awayTvBroadcasters": [],
+      "awayRadioBroadcasters": [],
+      "intlRadioBroadcasters": [],
+      "intlTvBroadcasters": [],
+      "homeOttBroadcasters": [],
+      "awayOttBroadcasters": [],
+      "intlOttBroadcasters": [],
+      "nationalOttBroadcasters": [],
+      "nationalRadioBroadcasters": [],
+      "subscriptionBroadcasters": []
+     },
+     "showPostGameBroadcasters": true,
+     "streamOrder": [],
+     "extraMoreMenuItems": null,
+     "gameSubtype": "",
+     "isNeutral": false,
+     "scoreStripHeader": {
+      "scoreStripSpoilerHeader": "",
+      "scoreStripNonSpoilerHeader": ""
+     },
+     "isTabletopGame": false,
+     "actualStartTimeUTC": null,
+     "actualEndTimeUTC": null,
+     "gameDurationSeconds": null,
+     "immersiveExperiences": null
+    },
+    "cardType": "game",
+    "cardId": "345dd4db-9175-1874-b791-6525d6ebff10"
+   },
+   "cardDataKeys": [
+    "heroConfiguration",
+    "gameId",
+    "leagueId",
+    "seasonYear",
+    "seasonType",
+    "dailyGameRank",
+    "period",
+    "homeTeam",
+    "awayTeam",
+    "seasonLeadersFlag",
+    "gameClock",
+    "gameStatus",
+    "gameStatusText",
+    "gameBreakStatus",
+    "gameState",
+    "duration",
+    "gameTimeEastern",
+    "gameTimeUtc",
+    "info",
+    "subInfo",
+    "gameDetailsHeader",
+    "actions",
+    "images",
+    "ifNecessary",
+    "cardId",
+    "contentAccess",
+    "shareUrl",
+    "ticketUrl",
+    "isTntOT",
+    "cardHat",
+    "broadcasters",
+    "showPostGameBroadcasters",
+    "streamOrder",
+    "extraMoreMenuItems",
+    "gameSubtype",
+    "isNeutral",
+    "scoreStripHeader",
+    "isTabletopGame",
+    "actualStartTimeUTC",
+    "actualEndTimeUTC",
+    "gameDurationSeconds",
+    "immersiveExperiences"
+   ],
+   "gameIdsFound": [
+    "0049500068"
+   ],
+   "gameCodeSample": []
+  },
+  {
+   "date": "2026-10-03",
+   "htmlBytes": 285579,
+   "cardCount": 1,
+   "cardKeys": [
+    "cardData",
+    "cardType",
+    "cardId"
+   ],
+   "firstCard": {
+    "cardData": {
+     "heroConfiguration": {
+      "headline": "Heat @ Raptors",
+      "subhead": "",
+      "image": {
+       "imageUrl": ""
+      },
+      "video": null,
+      "gameRecap": null,
+      "headlineNoSpoilers": "Heat @ Raptors"
+     },
+     "gameId": "0012600009",
+     "leagueId": "00",
+     "seasonYear": "2026-27",
+     "seasonType": "Preseason",
+     "dailyGameRank": null,
+     "period": 0,
+     "homeTeam": {
+      "teamId": 1610612761,
+      "teamName": "Raptors",
+      "wins": 0,
+      "losses": 0,
+      "teamSubtitle": "0-0",
+      "score": 0,
+      "timeoutsRemaining": 0,
+      "inBonus": false,
+      "teamTricode": "TOR",
+      "teamSlug": "raptors",
+      "specialInfoPrefix": null,
+      "marqueePlayer": "1630567",
+      "periods": [
+       {
+        "period": 1,
+        "score": 0
+       },
+       {
+        "period": 2,
+        "score": 0
+       },
+       {
+        "period": 3,
+        "score": 0
+       },
+       {
+        "period": 4,
+        "score": 0
+       }
+      ],
+      "teamLeader": {
+       "personId": 0,
+       "name": "",
+       "jerseyNum": "",
+       "position": "",
+       "teamTricode": "TOR",
+       "playerSlug": "",
+       "points": "0",
+       "rebounds": "0",
+       "assists": "0",
+       "blocks": null,
+       "steals": null
+      }
+     },
+     "awayTeam": {
+      "teamId": 1610612748,
+      "teamName": "Heat",
+      "wins": 0,
+      "losses": 0,
+      "teamSubtitle": "0-0",
+      "score": 0,
+      "timeoutsRemaining": 0,
+      "inBonus": false,
+      "teamTricode": "MIA",
+      "teamSlug": "heat",
+      "specialInfoPrefix": null,
+      "marqueePlayer": "1628389",
+      "periods": [
+       {
+        "period": 1,
+        "score": 0
+       },
+       {
+        "period": 2,
+        "score": 0
+       },
+       {
+        "period": 3,
+        "score": 0
+       },
+       {
+        "period": 4,
+        "score": 0
+       }
+      ],
+      "teamLeader": {
+       "personId": 0,
+       "name": "",
+       "jerseyNum": "",
+       "position": "",
+       "teamTricode": "MIA",
+       "playerSlug": "",
+       "points": "0",
+       "rebounds": "0",
+       "assists": "0",
+       "blocks": null,
+       "steals": null
+      }
+     },
+     "seasonLeadersFlag": 2,
+     "gameClock": "--:--",
+     "gameStatus": 1,
+     "gameStatusText": "7:00 pm ET",
+     "gameBreakStatus": "",
+     "gameState": 1,
+     "duration": 0,
+     "gameTimeEastern": "2026-10-03T19:00:00Z",
+     "gameTimeUtc": "2026-10-03T23:00:00Z",
+     "info": "NBA Canada Game",
+     "subInfo": "",
+     "gameDetailsHeader": {
+      "spoilerHeader": "Preseason",
+      "nonSpoilerHeader": "Preseason"
+     },
+     "actions": [
+      {
+       "title": "Preview",
+       "resourceLocator": {
+        "resourceUrl": "/game/mia-vs-tor-0012600009/",
+        "resourceId": "0012600009",
+        "resourceType": "game"
+       }
+      },
+      {
+       "title": "Tickets",
+       "resourceLocator": {
+        "resourceUrl": "https://a.data.nba.com/tickets/single/2026/0012600009/LEAG_GAMELINE",
+        "resourceId": "0012600009",
+        "resourceType": "game"
+       }
+      },
+      {
+       "title": "Game Charts",
+       "resourceLocator": {
+        "resourceUrl": "/game/mia-vs-tor-0012600009/game-charts",
+        "resourceId": "0012600009",
+        "resourceType": "game"
+       }
+      }
+     ],
+     "images": {
+      "1920x1080": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/mia-tor/1920x1080.png",
+      "1280x720": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/mia-tor/1280x720.png",
+      "640x360": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/mia-tor/640x360.png",
+      "480x270": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/mia-tor/480x270.png",
+      "320x180": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/mia-tor/320x180.png",
+      "160x90": "https://cdn.nba.com/davinci/images/team-matchups/nba/latest/ced/mia-tor/160x90.png"
+     },
+     "ifNecessary": false,
+     "cardId": "",
+     "contentAccess": {
+      "isMemberGated": false,
+      "isVivoContent": false,
+      "cmsEntitlement": null,
+      "isNikeGated": false
+     },
+     "shareUrl": "https://www.nba.com/game/mia-vs-tor-0012600009",
+     "ticketUrl": "https://a.data.nba.com/tickets/single/2026/0012600009/LEAG_GAMELINE",
+     "isTntOT": false,
+     "cardHat": "Preseason",
+     "broadcasters": {
+      "nationalBroadcasters": [
+       {
+        "broadcasterId": 7,
+        "broadcasterScope": null,
+        "broadcasterDisplayName": "NBA TV",
+        "broadcasterLogoUrl": null,
+        "broadcasterVideoLink": "",
+        "broadcasterDescription": "",
+        "broadcasterTeamId": null,
+        "broadcasterRanking": null,
+        "broadcasterLocalizationRegion": "",
+        "broadcasterLogoUrlDarkLg": "https://cdn.nba.com/logos/nba/broadcast_logos/D/120h/nbatv.png",
+        "broadcasterLogoUrlLightLg": "https://cdn.nba.com/logos/nba/broadcast_logos/L/120h/nbatv.png",
+        "broadcasterLogoUrlDarkSm": "https://cdn.nba.com/logos/nba/broadcast_logos/D/40h/nbatv.png",
+        "broadcasterLogoUrlLightSm": "https://cdn.nba.com/logos/nba/broadcast_logos/L/40h/nbatv.png",
+        "broadcasterLogoUrlLightSvg": "https://cdn.nba.com/logos/nba/broadcast_logos/L/120h/nbatv.svg",
+        "broadcasterLogoUrlDarkSvg": "https://cdn.nba.com/logos/nba/broadcast_logos/D/120h/nbatv.svg",
+        "broadcasterLogoIcon1x1": "https://cdn.nba.com/logos/nba/broadcast_logos/D/dtc-icons/square/nbatv.png",
+        "broadcasterLogoIcon1x1Svg": "https://cdn.nba.com/logos/nba/broadcast_logos/D/dtc-icons/square/nbatv.svg",
+        "broadcasterLogoIcon16x9": "https://cdn.nba.com/logos/nba/broadcast_logos/D/dtc-icons/16x9/nbatv.png",
+        "broadcasterLogoIcon16x9Svg": "https://cdn.nba.com/logos/nba/broadcast_logos/D/dtc-icons/16x9/nbatv.svg"
+       }
+      ],
+      "homeTvBroadcasters": [],
+      "homeRadioBroadcasters": [],
+      "awayTvBroadcasters": [],
+      "awayRadioBroadcasters": [
+       {
+        "broadcasterId": 1001523,
+        "broadcasterScope": null,
+        "broadcasterDisplayName": "FM 104.3 WQAM / S: WAQI 710",
+        "broadcasterLogoUrl": null,
+        "broadcasterVideoLink": "",
+        "broadcasterDescription": "",
+        "broadcasterTeamId": 1610612748,
+        "broadcasterRanking": null,
+        "broadcasterLocalizationRegion": ""
+       }
+      ],
+      "intlRadioBroadcasters": [],
+      "intlTvBroadcasters": [],
+      "homeOttBroadcasters": [],
+      "awayOttBroadcasters": [],
+      "intlOttBroadcasters": [],
+      "nationalOttBroadcasters": [],
+      "nationalRadioBroadcasters": [],
+      "subscriptionBroadcasters": []
+     },
+     "showPostGameBroadcasters": false,
+     "streamOrder": [],
+     "extraMoreMenuItems": null,
+     "gameSubtype": "",
+     "isNeutral": false,
+     "scoreStripHeader": {
+      "scoreStripSpoilerHeader": "NBA Canada Game",
+      "scoreStripNonSpoilerHeader": "NBA Canada Game"
+     },
+     "isTabletopGame": false,
+     "actualStartTimeUTC": null,
+     "actualEndTimeUTC": null,
+     "gameDurationSeconds": null,
+     "immersiveExperiences": null
+    },
+    "cardType": "game",
+    "cardId": "d5d6cd39-0d11-8da7-a609-0ae3a11154ab"
+   },
+   "cardDataKeys": [
+    "heroConfiguration",
+    "gameId",
+    "leagueId",
+    "seasonYear",
+    "seasonType",
+    "dailyGameRank",
+    "period",
+    "homeTeam",
+    "awayTeam",
+    "seasonLeadersFlag",
+    "gameClock",
+    "gameStatus",
+    "gameStatusText",
+    "gameBreakStatus",
+    "gameState",
+    "duration",
+    "gameTimeEastern",
+    "gameTimeUtc",
+    "info",
+    "subInfo",
+    "gameDetailsHeader",
+    "actions",
+    "images",
+    "ifNecessary",
+    "cardId",
+    "contentAccess",
+    "shareUrl",
+    "ticketUrl",
+    "isTntOT",
+    "cardHat",
+    "broadcasters",
+    "showPostGameBroadcasters",
+    "streamOrder",
+    "extraMoreMenuItems",
+    "gameSubtype",
+    "isNeutral",
+    "scoreStripHeader",
+    "isTabletopGame",
+    "actualStartTimeUTC",
+    "actualEndTimeUTC",
+    "gameDurationSeconds",
+    "immersiveExperiences"
+   ],
+   "gameIdsFound": [
+    "0012600009"
+   ],
+   "gameCodeSample": []
+  }
+ ]
+}

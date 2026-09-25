@@ -1,0 +1,559 @@
+{
+ "generatedAtUtc": "2026-09-25T19:43:20.318875+00:00",
+ "coverage": [
+  {
+   "gameId": "0022400247",
+   "boxscore": {
+    "kind": "boxscore",
+    "httpStatus": 200,
+    "bytes": 41012,
+    "error": null,
+    "verifiedGame": true,
+    "gameEt": "2024-11-18T19:30:00-05:00",
+    "gameStatus": 3,
+    "home": "TOR",
+    "away": "IND",
+    "hasPeriods": true,
+    "homeTeamKeys": [
+     "teamId",
+     "teamName",
+     "teamCity",
+     "teamTricode",
+     "score",
+     "inBonus",
+     "timeoutsRemaining",
+     "periods",
+     "players",
+     "statistics"
+    ],
+    "firstPeriod": {
+     "period": 1,
+     "periodType": "REGULAR",
+     "score": 34
+    },
+    "gameKeys": [
+     "gameId",
+     "gameTimeLocal",
+     "gameTimeUTC",
+     "gameTimeHome",
+     "gameTimeAway",
+     "gameEt",
+     "duration",
+     "gameCode",
+     "gameStatusText",
+     "gameStatus",
+     "regulationPeriods",
+     "period",
+     "gameClock",
+     "attendance",
+     "sellout",
+     "arena",
+     "officials",
+     "homeTeam",
+     "awayTeam"
+    ]
+   },
+   "playbyplay": {
+    "kind": "playbyplay",
+    "httpStatus": 200,
+    "bytes": 438994,
+    "error": null,
+    "verifiedGame": true,
+    "gameEt": null,
+    "gameStatus": null,
+    "home": null,
+    "away": null
+   }
+  },
+  {
+   "gameId": "0022400196",
+   "boxscore": {
+    "kind": "boxscore",
+    "httpStatus": 200,
+    "bytes": 40138,
+    "error": null,
+    "verifiedGame": true,
+    "gameEt": "2024-11-08T22:00:00-05:00",
+    "gameStatus": 3,
+    "home": "SAC",
+    "away": "LAC",
+    "hasPeriods": true,
+    "homeTeamKeys": [
+     "teamId",
+     "teamName",
+     "teamCity",
+     "teamTricode",
+     "score",
+     "inBonus",
+     "timeoutsRemaining",
+     "periods",
+     "players",
+     "statistics"
+    ],
+    "firstPeriod": {
+     "period": 1,
+     "periodType": "REGULAR",
+     "score": 28
+    },
+    "gameKeys": [
+     "gameId",
+     "gameTimeLocal",
+     "gameTimeUTC",
+     "gameTimeHome",
+     "gameTimeAway",
+     "gameEt",
+     "duration",
+     "gameCode",
+     "gameStatusText",
+     "gameStatus",
+     "regulationPeriods",
+     "period",
+     "gameClock",
+     "attendance",
+     "sellout",
+     "arena",
+     "officials",
+     "homeTeam",
+     "awayTeam"
+    ]
+   },
+   "playbyplay": {
+    "kind": "playbyplay",
+    "httpStatus": 200,
+    "bytes": 380077,
+    "error": null,
+    "verifiedGame": true,
+    "gameEt": null,
+    "gameStatus": null,
+    "home": null,
+    "away": null
+   }
+  },
+  {
+   "gameId": "0022301170",
+   "boxscore": {
+    "kind": "boxscore",
+    "httpStatus": 200,
+    "bytes": 40025,
+    "error": null,
+    "verifiedGame": true,
+    "gameEt": "2024-04-11T22:00:00-04:00",
+    "gameStatus": 3,
+    "home": "SAC",
+    "away": "NOP",
+    "hasPeriods": true,
+    "homeTeamKeys": [
+     "teamId",
+     "teamName",
+     "teamCity",
+     "teamTricode",
+     "score",
+     "inBonus",
+     "timeoutsRemaining",
+     "periods",
+     "players",
+     "statistics"
+    ],
+    "firstPeriod": {
+     "period": 1,
+     "periodType": "REGULAR",
+     "score": 23
+    },
+    "gameKeys": [
+     "gameId",
+     "gameTimeLocal",
+     "gameTimeUTC",
+     "gameTimeHome",
+     "gameTimeAway",
+     "gameEt",
+     "duration",
+     "gameCode",
+     "gameStatusText",
+     "gameStatus",
+     "regulationPeriods",
+     "period",
+     "gameClock",
+     "attendance",
+     "sellout",
+     "arena",
+     "officials",
+     "homeTeam",
+     "awayTeam"
+    ]
+   },
+   "playbyplay": {
+    "kind": "playbyplay",
+    "httpStatus": 200,
+    "bytes": 384931,
+    "error": null,
+    "verifiedGame": true,
+    "gameEt": null,
+    "gameStatus": null,
+    "home": null,
+    "away": null
+   }
+  },
+  {
+   "gameId": "0022200879",
+   "boxscore": {
+    "kind": "boxscore",
+    "httpStatus": 200,
+    "bytes": 38268,
+    "error": null,
+    "verifiedGame": true,
+    "gameEt": "2023-02-15T20:00:00-05:00",
+    "gameStatus": 3,
+    "home": "MEM",
+    "away": "UTA",
+    "hasPeriods": true,
+    "homeTeamKeys": [
+     "teamId",
+     "teamName",
+     "teamCity",
+     "teamTricode",
+     "score",
+     "inBonus",
+     "timeoutsRemaining",
+     "periods",
+     "players",
+     "statistics"
+    ],
+    "firstPeriod": {
+     "period": 1,
+     "periodType": "REGULAR",
+     "score": 38
+    },
+    "gameKeys": [
+     "gameId",
+     "gameTimeLocal",
+     "gameTimeUTC",
+     "gameTimeHome",
+     "gameTimeAway",
+     "gameEt",
+     "duration",
+     "gameCode",
+     "gameStatusText",
+     "gameStatus",
+     "regulationPeriods",
+     "period",
+     "gameClock",
+     "attendance",
+     "sellout",
+     "arena",
+     "officials",
+     "homeTeam",
+     "awayTeam"
+    ]
+   },
+   "playbyplay": {
+    "kind": "playbyplay",
+    "httpStatus": 200,
+    "bytes": 460795,
+    "error": null,
+    "verifiedGame": true,
+    "gameEt": null,
+    "gameStatus": null,
+    "home": null,
+    "away": null
+   }
+  },
+  {
+   "gameId": "0042000404",
+   "boxscore": {
+    "kind": "boxscore",
+    "httpStatus": 200,
+    "bytes": 37905,
+    "error": null,
+    "verifiedGame": true,
+    "gameEt": "2021-07-14T21:00:00-04:00",
+    "gameStatus": 3,
+    "home": "MIL",
+    "away": "PHX",
+    "hasPeriods": true,
+    "homeTeamKeys": [
+     "teamId",
+     "teamName",
+     "teamCity",
+     "teamTricode",
+     "score",
+     "inBonus",
+     "timeoutsRemaining",
+     "periods",
+     "players",
+     "statistics"
+    ],
+    "firstPeriod": {
+     "period": 1,
+     "periodType": "REGULAR",
+     "score": 20
+    },
+    "gameKeys": [
+     "gameId",
+     "gameTimeLocal",
+     "gameTimeUTC",
+     "gameTimeHome",
+     "gameTimeAway",
+     "gameEt",
+     "duration",
+     "gameCode",
+     "gameStatusText",
+     "gameStatus",
+     "regulationPeriods",
+     "period",
+     "gameClock",
+     "attendance",
+     "sellout",
+     "arena",
+     "officials",
+     "homeTeam",
+     "awayTeam"
+    ]
+   },
+   "playbyplay": {
+    "kind": "playbyplay",
+    "httpStatus": 200,
+    "bytes": 378064,
+    "error": null,
+    "verifiedGame": true,
+    "gameEt": null,
+    "gameStatus": null,
+    "home": null,
+    "away": null
+   }
+  },
+  {
+   "gameId": "0021900001",
+   "boxscore": {
+    "kind": "boxscore",
+    "httpStatus": 200,
+    "bytes": 38534,
+    "error": null,
+    "verifiedGame": true,
+    "gameEt": "2019-10-22T20:00:00-04:00",
+    "gameStatus": 3,
+    "home": "TOR",
+    "away": "NOP",
+    "hasPeriods": true,
+    "homeTeamKeys": [
+     "teamId",
+     "teamName",
+     "teamCity",
+     "teamTricode",
+     "score",
+     "inBonus",
+     "timeoutsRemaining",
+     "periods",
+     "players",
+     "statistics"
+    ],
+    "firstPeriod": {
+     "period": 1,
+     "periodType": "REGULAR",
+     "score": 27
+    },
+    "gameKeys": [
+     "gameId",
+     "gameTimeLocal",
+     "gameTimeUTC",
+     "gameTimeHome",
+     "gameTimeAway",
+     "gameEt",
+     "duration",
+     "gameCode",
+     "gameStatusText",
+     "gameStatus",
+     "gameStatusTextOther",
+     "regulationPeriods",
+     "period",
+     "gameClock",
+     "attendance",
+     "sellout",
+     "arena",
+     "officials",
+     "homeTeam",
+     "awayTeam"
+    ]
+   },
+   "playbyplay": {
+    "kind": "playbyplay",
+    "httpStatus": 200,
+    "bytes": 454536,
+    "error": null,
+    "verifiedGame": true,
+    "gameEt": null,
+    "gameStatus": null,
+    "home": null,
+    "away": null
+   }
+  },
+  {
+   "gameId": "0021800001",
+   "boxscore": {
+    "kind": "boxscore",
+    "httpStatus": 403,
+    "bytes": 263,
+    "error": "HTTPError 403"
+   },
+   "playbyplay": {
+    "kind": "playbyplay",
+    "httpStatus": 403,
+    "bytes": 263,
+    "error": "HTTPError 403"
+   }
+  },
+  {
+   "gameId": "0021700001",
+   "boxscore": {
+    "kind": "boxscore",
+    "httpStatus": 403,
+    "bytes": 263,
+    "error": "HTTPError 403"
+   },
+   "playbyplay": {
+    "kind": "playbyplay",
+    "httpStatus": 403,
+    "bytes": 243,
+    "error": "HTTPError 403"
+   }
+  },
+  {
+   "gameId": "0021600001",
+   "boxscore": {
+    "kind": "boxscore",
+    "httpStatus": 403,
+    "bytes": 243,
+    "error": "HTTPError 403"
+   },
+   "playbyplay": {
+    "kind": "playbyplay",
+    "httpStatus": 403,
+    "bytes": 243,
+    "error": "HTTPError 403"
+   }
+  },
+  {
+   "gameId": "0021500001",
+   "boxscore": {
+    "kind": "boxscore",
+    "httpStatus": 403,
+    "bytes": 263,
+    "error": "HTTPError 403"
+   },
+   "playbyplay": {
+    "kind": "playbyplay",
+    "httpStatus": 403,
+    "bytes": 243,
+    "error": "HTTPError 403"
+   }
+  },
+  {
+   "gameId": "0021400001",
+   "boxscore": {
+    "kind": "boxscore",
+    "httpStatus": 403,
+    "bytes": 243,
+    "error": "HTTPError 403"
+   },
+   "playbyplay": {
+    "kind": "playbyplay",
+    "httpStatus": 403,
+    "bytes": 263,
+    "error": "HTTPError 403"
+   }
+  },
+  {
+   "gameId": "0021300001",
+   "boxscore": {
+    "kind": "boxscore",
+    "httpStatus": 403,
+    "bytes": 243,
+    "error": "HTTPError 403"
+   },
+   "playbyplay": {
+    "kind": "playbyplay",
+    "httpStatus": 403,
+    "bytes": 243,
+    "error": "HTTPError 403"
+   }
+  },
+  {
+   "gameId": "0021200001",
+   "boxscore": {
+    "kind": "boxscore",
+    "httpStatus": 403,
+    "bytes": 263,
+    "error": "HTTPError 403"
+   },
+   "playbyplay": {
+    "kind": "playbyplay",
+    "httpStatus": 403,
+    "bytes": 243,
+    "error": "HTTPError 403"
+   }
+  }
+ ],
+ "officialPages": [
+  {
+   "label": "standings",
+   "url": "https://www.nba.com/standings",
+   "httpStatus": 200,
+   "bytes": 256803,
+   "hasNextData": true,
+   "nextDataKeys": [
+    "props",
+    "page",
+    "query",
+    "buildId",
+    "isFallback",
+    "isExperimentalCompile",
+    "dynamicIds",
+    "gssp",
+    "appGip",
+    "locale",
+    "locales",
+    "defaultLocale",
+    "scriptLoader"
+   ],
+   "pagePropsKeys": [
+    "layout",
+    "contentExpanded",
+    "region"
+   ],
+   "nextDataBytes": 107540
+  },
+  {
+   "label": "games",
+   "url": "https://www.nba.com/games",
+   "httpStatus": 200,
+   "bytes": 285692,
+   "hasNextData": true,
+   "nextDataKeys": [
+    "props",
+    "page",
+    "query",
+    "buildId",
+    "isFallback",
+    "isExperimentalCompile",
+    "gssp",
+    "appGip",
+    "locale",
+    "locales",
+    "defaultLocale",
+    "scriptLoader"
+   ],
+   "pagePropsKeys": [
+    "hasError",
+    "layout",
+    "selectedDate",
+    "isDateOverrideActive",
+    "events",
+    "allGamesInCurrentYear",
+    "headlines",
+    "headers",
+    "region",
+    "gameCardFeed"
+   ],
+   "nextDataBytes": 125397
+  }
+ ]
+}

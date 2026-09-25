@@ -1,0 +1,156 @@
+{
+ "generatedAtUtc": "2026-09-25T19:40:31.742632+00:00",
+ "question": "Does the NBA-owned S3 mirror answer a third-party browser origin?",
+ "results": [
+  {
+   "url": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json",
+   "origin": "https://buffedlizard55-lab.github.io",
+   "ok": true,
+   "httpStatus": 200,
+   "bytes": 376,
+   "acao": null,
+   "corsHeaders": {},
+   "bodyPrefix": "{\r\n  \"meta\": {\r\n    \"version\": 1,\r\n    \"request\": \"https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveDa",
+   "looksLikeOfficialNbaJson": true,
+   "topLevelKeys": [
+    "meta",
+    "scoreboard"
+   ]
+  },
+  {
+   "url": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/scoreboard/todaysScoreboard_00.json",
+   "origin": "https://www.nba.com",
+   "ok": true,
+   "httpStatus": 200,
+   "bytes": 376,
+   "acao": null,
+   "corsHeaders": {},
+   "bodyPrefix": "{\r\n  \"meta\": {\r\n    \"version\": 1,\r\n    \"request\": \"https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveDa",
+   "looksLikeOfficialNbaJson": true,
+   "topLevelKeys": [
+    "meta",
+    "scoreboard"
+   ]
+  },
+  {
+   "url": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/boxscore/boxscore_0022400247.json",
+   "origin": "https://buffedlizard55-lab.github.io",
+   "ok": true,
+   "httpStatus": 200,
+   "bytes": 41012,
+   "acao": null,
+   "corsHeaders": {},
+   "bodyPrefix": "{\"meta\": {\"version\": 1, \"code\": 200, \"request\": \"http://nba.cloud/games/0022400247/boxscore?Format=json\", \"time\": \"2024-",
+   "looksLikeOfficialNbaJson": true,
+   "topLevelKeys": [
+    "meta",
+    "game"
+   ]
+  },
+  {
+   "url": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/boxscore/boxscore_0022400247.json",
+   "origin": "https://www.nba.com",
+   "ok": true,
+   "httpStatus": 200,
+   "bytes": 41012,
+   "acao": null,
+   "corsHeaders": {},
+   "bodyPrefix": "{\"meta\": {\"version\": 1, \"code\": 200, \"request\": \"http://nba.cloud/games/0022400247/boxscore?Format=json\", \"time\": \"2024-",
+   "looksLikeOfficialNbaJson": true,
+   "topLevelKeys": [
+    "meta",
+    "game"
+   ]
+  },
+  {
+   "url": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/playbyplay/playbyplay_0022400247.json",
+   "origin": "https://buffedlizard55-lab.github.io",
+   "ok": true,
+   "httpStatus": 200,
+   "bytes": 438994,
+   "acao": null,
+   "corsHeaders": {},
+   "bodyPrefix": "{\"meta\": {\"version\": 1, \"code\": 200, \"request\": \"http://nba.cloud/games/0022400247/playbyplay?Format=json\", \"time\": \"202",
+   "looksLikeOfficialNbaJson": true,
+   "topLevelKeys": [
+    "meta",
+    "game"
+   ]
+  },
+  {
+   "url": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/liveData/playbyplay/playbyplay_0022400247.json",
+   "origin": "https://www.nba.com",
+   "ok": true,
+   "httpStatus": 200,
+   "bytes": 438994,
+   "acao": null,
+   "corsHeaders": {},
+   "bodyPrefix": "{\"meta\": {\"version\": 1, \"code\": 200, \"request\": \"http://nba.cloud/games/0022400247/playbyplay?Format=json\", \"time\": \"202",
+   "looksLikeOfficialNbaJson": true,
+   "topLevelKeys": [
+    "meta",
+    "game"
+   ]
+  },
+  {
+   "url": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/games/0022400247/boxscore.json",
+   "origin": "https://buffedlizard55-lab.github.io",
+   "ok": false,
+   "httpStatus": 403,
+   "bytes": 263,
+   "error": "HTTPError 403",
+   "corsHeaders": {},
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>EJM1ZDV8WZ8SH33Q</RequestId><HostId>Ue3HSu0JUn"
+  },
+  {
+   "url": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/games/0022400247/boxscore.json",
+   "origin": "https://www.nba.com",
+   "ok": false,
+   "httpStatus": 403,
+   "bytes": 243,
+   "error": "HTTPError 403",
+   "corsHeaders": {},
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>EJMBH9S099DREXB2</RequestId><HostId>hbs+pgFHrM"
+  },
+  {
+   "url": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/games/0022400247/playbyplay.json",
+   "origin": "https://buffedlizard55-lab.github.io",
+   "ok": false,
+   "httpStatus": 403,
+   "bytes": 263,
+   "error": "HTTPError 403",
+   "corsHeaders": {},
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>EJM9NHYVJ7CKSRCE</RequestId><HostId>rRvG0NBbbE"
+  },
+  {
+   "url": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/NBA/games/0022400247/playbyplay.json",
+   "origin": "https://www.nba.com",
+   "ok": false,
+   "httpStatus": 403,
+   "bytes": 263,
+   "error": "HTTPError 403",
+   "corsHeaders": {},
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>HAH7M9B5D6AR0GRN</RequestId><HostId>nr6BjDJRRO"
+  },
+  {
+   "url": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/?list-type=2&prefix=NBA/liveData&max-keys=25",
+   "origin": "https://buffedlizard55-lab.github.io",
+   "ok": false,
+   "httpStatus": 403,
+   "bytes": 263,
+   "error": "HTTPError 403",
+   "corsHeaders": {},
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>HAH7Q25TMNJV7M45</RequestId><HostId>GsjHDx5PSv"
+  },
+  {
+   "url": "https://nba-prod-us-east-1-mediaops-stats.s3.amazonaws.com/?list-type=2&prefix=NBA/liveData&max-keys=25",
+   "origin": "https://www.nba.com",
+   "ok": false,
+   "httpStatus": 403,
+   "bytes": 263,
+   "error": "HTTPError 403",
+   "corsHeaders": {},
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>HAHEFVX52K4YCN5V</RequestId><HostId>fIiEw3FSns"
+  }
+ ]
+}

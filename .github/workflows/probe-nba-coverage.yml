@@ -1,0 +1,39 @@
+name: Probe NBA coverage (verification)
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/probe_coverage.py'
+      - '.github/workflows/probe-nba-coverage.yml'
+permissions:
+  contents: write
+concurrency:
+  # All data-writing workflows share one group so their commits never race.
+  group: nba-probe-writes
+  cancel-in-progress: false
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 scripts/probe_coverage.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-probe-evidence
+          path: data/verification/
+      - name: Commit evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/verification/coverage-probe.json
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git commit -m "chore(verify): coverage probe evidence [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase --autostash -X theirs -q origin "${GITHUB_REF_NAME}" && git push && { echo pushed; exit 0; }
+            echo "retry ${attempt}"; sleep 5
+          done
+          exit 1

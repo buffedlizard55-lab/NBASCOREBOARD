@@ -1,0 +1,452 @@
+{
+ "generatedAtUtc": "2026-09-25T19:57:11.671293+00:00",
+ "games": [
+  {
+   "date": "2026-09-25",
+   "url": "https://www.nba.com/games?date=2026-09-25",
+   "htmlBytes": 279164,
+   "hasNextData": true,
+   "pagePropsKeys": [
+    "hasError",
+    "layout",
+    "selectedDate",
+    "isDateOverrideActive",
+    "events",
+    "allGamesInCurrentYear",
+    "headlines",
+    "headers",
+    "region",
+    "gameCardFeed"
+   ],
+   "eventsType": "dict",
+   "feedKeys": [
+    "nextPageToken",
+    "previousPageToken",
+    "headerConfiguration",
+    "stickyAdsConfiguration",
+    "additionalSettings",
+    "modules"
+   ],
+   "feedShape": {
+    "nextPageToken": null,
+    "previousPageToken": null,
+    "headerConfiguration": {
+     "title": "Game Schedule",
+     "contents": {
+      "__len": 2,
+      "__item": "cast"
+     }
+    },
+    "stickyAdsConfiguration": {
+     "footerAds": {
+      "__len": 0,
+      "__item": null
+     },
+     "headerAds": {
+      "__len": 0,
+      "__item": null
+     },
+     "gamePlayerAds": {
+      "__len": 0,
+      "__item": null
+     }
+    },
+    "additionalSettings": {},
+    "modules": {
+     "__len": 0,
+     "__item": null
+    }
+   }
+  },
+  {
+   "date": "2024-11-04",
+   "url": "https://www.nba.com/games?date=2024-11-04",
+   "htmlBytes": 727561,
+   "hasNextData": true,
+   "pagePropsKeys": [
+    "hasError",
+    "layout",
+    "selectedDate",
+    "isDateOverrideActive",
+    "events",
+    "allGamesInCurrentYear",
+    "headlines",
+    "headers",
+    "region",
+    "gameCardFeed"
+   ],
+   "eventsType": "dict",
+   "feedKeys": [
+    "nextPageToken",
+    "previousPageToken",
+    "headerConfiguration",
+    "stickyAdsConfiguration",
+    "additionalSettings",
+    "modules"
+   ],
+   "feedShape": {
+    "nextPageToken": null,
+    "previousPageToken": null,
+    "headerConfiguration": {
+     "title": "Game Schedule",
+     "contents": {
+      "__len": 2,
+      "__item": "cast"
+     }
+    },
+    "stickyAdsConfiguration": {
+     "footerAds": {
+      "__len": 0,
+      "__item": null
+     },
+     "headerAds": {
+      "__len": 0,
+      "__item": null
+     },
+     "gamePlayerAds": {
+      "__len": 0,
+      "__item": null
+     }
+    },
+    "additionalSettings": {},
+    "modules": {
+     "__len": 1,
+     "__item": {
+      "__keys": [
+       "moduleType",
+       "moduleData",
+       "cards"
+      ]
+     }
+    }
+   }
+  },
+  {
+   "date": "2019-10-22",
+   "url": "https://www.nba.com/games?date=2019-10-22",
+   "htmlBytes": 321953,
+   "hasNextData": true,
+   "pagePropsKeys": [
+    "hasError",
+    "layout",
+    "selectedDate",
+    "isDateOverrideActive",
+    "events",
+    "allGamesInCurrentYear",
+    "headlines",
+    "headers",
+    "region",
+    "gameCardFeed"
+   ],
+   "eventsType": "dict",
+   "feedKeys": [
+    "nextPageToken",
+    "previousPageToken",
+    "headerConfiguration",
+    "stickyAdsConfiguration",
+    "additionalSettings",
+    "modules"
+   ],
+   "feedShape": {
+    "nextPageToken": null,
+    "previousPageToken": null,
+    "headerConfiguration": {
+     "title": "Game Schedule",
+     "contents": {
+      "__len": 2,
+      "__item": "cast"
+     }
+    },
+    "stickyAdsConfiguration": {
+     "footerAds": {
+      "__len": 0,
+      "__item": null
+     },
+     "headerAds": {
+      "__len": 0,
+      "__item": null
+     },
+     "gamePlayerAds": {
+      "__len": 0,
+      "__item": null
+     }
+    },
+    "additionalSettings": {},
+    "modules": {
+     "__len": 1,
+     "__item": {
+      "__keys": [
+       "moduleType",
+       "moduleData",
+       "cards"
+      ]
+     }
+    }
+   }
+  },
+  {
+   "date": "1996-06-16",
+   "url": "https://www.nba.com/games?date=1996-06-16",
+   "htmlBytes": 287543,
+   "hasNextData": true,
+   "pagePropsKeys": [
+    "hasError",
+    "layout",
+    "selectedDate",
+    "isDateOverrideActive",
+    "events",
+    "allGamesInCurrentYear",
+    "headlines",
+    "headers",
+    "region",
+    "gameCardFeed"
+   ],
+   "eventsType": "dict",
+   "feedKeys": [
+    "nextPageToken",
+    "previousPageToken",
+    "headerConfiguration",
+    "stickyAdsConfiguration",
+    "additionalSettings",
+    "modules"
+   ],
+   "feedShape": {
+    "nextPageToken": null,
+    "previousPageToken": null,
+    "headerConfiguration": {
+     "title": "Game Schedule",
+     "contents": {
+      "__len": 2,
+      "__item": "cast"
+     }
+    },
+    "stickyAdsConfiguration": {
+     "footerAds": {
+      "__len": 0,
+      "__item": null
+     },
+     "headerAds": {
+      "__len": 0,
+      "__item": null
+     },
+     "gamePlayerAds": {
+      "__len": 0,
+      "__item": null
+     }
+    },
+    "additionalSettings": {},
+    "modules": {
+     "__len": 1,
+     "__item": {
+      "__keys": [
+       "moduleType",
+       "moduleData",
+       "cards"
+      ]
+     }
+    }
+   }
+  }
+ ],
+ "standings": {
+  "htmlBytes": 256758,
+  "hasNextData": true,
+  "pagePropsKeys": [
+   "layout",
+   "contentExpanded",
+   "region"
+  ],
+  "contains:standings": true,
+  "contains:Standings": true,
+  "contains:conference": true,
+  "contains:playoffRank": false,
+  "contains:winPercentage": false,
+  "contains:wins": false,
+  "contains:losses": false,
+  "layoutShape": {
+   "header": {
+    "links": {
+     "__len": 17,
+     "__item": {
+      "id": 13,
+      "order": 1,
+      "text": "Games",
+      "href": "https://www.nba.com/games",
+      "type": "custom",
+      "icon": "",
+      "mobileOrder": 1,
+      "children": {
+       "__len": 2,
+       "__item": {
+        "__keys": [
+         "id",
+         "order",
+         "text",
+         "href",
+         "type",
+         "icon",
+         "mobileOrder"
+        ]
+       }
+      }
+     }
+    }
+   },
+   "footer": {
+    "links": {
+     "__len": 5,
+     "__item": {
+      "id": 172557,
+      "order": 1,
+      "text": "NBA Organization",
+      "href": "https://www.nba.com/#",
+      "type": "custom",
+      "icon": "",
+      "mobile_order": 0,
+      "children": {
+       "__len": 4,
+       "__item": {
+        "__keys": [
+         "id",
+         "order",
+         "text",
+         "href",
+         "type",
+         "icon",
+         "mobile_order"
+        ]
+       }
+      }
+     }
+    },
+    "legal": {
+     "__len": 10,
+     "__item": {
+      "id": 275565,
+      "order": 1,
+      "text": "Privacy Policy",
+      "href": "https://www.nba.com/privacy-policy",
+      "type": "post_type",
+      "icon": "",
+      "mobile_order": 0,
+      "post_id": 196023,
+      "post_type": "page"
+     }
+    },
+    "social": {
+     "__len": 7,
+     "__item": {
+      "id": 171872,
+      "order": 1,
+      "text": "Facebook",
+      "href": "https://facebook.com/nba",
+      "type": "custom",
+      "icon": "facebook"
+     }
+    }
+   },
+   "subNav": {
+    "name": "Standings",
+    "links": {
+     "__len": 5,
+     "__item": {
+      "id": 1874960,
+      "order": 114,
+      "text": "2025-26 Regular Season Standings",
+      "href": "https://www.nba.com/standings",
+      "type": "custom",
+      "icon": "",
+      "mobileOrder": 0
+     }
+    }
+   },
+   "adPlacements": {
+    "section": "standings",
+    "refresh": {
+     "__len": 2,
+     "__item": {
+      "__len": 2,
+      "__item": 5
+     }
+    },
+    "responsive": true,
+    "units": {
+     "__len": 3,
+     "__item": {
+      "adUnit": "NBA/Standings",
+      "domId": "standings_ad_b_1",
+      "posId": "bnr_atf_01",
+      "sizeMap": {
+       "__len": 5,
+       "__item": {
+        "__keys": [
+         "viewport",
+         "sizes"
+        ]
+       }
+      },
+      "targets": {
+       "__len": 2,
+       "__item": {
+        "__len": 2,
+        "__item": "pos"
+       }
+      }
+     }
+    },
+    "exists": true
+   },
+   "analytics": {
+    "page": {
+     "pageInfo": {
+      "pageName": "nba:standings:main",
+      "siteSection": "nba:standings",
+      "subSection1": "nba:standings:main",
+      "subSection2": "nba:standings:main",
+      "primaryCategory": "standings"
+     },
+     "content": {
+      "season": "2022",
+      "seasonType": "regular"
+     }
+    },
+    "site": {
+     "propertyName": "nba:web",
+     "league": "nba"
+    },
+    "exists": true
+   }
+  },
+  "standingsLikeNodes": []
+ },
+ "schedule": {
+  "2025-26": {
+   "season": "2025-26",
+   "url": "https://www.nba.com/schedule?season=2025-26",
+   "htmlBytes": 236303,
+   "hasNextData": true,
+   "pagePropsKeys": [
+    "layout",
+    "teamName",
+    "region",
+    "scheduleSettings"
+   ],
+   "gameIdMatches": 0,
+   "firstGameId": null
+  },
+  "2019-20": {
+   "season": "2019-20",
+   "url": "https://www.nba.com/schedule?season=2019-20",
+   "htmlBytes": 236303,
+   "hasNextData": true,
+   "pagePropsKeys": [
+    "layout",
+    "teamName",
+    "region",
+    "scheduleSettings"
+   ],
+   "gameIdMatches": 0,
+   "firstGameId": null
+  }
+ }
+}

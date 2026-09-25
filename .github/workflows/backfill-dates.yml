@@ -1,0 +1,88 @@
+name: Backfill official scoreboard dates
+
+# Fetches the official NBA.com game page for specific dates and archives the
+# scoreboard rows under data/scoreboard/<date>.json. Useful for:
+#   * seeding a new clone,
+#   * filling in a date range a reviewer asks about,
+#   * re-verifying what the official page currently says for a past night.
+#
+# On push it uses a demonstration list; on manual dispatch pass your own list.
+on:
+  workflow_dispatch:
+    inputs:
+      dates:
+        description: 'Comma-separated YYYY-MM-DD list (empty = default list)'
+        required: false
+        default: ''
+  push:
+    paths:
+      - '.github/workflows/backfill-dates.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  # All data-writing workflows share one group so their commits never race.
+  group: nba-data-writes
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Backfill dates
+        env:
+          REQUESTED: ${{ inputs.dates }}
+        run: |
+          set -euo pipefail
+          # Detail archives (box score + play-by-play) are only possible from 2019-20 on,
+          # so keep the detail-heavy dates recent and the older ones digest-only.
+          DATES="${REQUESTED:-1996-06-16,2010-06-17,2016-06-19,2019-10-22,2020-10-11,2024-06-17,2024-11-04}"
+          IFS=',' read -ra LIST <<< "$DATES"
+          for d in "${LIST[@]}"; do
+            d="$(echo "$d" | xargs)"
+            [ -z "$d" ] && continue
+            echo "::group::backfill $d"
+            python3 scripts/sync_nba_data.py --mode live --date "$d" --with-games || true
+            echo "::endgroup::"
+          done
+
+      - name: Show what was archived
+        run: |
+          python3 - <<'PY'
+          import json, glob, os
+          for path in sorted(glob.glob('data/scoreboard/*.json')):
+              d = json.load(open(path))
+              if d.get('gameCount'):
+                  print(f"{d['gameDate']}: {d['gameCount']} games")
+                  for g in d['games'][:3]:
+                      print(f"   {g['gameId']} {g.get('seasonYear')} {g['away']['tricode']} {g['away']['score']} @ {g['home']['tricode']} {g['home']['score']} ({g.get('gameStatusText')})")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backfill-evidence
+          path: data/
+
+      - name: Commit data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git commit -m "data: official scoreboard backfill [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase --autostash -X theirs -q origin "${GITHUB_REF_NAME}" && git push && { echo pushed; exit 0; }
+            echo "retry ${attempt}"; sleep 5
+          done
+          exit 1
+
+# (touch: run the backfill after the 2019-20 detail support was added)
+
+# (touch: run the backfill with detail archives again after the retention policy change)
