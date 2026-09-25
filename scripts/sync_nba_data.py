@@ -1,35 +1,30 @@
 #!/usr/bin/env python3
 """
-sync_nba_data.py — Fetch OFFICIAL NBA data server-side and publish it as static JSON.
+sync_nba_data.py — build the scoreboard's official data set, server-side.
 
-WHY THIS EXISTS
----------------
-Two real-world blockers stop a purely client-side scoreboard from showing every game:
+WHY SERVER-SIDE (measured, 2026-09-25 — see data/verification/):
+  * A page on any non-nba.com origin is refused by cdn.nba.com (Akamai 403).
+    Measured: Origin=https://buffedlizard55-lab.github.io -> 403, with or without
+    a referer, over HTTP/1.1 and HTTP/2.
+  * NBA's own S3 mirror of the same files answers 200 but sends no CORS header.
+  * stats.nba.com never answered a GitHub-hosted runner (45s timeouts, all recipes).
+  => No browser can read official NBA JSON directly. The only way to run a scoreboard
+     with 100% official data and zero third parties is to fetch it on a real egress
+     (GitHub Actions) and publish it next to the site.
 
-1. stats.nba.com (historical scoreboards, standings, pre-2019 play-by-play) refuses
-   cross-origin browser requests (no Access-Control-Allow-Origin). A browser page
-   cannot read it directly.
-2. Some client networks/VPNs/regions cannot reach cdn.nba.com at all.
+WHAT IT PUBLISHES (all under data/, all traceable to an official URL):
+  data/live/scoreboard.json        today's official live scoreboard (raw payload)
+  data/live/plays.json             compacted recent plays for today's games
+  data/schedule/<season>.json      compacted official season schedule (incl. future)
+  data/scoreboard/<date>.json      compacted scoreboard for a played date
+  data/games/<gameId>/boxscore.json    compacted official box score (archived at final)
+  data/games/<gameId>/playbyplay.json  compacted official play-by-play (archived at final)
+  data/index.json                  manifest the site reads first
+  data/verification/sync-log.json  machine record of every fetch (url, status, counts)
 
-This pipeline runs on GitHub Actions (real egress), pulls ONLY official NBA
-endpoints, and commits the responses as static files next to the site. GitHub Pages
-then serves them same-origin, so the scoreboard has a verified official fallback
-for every case above — with no third-party data and no manual work.
-
-GUARANTEES
-----------
-* Only hosts owned by the NBA are contacted (see scripts/nba_official.py).
-* Every stored payload keeps the exact official response under `official`, plus a
-  `_sync` block recording source URL + fetch time. Nothing is edited or invented.
-* Files are written only when the official content actually changed, so the repo
-  and the deploy pipeline do not churn.
-* Every run appends a machine-readable record of what it did to
-  data/verification/sync-log.json (endpoint, HTTP status, bytes, games found).
-
-Usage:
-  python3 scripts/sync_nba_data.py --mode live      # today's feed only (frequent)
-  python3 scripts/sync_nba_data.py --mode daily     # live + standings + recent history
-  python3 scripts/sync_nba_data.py --mode full      # daily + season schedule + backfill
+Compaction never invents values: every number is copied from the official payload and
+each file records the official source URL plus a sha256 of the original payload.
+Files are only rewritten when the official content actually changed.
 """
 
 from __future__ import annotations
@@ -51,35 +46,60 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from nba_official import (  # noqa: E402
     CDN_HEADERS,
     LIVE_SCOREBOARD_URL,
-    STATS_HEADERS,
-    boxscore_url,
-    league_standings_v3_url,
-    playbyplay_url,
-    schedule_candidates,
-    scoreboard_v3_url,
+    SEASON_SCHEDULE_URL,
+    HTML_HEADERS,
+    games_page_url,
+    live_boxscore_url,
+    live_playbyplay_url,
+    s3_boxscore_url,
 )
+from nba_official import live_playbyplay_url as pbp_url  # noqa: F401  (kept explicit)
 
-TIMEOUT = 30
-RETRIES = 3
 DATA = os.path.join(ROOT, "data")
 LOG_PATH = os.path.join(DATA, "verification", "sync-log.json")
-MAX_LOG_RUNS = 40
-# How many historical dates we keep as static scoreboards in the repo.
-HISTORY_WINDOW_DAYS = 45
-BACKFILL_MAX_DATES = 120
+MAX_LOG_RUNS = 30
+PLAYS_PER_GAME = 80
+HISTORY_DAYS_DEFAULT = 14
+BACKFILL_MAX_DATES = 60
+PIPELINE = "scripts/sync_nba_data.py"
 
-
-# --------------------------------------------------------------------------- io
+# Player statistics fields kept from the official box score (subset = smaller files).
+PLAYER_STAT_KEYS = [
+    "minutes", "points", "reboundsTotal", "assists", "steals", "blocks",
+    "turnovers", "fieldGoalsMade", "fieldGoalsAttempted", "fieldGoalsPercentage",
+    "threePointersMade", "threePointersAttempted", "threePointersPercentage",
+    "freeThrowsMade", "freeThrowsAttempted", "freeThrowsPercentage",
+    "reboundsOffensive", "reboundsDefensive", "foulsPersonal", "plusMinusPoints",
+    "pointsInThePaint", "pointsFastBreak", "assistsTurnoverRatio", "comment",
+]
+TEAM_STAT_KEYS = [
+    "points", "reboundsTotal", "assists", "steals", "blocks", "turnovers",
+    "fieldGoalsMade", "fieldGoalsAttempted", "fieldGoalsPercentage",
+    "threePointersMade", "threePointersAttempted", "threePointersPercentage",
+    "freeThrowsMade", "freeThrowsAttempted", "freeThrowsPercentage",
+    "reboundsOffensive", "reboundsDefensive", "foulsPersonal", "pointsInThePaint",
+    "pointsFastBreak", "pointsFromTurnovers", "pointsSecondChance", "benchPoints",
+    "biggestLead", "biggestScoringRun", "leadChanges", "timesTied", "timeoutsRemaining",
+]
+ACTION_KEYS = [
+    "actionNumber", "period", "clock", "teamTricode", "personId", "playerNameI",
+    "actionType", "subType", "description", "scoreHome", "scoreAway", "isFieldGoal",
+    "shotResult", "pointsTotal", "reboundTotal", "stealPersonId", "blockPersonId",
+    "assistPersonId", "shotDistance", "x", "y",
+]
 
 
 def now_utc() -> str:
     return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
 
 
-def http_get_json(url: str, headers: dict, timeout: int = TIMEOUT):
-    """GET a URL. Returns (json_or_None, meta). Never raises."""
+# --------------------------------------------------------------------------- http
+
+
+def http_get(url: str, headers: dict, timeout: int = 40, retries: int = 3):
+    """GET a URL and return (payload_or_None, meta). Never raises."""
     meta = {"url": url, "attempts": 0, "httpStatus": None, "error": None, "bytes": 0}
-    for attempt in range(1, RETRIES + 1):
+    for attempt in range(1, retries + 1):
         meta["attempts"] = attempt
         try:
             req = urllib.request.Request(url, headers=headers)
@@ -93,22 +113,45 @@ def http_get_json(url: str, headers: dict, timeout: int = TIMEOUT):
                 meta["httpStatus"] = resp.status
                 meta["bytes"] = len(raw)
                 meta["cacheControl"] = resp.headers.get("Cache-Control")
-                meta["serverDate"] = resp.headers.get("Date")
                 try:
                     return json.loads(raw.decode("utf-8")), meta
                 except Exception as exc:
                     meta["error"] = f"JSON parse failed: {exc}"
+                    meta["bodyPrefix"] = raw[:120].decode("utf-8", "replace")
                     return None, meta
         except urllib.error.HTTPError as exc:
+            body = exc.read()
             meta["httpStatus"] = exc.code
             meta["error"] = f"HTTPError {exc.code}"
+            # 403 from this CDN is either the Akamai wall (bot-looking request) or a
+            # missing object. Record which, so the log is diagnosable.
+            meta["bodyPrefix"] = body[:100].decode("utf-8", "replace")
             if 400 <= exc.code < 500 and exc.code != 429:
-                return None, meta  # no point retrying a 404/403
+                return None, meta
         except Exception as exc:
             meta["error"] = f"{type(exc).__name__}: {exc}"
-        if attempt < RETRIES:
-            time.sleep(min(2 ** attempt, 8))
+        if attempt < retries:
+            time.sleep(min(2 ** attempt, 6))
     return None, meta
+
+
+def http_get_html(url: str, timeout: int = 45):
+    meta = {"url": url, "httpStatus": None, "error": None}
+    try:
+        req = urllib.request.Request(url, headers=HTML_HEADERS)
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            raw = resp.read()
+            if resp.headers.get("Content-Encoding") == "gzip":
+                raw = gzip.decompress(raw)
+            meta["httpStatus"] = resp.status
+            meta["bytes"] = len(raw)
+            return raw.decode("utf-8", "replace"), meta
+    except Exception as exc:
+        meta["error"] = f"{type(exc).__name__}: {exc}"
+        return None, meta
+
+
+# -------------------------------------------------------------------------- store
 
 
 def semantic_hash(payload) -> str:
@@ -128,443 +171,532 @@ def load_json(path: str):
 def write_json(path: str, payload) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as fh:
-        json.dump(payload, fh, ensure_ascii=False, separators=(",", ":"))
+        json.dump(payload, fh, ensure_ascii=False, separators=(",", ":"), sort_keys=False)
         fh.write("\n")
 
 
-def store_official(path: str, url: str, official, extra: dict | None = None) -> bool:
-    """Write official payload at `path` unless its content is unchanged.
-
-    Returns True when the file was written.
-    """
-    content_hash = semantic_hash(official)
+def store_compact(path: str, official_url: str, official_payload, content, note: str) -> bool:
+    """Write a compacted file unless the official content behind it is unchanged."""
+    content_hash = semantic_hash(official_payload)
     existing = load_json(path)
-    if existing and isinstance(existing, dict):
-        if existing.get("_sync", {}).get("contentHash") == content_hash:
-            return False  # identical official content -> no write, no churn
+    if isinstance(existing, dict) and existing.get("_sync", {}).get("contentHash") == content_hash:
+        return False
     payload = {
         "_sync": {
-            "source": url,
+            "source": official_url,
             "fetchedAtUtc": now_utc(),
             "contentHash": content_hash,
-            "pipeline": "scripts/sync_nba_data.py",
-            "dataOwner": "NBA (official)",
+            "officialBytes": len(json.dumps(official_payload, separators=(",", ":"))),
+            "note": note,
+            "pipeline": PIPELINE,
         },
-        "official": official,
+        **content,
     }
-    if extra:
-        payload["_sync"].update(extra)
     write_json(path, payload)
     return True
 
 
-# ------------------------------------------------------------------- extractors
-# Tolerant readers: they accept every official shape observed by the probe and
-# return [] rather than inventing data when a shape is unknown.
+# ---------------------------------------------------------------------- compactors
 
 
-def find_key(obj, names, depth=0):
-    """Case-insensitive key lookup for the first matching name (bounded depth)."""
-    if depth > 6 or not isinstance(obj, dict):
+def _subset(src: dict, keys: list) -> dict:
+    if not isinstance(src, dict):
+        return {}
+    return {k: src.get(k) for k in keys if k in src}
+
+
+def compact_periods(team: dict) -> list:
+    out = []
+    for p in (team or {}).get("periods") or []:
+        if isinstance(p, dict):
+            out.append({"period": p.get("period"), "periodType": p.get("periodType"),
+                        "score": p.get("score")})
+    return out
+
+
+def compact_player(player: dict) -> dict | None:
+    if not isinstance(player, dict) or not player.get("personId"):
         return None
-    lowered = {k.lower(): k for k in obj.keys()}
-    for name in names:
-        if name.lower() in lowered:
-            return obj[lowered[name.lower()]]
-    for value in obj.values():
-        if isinstance(value, dict):
-            found = find_key(value, names, depth + 1)
-            if found is not None:
-                return found
-    return None
+    return {
+        "personId": player.get("personId"),
+        "name": player.get("name") or player.get("familyName"),
+        "nameI": player.get("nameI"),
+        "firstName": player.get("firstName"),
+        "familyName": player.get("familyName"),
+        "jerseyNum": player.get("jerseyNum"),
+        "position": player.get("position"),
+        "starter": player.get("starter") or player.get("position") == "G" and None,
+        "oncourt": player.get("oncourt"),
+        "played": player.get("played"),
+        "statistics": _subset(player.get("statistics") or {}, PLAYER_STAT_KEYS),
+    }
 
 
-def games_from_scoreboard_payload(payload) -> list:
-    """Extract games from either cdn.nba.com (scoreboard.games) or
-    stats.nba.com scoreboardv3 (scoreboard.games or resultSets)."""
-    if not isinstance(payload, dict):
-        return []
-    sb = payload.get("scoreboard")
-    if isinstance(sb, dict) and isinstance(sb.get("games"), list):
-        return [g for g in sb["games"] if isinstance(g, dict)]
-    for rs in payload.get("resultSets") or []:
-        if not isinstance(rs, dict):
+def compact_team_box(team: dict) -> dict:
+    return {
+        "teamId": team.get("teamId"),
+        "teamCity": team.get("teamCity"),
+        "teamName": team.get("teamName"),
+        "teamTricode": team.get("teamTricode"),
+        "score": team.get("score"),
+        "inBonus": team.get("inBonus"),
+        "timeoutsRemaining": team.get("timeoutsRemaining"),
+        "periods": compact_periods(team),
+        "statistics": _subset(team.get("statistics") or {}, TEAM_STAT_KEYS),
+        "players": [p for p in (compact_player(pl) for pl in (team.get("players") or [])) if p],
+    }
+
+
+def compact_boxscore(payload: dict) -> dict:
+    game = payload.get("game") or {}
+    return {
+        "gameId": game.get("gameId"),
+        "gameCode": game.get("gameCode"),
+        "gameStatus": game.get("gameStatus"),
+        "gameStatusText": game.get("gameStatusText"),
+        "gameEt": game.get("gameEt"),
+        "gameTimeUTC": game.get("gameTimeUTC"),
+        "gameTimeLocal": game.get("gameTimeLocal"),
+        "period": game.get("period"),
+        "regulationPeriods": game.get("regulationPeriods"),
+        "attendance": game.get("attendance"),
+        "duration": game.get("duration"),
+        "seriesText": game.get("seriesText"),
+        "seriesGameNumber": game.get("seriesGameNumber"),
+        "arena": game.get("arena"),
+        "officials": game.get("officials"),
+        "homeTeam": compact_team_box(game.get("homeTeam") or {}),
+        "awayTeam": compact_team_box(game.get("awayTeam") or {}),
+        "gameLeaders": {
+            side: {
+                k: v for k, v in (game.get("gameLeaders", {}).get(side) or {}).items()
+                if k in ("personId", "name", "jerseyNum", "position", "teamTricode",
+                         "points", "rebounds", "assists")
+            }
+            for side in ("homeLeaders", "awayLeaders")
+        },
+    }
+
+
+def compact_actions(payload: dict, limit: int | None = None) -> list:
+    actions = (payload.get("game") or {}).get("actions") or []
+    picked = actions[-limit:] if limit else actions
+    out = []
+    for a in picked:
+        if not isinstance(a, dict):
             continue
-        if (rs.get("name") or "").lower() in ("gameheader", "games"):
-            headers = rs.get("headers") or []
-            rows = rs.get("rowSet") or []
-            out = []
-            for row in rows:
-                rec = dict(zip(headers, row))
-                gid = rec.get("GAME_ID")
-                if gid:
-                    out.append({"gameId": gid, "_resultSetRow": rec})
-            if out:
-                return out
-    return []
+        out.append({k: a.get(k) for k in ACTION_KEYS if k in a})
+    return out
 
 
-def game_id(game: dict):
-    return game.get("gameId") or game.get("GAME_ID") or game.get("gameid")
+def compact_schedule(payload: dict) -> dict | None:
+    league = payload.get("leagueSchedule") or {}
+    if not isinstance(league, dict) or not league.get("gameDates"):
+        return None
+    games = []
+    for gd in league["gameDates"]:
+        for g in gd.get("games") or []:
+            if not isinstance(g, dict) or not g.get("gameId"):
+                continue
+            home = g.get("homeTeam") or {}
+            away = g.get("awayTeam") or {}
+            games.append({
+                "gameId": g.get("gameId"),
+                "gameCode": g.get("gameCode"),
+                "gameStatus": g.get("gameStatus"),
+                "gameStatusText": g.get("gameStatusText"),
+                "gameDateEst": (g.get("gameDateEst") or "")[:10],
+                "gameDateTimeUTC": g.get("gameDateTimeUTC"),
+                "day": g.get("day"),
+                "gameLabel": g.get("gameLabel"),
+                "gameSubLabel": g.get("gameSubLabel"),
+                "seriesGameNumber": g.get("seriesGameNumber"),
+                "seriesText": g.get("seriesText"),
+                "arena": g.get("arenaName"),
+                "arenaCity": g.get("arenaCity"),
+                "arenaState": g.get("arenaState"),
+                "postponedStatus": g.get("postponedStatus"),
+                "homeTeamId": home.get("teamId"),
+                "homeTricode": home.get("teamTricode"),
+                "homeCity": home.get("teamCity"),
+                "homeName": home.get("teamName"),
+                "homeWins": home.get("wins"),
+                "homeLosses": home.get("losses"),
+                "homeScore": home.get("score"),
+                "awayTeamId": away.get("teamId"),
+                "awayTricode": away.get("teamTricode"),
+                "awayCity": away.get("teamCity"),
+                "awayName": away.get("teamName"),
+                "awayWins": away.get("wins"),
+                "awayLosses": away.get("losses"),
+                "awayScore": away.get("score"),
+                "broadcasters": [
+                    {"name": b.get("broadcasterDisplay"), "abbr": b.get("broadcasterAbbreviation"),
+                     "type": b.get("broadcasterType"), "region": b.get("regionId")}
+                    for b in (g.get("broadcasters") or {}).get("nationalBroadcasters", [])
+                ] + [
+                    {"name": b.get("broadcasterDisplay"), "abbr": b.get("broadcasterAbbreviation"),
+                     "type": "local"}
+                    for b in (g.get("broadcasters") or {}).get("homeBroadcasters", [])[:1]
+                ],
+                "pointsLeaders": [
+                    {"personId": p.get("personId"), "name": p.get("firstName", "") + " " + (p.get("lastName") or ""),
+                     "points": p.get("points"), "teamTricode": p.get("teamTricode")}
+                    for p in (g.get("pointsLeaders") or [])
+                ],
+            })
+    return {
+        "season": league.get("seasonYear"),
+        "leagueId": league.get("leagueId"),
+        "gameCount": len(games),
+        "firstGameDate": min((g["gameDateEst"] for g in games), default=None),
+        "lastGameDate": max((g["gameDateEst"] for g in games), default=None),
+        "games": games,
+    }
 
 
-def game_date_et(game: dict) -> str | None:
-    """Best-effort ET game date (YYYY-MM-DD) from either feed shape."""
-    for key in ("gameEt", "gameTimeUTC", "gameTimeEst", "gameDateTimeEst", "gameDate"):
-        val = game.get(key) or (game.get("_resultSetRow") or {}).get(key.upper())
-        if isinstance(val, str) and len(val) >= 10:
-            return val[:10]
-    return None
+def leaders_from_box(team: dict) -> dict | None:
+    best = None
+    for pl in team.get("players") or []:
+        st = pl.get("statistics") or {}
+        pts = st.get("points") or 0
+        if best is None or (pts or 0) > (best[1] or 0):
+            best = (pl, pts)
+    if not best:
+        return None
+    pl, pts = best
+    st = pl.get("statistics") or {}
+    return {
+        "personId": pl.get("personId"),
+        "name": pl.get("name") or pl.get("nameI"),
+        "jerseyNum": pl.get("jerseyNum"),
+        "position": pl.get("position"),
+        "teamTricode": team.get("teamTricode"),
+        "points": pts,
+        "rebounds": st.get("reboundsTotal"),
+        "assists": st.get("assists"),
+    }
 
 
-# ------------------------------------------------------------------ sync steps
+def digest_game(box_payload: dict, source_url: str) -> dict:
+    """One row of a historical scoreboard, copied from an official box score."""
+    game = compact_boxscore(box_payload)
+    home, away = game.get("homeTeam") or {}, game.get("awayTeam") or {}
+    return {
+        "gameId": game.get("gameId"),
+        "gameCode": game.get("gameCode"),
+        "gameStatus": game.get("gameStatus"),
+        "gameStatusText": game.get("gameStatusText"),
+        "gameEt": game.get("gameEt"),
+        "gameTimeUTC": game.get("gameTimeUTC"),
+        "period": game.get("period"),
+        "attendance": game.get("attendance"),
+        "arena": (game.get("arena") or {}).get("arenaName") if isinstance(game.get("arena"), dict) else None,
+        "seriesText": game.get("seriesText"),
+        "home": {
+            "teamId": home.get("teamId"), "tricode": home.get("teamTricode"),
+            "city": home.get("teamCity"), "name": home.get("teamName"),
+            "score": home.get("score"), "periods": home.get("periods"),
+            "leaders": leaders_from_box(home),
+        },
+        "away": {
+            "teamId": away.get("teamId"), "tricode": away.get("teamTricode"),
+            "city": away.get("teamCity"), "name": away.get("teamName"),
+            "score": away.get("score"), "periods": away.get("periods"),
+            "leaders": leaders_from_box(away),
+        },
+        "_source": source_url,
+    }
+
+
+# ----------------------------------------------------------------------- steps
 
 
 def sync_live(log: dict) -> None:
-    print("[live] fetching today's official scoreboard", flush=True)
-    payload, meta = http_get_json(LIVE_SCOREBOARD_URL, CDN_HEADERS)
+    print("[live] official today's scoreboard", flush=True)
+    payload, meta = http_get(LIVE_SCOREBOARD_URL, CDN_HEADERS)
     entry = {"step": "live", **meta}
-    if payload is None:
+    if not payload or not isinstance(payload.get("scoreboard"), dict):
         log["steps"].append({**entry, "result": "FAILED"})
-        print(f"[live] FAILED: {meta.get('error')} status={meta.get('httpStatus')}", flush=True)
+        print(f"[live] FAILED status={meta.get('httpStatus')} err={meta.get('error')}", flush=True)
         return
-    games = games_from_scoreboard_payload(payload)
-    sb = payload.get("scoreboard") or {}
-    written = store_official(
-        os.path.join(DATA, "live", "scoreboard.json"),
-        LIVE_SCOREBOARD_URL,
-        payload,
-        extra={
-            "feedDate": sb.get("gameDate"),
-            "gameCount": len(games),
-        },
+    sb = payload["scoreboard"]
+    games = sb.get("games") or []
+    written = store_compact(
+        os.path.join(DATA, "live", "scoreboard.json"), LIVE_SCOREBOARD_URL, payload,
+        {"feedDate": sb.get("gameDate"), "gameCount": len(games),
+         "liveCount": sum(1 for g in games if g.get("gameStatus") == 2),
+         "scoreboard": payload},
+        "unmodified official payload under `scoreboard`",
     )
-    live_count = sum(1 for g in games if g.get("gameStatus") == 2)
-    log["steps"].append(
-        {
-            **entry,
-            "result": "OK",
-            "gameCount": len(games),
-            "liveCount": live_count,
-            "feedDate": sb.get("gameDate"),
-            "written": written,
+    log["steps"].append({**entry, "result": "OK", "gameCount": len(games),
+                         "feedDate": sb.get("gameDate"), "written": written})
+    print(f"[live] OK games={len(games)} feedDate={sb.get('gameDate')} written={written}", flush=True)
+
+    # Recent plays for games happening/recently finished today.
+    plays = {"_sync": {"sources": [], "note": "compacted official play-by-play actions (last N)"},
+             "games": {}}
+    for g in games:
+        gid = g.get("gameId")
+        if g.get("gameStatus") not in (2, 3) or not gid:
+            continue
+        pbp, pmeta = http_get(live_playbyplay_url(gid), CDN_HEADERS)
+        if not pbp or not (pbp.get("game") or {}).get("actions"):
+            log["steps"].append({"step": "livePlays", "gameId": gid, **pmeta, "result": "FAILED"})
+            continue
+        actions = compact_actions(pbp, limit=PLAYS_PER_GAME)
+        plays["games"][gid] = {
+            "gameStatus": g.get("gameStatus"),
+            "gameStatusText": g.get("gameStatusText"),
+            "actions": actions,
+            "_source": live_playbyplay_url(gid),
         }
-    )
-    print(
-        f"[live] OK games={len(games)} live={live_count} feedDate={sb.get('gameDate')} written={written}",
-        flush=True,
-    )
+        plays["_sync"]["sources"].append(live_playbyplay_url(gid))
+        log["steps"].append({"step": "livePlays", "gameId": gid, **pmeta, "result": "OK",
+                             "actionCount": len(actions)})
+    if plays["games"]:
+        path = os.path.join(DATA, "live", "plays.json")
+        existing = load_json(path)
+        new_hash = semantic_hash({k: v for k, v in plays["games"].items()})
+        if not existing or existing.get("_sync", {}).get("contentHash") != new_hash:
+            plays["_sync"]["contentHash"] = new_hash
+            plays["_sync"]["fetchedAtUtc"] = now_utc()
+            write_json(path, plays)
+            print(f"[live] plays written for {len(plays['games'])} games", flush=True)
 
 
-def sync_scoreboard_date(date_str: str, log: dict, force: bool = False) -> bool:
-    """Archive one official historical scoreboard (stats.nba.com scoreboardv3)."""
-    url = scoreboard_v3_url(date_str)
+def archive_game(game_id: str, log: dict, force: bool = False) -> bool:
+    """Archive official box score + play-by-play once a game is final."""
+    box_path = os.path.join(DATA, "games", game_id, "boxscore.json")
+    pbp_path = os.path.join(DATA, "games", game_id, "playbyplay.json")
+    if not force and os.path.exists(box_path) and os.path.exists(pbp_path):
+        return False
+    wrote = False
+    box, bmeta = http_get(live_boxscore_url(game_id), CDN_HEADERS)
+    if box and isinstance(box.get("game"), dict) and box["game"].get("gameId"):
+        wrote |= store_compact(
+            box_path, live_boxscore_url(game_id), box,
+            {"game": compact_boxscore(box),
+             "gameLeaders": compact_boxscore(box).get("gameLeaders")},
+            "official box score, player/team stats copied field-for-field (subset of keys)",
+        )
+        log["steps"].append({"step": "archiveBoxscore", "gameId": game_id, **bmeta, "result": "OK",
+                             "written": wrote})
+        print(f"[archive] {game_id} boxscore OK {bmeta.get('bytes')}B", flush=True)
+    else:
+        log["steps"].append({"step": "archiveBoxscore", "gameId": game_id, **bmeta, "result": "FAILED"})
+        print(f"[archive] {game_id} boxscore FAILED status={bmeta.get('httpStatus')}", flush=True)
+    pbp, pmeta = http_get(live_playbyplay_url(game_id), CDN_HEADERS)
+    if pbp and (pbp.get("game") or {}).get("actions"):
+        actions = compact_actions(pbp)
+        wrote |= store_compact(
+            pbp_path, live_playbyplay_url(game_id), pbp,
+            {"gameId": game_id, "actionCount": len(actions), "actions": actions},
+            "official play-by-play actions, fields copied field-for-field (subset of keys)",
+        )
+        log["steps"].append({"step": "archivePlaybyplay", "gameId": game_id, **pmeta, "result": "OK",
+                             "actionCount": len(actions)})
+        print(f"[archive] {game_id} pbp OK actions={len(actions)}", flush=True)
+    else:
+        log["steps"].append({"step": "archivePlaybyplay", "gameId": game_id, **pmeta, "result": "FAILED"})
+        print(f"[archive] {game_id} pbp FAILED status={pmeta.get('httpStatus')}", flush=True)
+    return wrote
+
+
+def game_ids_for_date_from_schedule(date_str: str, season: str) -> list:
+    sched = load_json(os.path.join(DATA, "schedule", f"{season}.json"))
+    if not sched:
+        return []
+    ids = [g["gameId"] for g in sched.get("games", []) if g.get("gameDateEst") == date_str]
+    return ids
+
+
+def game_ids_for_date_from_cards(date_str: str, log: dict) -> list:
+    """Official www.nba.com/games page server-renders the day's cards (measured)."""
+    import re
+    html, meta = http_get_html(games_page_url(date_str))
+    if not html:
+        log["steps"].append({"step": "cards", "date": date_str, **meta, "result": "FAILED"})
+        return []
+    m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.S)
+    if not m:
+        log["steps"].append({"step": "cards", "date": date_str, **meta,
+                             "result": "NO_NEXT_DATA"})
+        return []
+    try:
+        nd = json.loads(m.group(1))
+    except Exception as exc:
+        log["steps"].append({"step": "cards", "date": date_str, **meta,
+                             "result": f"PARSE_ERROR {exc}"})
+        return []
+    raw = json.dumps(((nd.get("props") or {}).get("pageProps") or {}))
+    ids = sorted(set(re.findall(r'"gameId"\s*:\s*"(\d{10})"', raw)))
+    log["steps"].append({"step": "cards", "date": date_str, **meta, "result": "OK",
+                         "gameCount": len(ids)})
+    print(f"[cards] {date_str} found {len(ids)} official game ids", flush=True)
+    return ids
+
+
+def sync_date_digest(date_str: str, log: dict, season: str, force: bool = False) -> bool:
     path = os.path.join(DATA, "scoreboard", f"{date_str}.json")
     if not force and os.path.exists(path):
-        # Already archived and games are final -> nothing to gain by re-fetching,
-        # except for today (scores can still change).
-        if date_str != dt.datetime.now(dt.timezone.utc).date().isoformat():
-            return False
-    payload, meta = http_get_json(url, STATS_HEADERS)
-    if payload is None:
-        log["steps"].append({"step": "scoreboard", "date": date_str, **meta, "result": "FAILED"})
-        print(f"[history] {date_str} FAILED: {meta.get('error')}", flush=True)
         return False
-    games = games_from_scoreboard_payload(payload)
-    if not games:
-        log["steps"].append(
-            {"step": "scoreboard", "date": date_str, **meta, "result": "NO_GAMES", "gameCount": 0}
-        )
-        print(f"[history] {date_str} official response had no games", flush=True)
+    ids = game_ids_for_date_from_schedule(date_str, season) or game_ids_for_date_from_cards(date_str, log)
+    if not ids:
+        log["steps"].append({"step": "digest", "date": date_str, "result": "NO_GAMES"})
+        print(f"[digest] {date_str}: no official game ids", flush=True)
         return False
-    written = store_official(
-        path, url, payload, extra={"gameDate": date_str, "gameCount": len(games)}
-    )
-    log["steps"].append(
-        {"step": "scoreboard", "date": date_str, **meta, "result": "OK",
-         "gameCount": len(games), "written": written}
-    )
-    print(f"[history] {date_str} OK games={len(games)} written={written}", flush=True)
+    rows = []
+    for gid in ids:
+        box, meta = http_get(live_boxscore_url(gid), CDN_HEADERS)
+        if box and isinstance(box.get("game"), dict) and box["game"].get("gameId"):
+            rows.append(digest_game(box, live_boxscore_url(gid)))
+            log["steps"].append({"step": "digestGame", "gameId": gid, **meta, "result": "OK"})
+        else:
+            log["steps"].append({"step": "digestGame", "gameId": gid, **meta, "result": "FAILED"})
+    if not rows:
+        return False
+    rows.sort(key=lambda r: (r.get("gameEt") or "", r.get("gameId") or ""))
+    content = {
+        "gameDate": date_str,
+        "gameCount": len(rows),
+        "games": rows,
+        "sources": [live_boxscore_url(r["gameId"]) for r in rows],
+    }
+    written = store_compact(path, games_page_url(date_str), rows, content,
+                            "rows copied from official box scores (per-game _source listed)")
+    log["steps"].append({"step": "digest", "date": date_str, "result": "OK",
+                         "gameCount": len(rows), "written": written})
+    print(f"[digest] {date_str} OK games={len(rows)} written={written}", flush=True)
     return written
 
 
-def sync_history(log: dict, days: int = HISTORY_WINDOW_DAYS, force: bool = False) -> None:
+def sync_schedule(log: dict) -> None:
+    payload, meta = http_get(SEASON_SCHEDULE_URL, CDN_HEADERS, timeout=60)
+    if not payload:
+        log["steps"].append({"step": "schedule", **meta, "result": "FAILED"})
+        print(f"[schedule] FAILED status={meta.get('httpStatus')}", flush=True)
+        return
+    compact = compact_schedule(payload)
+    if not compact:
+        log["steps"].append({"step": "schedule", **meta, "result": "SHAPE_UNKNOWN"})
+        return
+    season = compact.get("season") or "unknown"
+    path = os.path.join(DATA, "schedule", f"{season}.json")
+    written = store_compact(path, SEASON_SCHEDULE_URL, payload, compact,
+                            "official season schedule; includes future games (verified)")
+    log["steps"].append({"step": "schedule", "season": season, **meta, "result": "OK",
+                         "gameCount": compact["gameCount"], "written": written})
+    print(f"[schedule] OK season={season} games={compact['gameCount']} written={written}", flush=True)
+
+
+def sync_archive_pending(log: dict, days: int) -> None:
+    """Archive box scores + play-by-play for games that finished but are not stored."""
     today = dt.datetime.now(dt.timezone.utc).date()
     for offset in range(1, days + 1):
         date_str = (today - dt.timedelta(days=offset)).isoformat()
-        sync_scoreboard_date(date_str, log, force=force)
-
-
-def sync_standings(log: dict, seasons: list[str], season_types: list[str]) -> None:
-    for season in seasons:
-        for season_type in season_types:
-            url = league_standings_v3_url(season, season_type)
-            payload, meta = http_get_json(url, STATS_HEADERS)
-            if payload is None:
-                log["steps"].append(
-                    {"step": "standings", "season": season, "type": season_type, **meta,
-                     "result": "FAILED"}
-                )
-                print(f"[standings] {season} {season_type} FAILED: {meta.get('error')}", flush=True)
-                continue
-            rows = find_key(payload, ["resultSets"]) or []
-            count = 0
-            for rs in rows if isinstance(rows, list) else []:
-                if isinstance(rs, dict) and (rs.get("name") or "").lower() == "standings":
-                    count = len(rs.get("rowSet") or [])
-            safe_type = season_type.replace(" ", "")
-            path = os.path.join(DATA, "standings", f"{season}-{safe_type}.json")
-            written = store_official(
-                path, url, payload, extra={"season": season, "seasonType": season_type,
-                                           "teamCount": count}
-            )
-            log["steps"].append(
-                {"step": "standings", "season": season, "type": season_type, **meta,
-                 "result": "OK", "teamCount": count, "written": written}
-            )
-            print(f"[standings] {season} {season_type} OK teams={count} written={written}", flush=True)
-
-
-def trim_schedule(payload) -> dict | None:
-    """Reduce an official CDN/Stats schedule payload to the fields the UI needs.
-
-    Returns None when the shape is not a game list (so we never publish junk).
-    """
-    if not isinstance(payload, dict):
-        return None
-    league = payload.get("leagueSchedule") or payload.get("LeagueSchedule")
-    if not isinstance(league, dict):
-        league = find_key(payload, ["leagueSchedule"]) or {}
-    game_dates = None
-    if isinstance(league, dict):
-        game_dates = league.get("gameDates") or league.get("GameDates")
-    if not isinstance(game_dates, list):
-        game_dates = find_key(payload, ["gameDates"]) or []
-    games_out = []
-    if isinstance(game_dates, list) and game_dates:
-        for gd in game_dates:
-            if not isinstance(gd, dict):
-                continue
-            for g in gd.get("games") or []:
-                if not isinstance(g, dict):
-                    continue
-                gid = game_id(g)
-                if not gid:
-                    continue
-                home = g.get("homeTeam") or {}
-                away = g.get("awayTeam") or {}
-                games_out.append(
-                    {
-                        "gameId": gid,
-                        "gameCode": g.get("gameCode"),
-                        "gameDateEst": (g.get("gameDateEst") or gd.get("gameDate") or "")[:10],
-                        "gameDateTimeUTC": g.get("gameDateTimeUTC"),
-                        "gameStatus": g.get("gameStatus"),
-                        "gameStatusText": g.get("gameStatusText"),
-                        "homeTeamId": home.get("teamId"),
-                        "homeTricode": home.get("teamTricode"),
-                        "homeScore": home.get("score"),
-                        "homeWins": home.get("wins"),
-                        "homeLosses": home.get("losses"),
-                        "awayTeamId": away.get("teamId"),
-                        "awayTricode": away.get("teamTricode"),
-                        "awayScore": away.get("score"),
-                        "awayWins": away.get("wins"),
-                        "awayLosses": away.get("losses"),
-                        "arena": (g.get("arena") or {}).get("arenaName"),
-                        "seriesText": g.get("seriesText"),
-                    }
-                )
-    if not games_out:
-        # stats.nba.com scheduleleaguev2 resultSets fallback
-        for rs in payload.get("resultSets") or []:
-            if not isinstance(rs, dict):
-                continue
-            headers = rs.get("headers") or []
-            if "GAME_ID" not in headers or "GAME_DATE" not in headers:
-                continue
-            for row in rs.get("rowSet") or []:
-                rec = dict(zip(headers, row))
-                games_out.append(
-                    {
-                        "gameId": rec.get("GAME_ID"),
-                        "gameCode": rec.get("GAME_ID"),
-                        "gameDateEst": (rec.get("GAME_DATE") or "")[:10],
-                        "gameStatus": 3 if rec.get("WL") or rec.get("PTS") else None,
-                        "homeTeamId": rec.get("HOME_TEAM_ID"),
-                        "homeTricode": rec.get("HOME_TEAM_ABBREVIATION"),
-                        "awayTeamId": rec.get("AWAY_TEAM_ID"),
-                        "awayTricode": rec.get("AWAY_TEAM_ABBREVIATION"),
-                        "arena": rec.get("ARENA_NAME"),
-                    }
-                )
-    if not games_out:
-        return None
-    season = None
-    for key in ("seasonYear", "SeasonYear", "seasonId", "SeasonID"):
-        if isinstance(league, dict) and league.get(key):
-            season = str(league[key])
-            break
-    # Derive season from game IDs (002YY -> season ending year) as a fallback.
-    if not season:
-        gid = games_out[0]["gameId"]
-        if isinstance(gid, str) and len(gid) >= 5 and gid[3:5].isdigit():
-            yy = int(gid[3:5])
-            season = f"{2000 + yy - 1}-{yy:02d}"
-    return {"season": season, "gameCount": len(games_out), "games": games_out}
-
-
-def sync_schedule(log: dict, season: str | None) -> None:
-    for label, url in schedule_candidates(season):
-        payload, meta = http_get_json(url, CDN_HEADERS if "cdn.nba.com" in url else STATS_HEADERS)
-        if payload is None:
-            log["steps"].append({"step": "schedule", "candidate": label, **meta, "result": "FAILED"})
-            print(f"[schedule] {label} FAILED: {meta.get('error')}", flush=True)
+        digest = load_json(os.path.join(DATA, "scoreboard", f"{date_str}.json"))
+        if not digest:
             continue
-        trimmed = trim_schedule(payload)
-        if not trimmed:
-            log["steps"].append(
-                {"step": "schedule", "candidate": label, **meta, "result": "SHAPE_UNKNOWN"}
-            )
-            print(f"[schedule] {label} returned 200 but shape not recognised -> skipped", flush=True)
-            continue
-        season_slug = trimmed.get("season") or (season or "unknown")
-        path = os.path.join(DATA, "schedule", f"{season_slug}.json")
-        old = load_json(path) or {}
-        official = {"season": trimmed["season"], "games": trimmed["games"]}
-        # merge with previously stored games for the same season (never lose data)
-        if isinstance(old.get("official"), dict) and old["official"].get("games"):
-            merged = {g["gameId"]: g for g in old["official"]["games"] if g.get("gameId")}
-            for g in trimmed["games"]:
-                merged[g["gameId"]] = {**merged.get(g["gameId"], {}), **g}
-            official["games"] = sorted(
-                merged.values(), key=lambda g: (g.get("gameDateEst") or "", g["gameId"])
-            )
-        written = store_official(
-            path, url, official, extra={"season": trimmed["season"] or season,
-                                        "gameCount": len(official["games"])}
-        )
-        log["steps"].append(
-            {"step": "schedule", "candidate": label, **meta, "result": "OK",
-             "season": trimmed["season"], "gameCount": len(official["games"]), "written": written}
-        )
-        print(
-            f"[schedule] {label} OK season={trimmed['season']} games={len(official['games'])} "
-            f"written={written}",
-            flush=True,
-        )
-        return
-
-
-def backfill_from_schedule(log: dict, season: str) -> int:
-    """Archive official scoreboards for finished game dates of the stored schedule.
-
-    This is what makes historical navigation work for visitors whose browser cannot
-    reach stats.nba.com (CORS) — the data is already published next to the site.
-    """
-    path = os.path.join(DATA, "schedule", f"{season}.json")
-    payload = load_json(path)
-    if not payload:
-        print(f"[backfill] no stored schedule for {season}", flush=True)
-        return 0
-    today = dt.datetime.now(dt.timezone.utc).date().isoformat()
-    dates = sorted(
-        {
-            g.get("gameDateEst")
-            for g in (payload.get("official") or {}).get("games", [])
-            if g.get("gameDateEst") and g["gameDateEst"] < today
-        }
-    )
-    pending = [
-        d
-        for d in dates
-        if not os.path.exists(os.path.join(DATA, "scoreboard", f"{d}.json"))
-    ]
-    if len(pending) > BACKFILL_MAX_DATES:
-        pending = pending[-BACKFILL_MAX_DATES:]
-    print(f"[backfill] {len(dates)} finished dates, {len(pending)} not archived yet", flush=True)
-    written = 0
-    for date_str in pending:
-        if sync_scoreboard_date(date_str, log, force=True):
-            written += 1
-    return written
+        for g in digest.get("games", []):
+            gid = g.get("gameId")
+            if not gid:
+                continue
+            if os.path.exists(os.path.join(DATA, "games", gid, "boxscore.json")):
+                continue
+            archive_game(gid, log)
 
 
 def build_index(log: dict) -> None:
-    """Manifest so the site can discover what is published without guessing."""
     index = {
+        "generatedBy": PIPELINE,
+        "rules": {
+            "dataOwner": "NBA — only official endpoints are used",
+            "evidence": "data/verification/",
+            "docs": "README.md#verified-data-sources",
+            "note": "Every file keeps the official source URL and a sha256 of the payload it was built from.",
+        },
         "live": None,
+        "plays": None,
         "scoreboards": {},
+        "games": {},
         "schedules": {},
         "standings": {},
         "sources": {
             "liveScoreboard": LIVE_SCOREBOARD_URL,
-            "historicalScoreboard": "https://stats.nba.com/stats/scoreboardv3?GameDate=YYYY-MM-DD&LeagueID=00",
-            "boxscore": boxscore_url("{gameId}"),
-            "playbyplay": playbyplay_url("{gameId}"),
-            "standings": "https://stats.nba.com/stats/leaguestandingsv3?LeagueID=00&Season=YYYY-YY&SeasonType=Regular+Season",
-        },
-        "rules": {
-            "dataOwner": "NBA (official endpoints only)",
-            "docs": "VERIFICATION.md",
-            "note": "Files hold the unmodified official response under `official`.",
+            "seasonSchedule": SEASON_SCHEDULE_URL,
+            "boxscoreTemplate": "https://cdn.nba.com/static/json/liveData/boxscore/boxscore_{gameId}.json",
+            "playbyplayTemplate": "https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_{gameId}.json",
+            "nbaGamesPage": "https://www.nba.com/games",
         },
     }
     live = load_json(os.path.join(DATA, "live", "scoreboard.json"))
     if live:
+        sb = (live.get("scoreboard") or {}).get("scoreboard") or {}
         index["live"] = {
             "path": "data/live/scoreboard.json",
             "fetchedAtUtc": live["_sync"]["fetchedAtUtc"],
-            "feedDate": live["_sync"].get("feedDate"),
-            "gameCount": live["_sync"].get("gameCount"),
+            "feedDate": sb.get("gameDate"),
+            "gameCount": len(sb.get("games") or []),
+            "liveCount": sum(1 for g in sb.get("games") or [] if g.get("gameStatus") == 2),
         }
-    sb_dir = os.path.join(DATA, "scoreboard")
-    if os.path.isdir(sb_dir):
-        for name in sorted(os.listdir(sb_dir)):
-            if not name.endswith(".json"):
-                continue
-            payload = load_json(os.path.join(sb_dir, name))
-            if not payload:
-                continue
-            games = games_from_scoreboard_payload(payload.get("official"))
-            index["scoreboards"][name[:-5]] = {
-                "path": f"data/scoreboard/{name}",
-                "fetchedAtUtc": payload["_sync"]["fetchedAtUtc"],
-                "gameCount": len(games),
-            }
-    for sub, key in (("schedule", "schedules"), ("standings", "standings")):
-        d = os.path.join(DATA, sub)
-        if not os.path.isdir(d):
+    plays = load_json(os.path.join(DATA, "live", "plays.json"))
+    if plays:
+        index["plays"] = {
+            "path": "data/live/plays.json",
+            "fetchedAtUtc": plays["_sync"].get("fetchedAtUtc"),
+            "gameCount": len(plays.get("games") or {}),
+        }
+    for name in sorted(os.listdir(os.path.join(DATA, "scoreboard"))) if os.path.isdir(os.path.join(DATA, "scoreboard")) else []:
+        if not name.endswith(".json"):
             continue
-        for name in sorted(os.listdir(d)):
-            if not name.endswith(".json"):
+        payload = load_json(os.path.join(DATA, "scoreboard", name))
+        if not payload:
+            continue
+        index["scoreboards"][name[:-5]] = {
+            "path": f"data/scoreboard/{name}",
+            "fetchedAtUtc": payload["_sync"]["fetchedAtUtc"],
+            "gameCount": payload.get("gameCount"),
+        }
+    games_dir = os.path.join(DATA, "games")
+    if os.path.isdir(games_dir):
+        for gid in sorted(os.listdir(games_dir)):
+            box_path = os.path.join(games_dir, gid, "boxscore.json")
+            box = load_json(box_path)
+            if not box:
                 continue
-            payload = load_json(os.path.join(d, name))
-            if not payload:
-                continue
-            index[key][name[:-5]] = {
-                "path": f"data/{sub}/{name}",
-                "fetchedAtUtc": payload["_sync"]["fetchedAtUtc"],
-                "gameCount": payload["_sync"].get("gameCount"),
-                "season": payload["_sync"].get("season"),
+            g = box.get("game") or {}
+            home, away = g.get("homeTeam") or {}, g.get("awayTeam") or {}
+            index["games"][gid] = {
+                "path": f"data/games/{gid}/",
+                "fetchedAtUtc": box["_sync"]["fetchedAtUtc"],
+                "gameEt": g.get("gameEt"),
+                "status": g.get("gameStatus"),
+                "away": away.get("teamTricode"), "home": home.get("teamTricode"),
+                "awayScore": away.get("score"), "homeScore": home.get("score"),
+                "hasPlaybyplay": os.path.exists(os.path.join(games_dir, gid, "playbyplay.json")),
+                "officialBoxscore": box["_sync"]["source"],
             }
-    index["verifiedAt"] = {
-        "live": (index["live"] or {}).get("fetchedAtUtc"),
-        "historicalDates": len(index["scoreboards"]),
-        "seasons": len(index["schedules"]),
-        "standingsTables": len(index["standings"]),
-    }
+    for name in sorted(os.listdir(os.path.join(DATA, "schedule"))) if os.path.isdir(os.path.join(DATA, "schedule")) else []:
+        if not name.endswith(".json"):
+            continue
+        payload = load_json(os.path.join(DATA, "schedule", name))
+        if not payload:
+            continue
+        index["schedules"][name[:-5]] = {
+            "path": f"data/schedule/{name}",
+            "fetchedAtUtc": payload["_sync"]["fetchedAtUtc"],
+            "gameCount": payload.get("gameCount"),
+            "firstGameDate": payload.get("firstGameDate"),
+            "lastGameDate": payload.get("lastGameDate"),
+        }
     path = os.path.join(DATA, "index.json")
-    existing = load_json(path)
-    if existing == index:
+    if load_json(path) == index:
         print("[index] unchanged", flush=True)
         return
     write_json(path, index)
-    print(
-        f"[index] written live={bool(index['live'])} dates={len(index['scoreboards'])} "
-        f"seasons={len(index['schedules'])} standings={len(index['standings'])}",
-        flush=True,
-    )
+    print(f"[index] live={bool(index['live'])} dates={len(index['scoreboards'])} "
+          f"games={len(index['games'])} seasons={len(index['schedules'])}", flush=True)
 
 
 def append_log(log: dict) -> None:
@@ -572,10 +704,8 @@ def append_log(log: dict) -> None:
     runs = history.get("runs") or []
     runs.insert(0, log)
     history["runs"] = runs[:MAX_LOG_RUNS]
-    history["_note"] = (
-        "Machine-written record of each sync run: which official endpoint was called, "
-        "what HTTP status came back, and how many games/teams were in the response."
-    )
+    history["_note"] = ("Machine-written record of each run: official endpoint called, "
+                        "HTTP status, bytes, and how many games/actions came back.")
     write_json(LOG_PATH, history)
 
 
@@ -588,31 +718,42 @@ def default_season() -> str:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=["live", "daily", "full"], default="live")
-    ap.add_argument("--history-days", type=int, default=HISTORY_WINDOW_DAYS)
-    ap.add_argument("--season", default=None, help="e.g. 2025-26 (defaults to current)")
-    ap.add_argument("--force-history", action="store_true", help="re-fetch archived dates")
+    ap.add_argument("--date", help="build data/scoreboard/<date>.json for this date")
+    ap.add_argument("--season", default=None)
+    ap.add_argument("--history-days", type=int, default=HISTORY_DAYS_DEFAULT)
+    ap.add_argument("--force", action="store_true", help="rewrite even if unchanged")
     args = ap.parse_args()
 
     season = args.season or default_season()
-    log = {
-        "runStartedUtc": now_utc(),
-        "mode": args.mode,
-        "season": season,
-        "steps": [],
-    }
+    log = {"runStartedUtc": now_utc(), "mode": args.mode, "season": season, "steps": []}
 
     sync_live(log)
+    # Archive any of today's games that just went final.
+    live = load_json(os.path.join(DATA, "live", "scoreboard.json"))
+    if live:
+        for g in ((live.get("scoreboard") or {}).get("scoreboard") or {}).get("games") or []:
+            if g.get("gameStatus") == 3 and g.get("gameId"):
+                archive_game(g["gameId"], log)
+
+    if args.date:
+        sync_date_digest(args.date, log, season, force=True)
 
     if args.mode in ("daily", "full"):
-        sync_standings(log, [season], ["Regular Season"])
-        sync_history(log, days=args.history_days, force=args.force_history)
+        today = dt.datetime.now(dt.timezone.utc).date()
+        for offset in range(1, args.history_days + 1):
+            sync_date_digest((today - dt.timedelta(days=offset)).isoformat(), log, season)
+        sync_archive_pending(log, args.history_days)
 
     if args.mode == "full":
-        sync_schedule(log, season)
-        # Backfill the season's finished dates so historical navigation has data
-        # even for clients that cannot reach cdn.nba.com.
-        backfill_from_schedule(log, season)
-        sync_standings(log, [season], ["Playoffs", "Pre Season"])
+        sync_schedule(log)
+        # One-time backfill of this season's finished dates (bounded).
+        sched = load_json(os.path.join(DATA, "schedule", f"{season}.json"))
+        if sched:
+            today = dt.datetime.now(dt.timezone.utc).date().isoformat()
+            done = {g["gameDateEst"] for g in sched.get("games", []) if g.get("gameDateEst") and g["gameDateEst"] < today}
+            pending = [d for d in sorted(done) if not os.path.exists(os.path.join(DATA, "scoreboard", f"{d}.json"))]
+            for date_str in pending[-BACKFILL_MAX_DATES:]:
+                sync_date_digest(date_str, log, season, force=True)
 
     build_index(log)
     log["runFinishedUtc"] = now_utc()
