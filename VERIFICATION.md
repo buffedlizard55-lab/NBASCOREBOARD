@@ -32,7 +32,7 @@ Machine-readable evidence lives in [`data/verification/`](../data/verification/)
 | 2.3 | Live feed cache/freshness | `cache-control: max-age=10` with etag/last-modified; the pipeline samples it every 10 minutes | [`endpoint-probe.json`](../data/verification/endpoint-probe.json) |
 | 2.4 | Schedule includes future games | **Yes** — 1274 games for 2026-27 with dates through 2027-04-11, read by the pipeline | [`deep-probe.json`](../data/verification/deep-probe.json) → `scheduleFiles`; `data/schedule/2026-27.json` |
 | 2.5 | Standings | **Unavailable from the paths tried.** 5 CDN standings paths → missing-object `403`; both Stats API recipes → read timeout; `nba.com/standings` HTML → 200 but no standings data in `__NEXT_DATA__` and no standings-shaped node anywhere in `pageProps` | [`standings-probe.json`](../data/verification/standings-probe.json) |
-| 2.7 | What nba.com's own front end calls | Its `_app` bundle references **`core-api.nba.com`** with `Core-Api-Key` / `Core-Api-Version` headers and `/api/v1/...` routes, and one chunk references the Stats endpoint `leaguestandingsv3`. `core-api.nba.com` is therefore the official app backend — being tested in [`core-api-probe.json`](../data/verification/core-api-probe.json) | [`standings-probe.json`](../data/verification/standings-probe.json) → `endpointHints`, [`deep-probe.json`](../data/verification/deep-probe.json) |
+| 2.7 | What nba.com's own front end calls | Its `_app` bundle references **`core-api.nba.com`** with `Core-Api-Key` / `Core-Api-Version` headers and `/api/v1/...` routes, and one chunk references the Stats endpoint `leaguestandingsv3`. **Measured:** `core-api.nba.com` returns `403` to a cloud runner on `/`, `/api/v1/authenticate?requestor_id=nba`, `/api/v1/checkauthn/` and `/api/v1/capi-preview/` (and to OPTIONS preflight), always with `Access-Control-Allow-Origin: https://www.nba.com` — so neither this site's origin nor a cloud runner can read it | [`core-api-probe.json`](../data/verification/core-api-probe.json), [`standings-probe.json`](../data/verification/standings-probe.json) → `endpointHints` |
 | 2.6 | Older seasons' schedules | Not published on the CDN (only the current one). Future/deeper seasons need the Stats API or the date pages | [`deep-probe.json`](../data/verification/deep-probe.json) |
 
 ---
@@ -47,6 +47,7 @@ Machine-readable evidence lives in [`data/verification/`](../data/verification/)
 4. **Cross-check on final:** when a game reaches "Final", the digest is re-read and the stored row is verified against the official box score (scores, team ids) — mismatches are written to `sync-log.json` as `MISMATCH` instead of being silently kept.
 5. **Append-only evidence:** probe workflows add timestamped result files; they never edit previous results.
 6. **Failure visibility:** every fetch attempt, its HTTP status, and the byte count land in [`sync-log.json`](../data/verification/sync-log.json), including failures.
+7. **No churn:** the live feed is gated on game data only — the feed's own `meta.time` (which changes on every request even when nothing else does) cannot create a commit, keeping the pipeline inside GitHub Pages' build-rate limit.
 
 ---
 
