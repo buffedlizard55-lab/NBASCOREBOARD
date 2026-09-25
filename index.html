@@ -69,6 +69,7 @@
       <div class="section-actions">
         <span class="pill" id="gameDatePill">—</span>
         <span class="pill" id="gameCountPill">0 games</span>
+        <input type="text" id="gameSearch" placeholder="Filter by team..." style="background:var(--card2); border:1px solid var(--border); color:var(--text); padding:6px 10px; border-radius:8px; font-size:12px; min-width:160px;">
       </div>
     </div>
 
@@ -76,6 +77,7 @@
       <code>GET https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json</code>
       <a href="https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json" target="_blank" class="link">View Raw ↗</a>
       <span class="cache">cache max-age=10s • CORS enabled</span>
+      <span class="pill" id="lastUpdated">—</span>
     </div>
 
     <div id="gamesGrid" class="games-grid">
