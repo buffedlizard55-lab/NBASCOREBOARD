@@ -1,5 +1,5 @@
 {
- "generatedAtUtc": "2026-09-25T19:43:20.318875+00:00",
+ "generatedAtUtc": "2026-09-25T20:38:52.887145+00:00",
  "coverage": [
   {
    "gameId": "0022400247",
@@ -391,13 +391,13 @@
    "boxscore": {
     "kind": "boxscore",
     "httpStatus": 403,
-    "bytes": 263,
+    "bytes": 243,
     "error": "HTTPError 403"
    },
    "playbyplay": {
     "kind": "playbyplay",
     "httpStatus": 403,
-    "bytes": 263,
+    "bytes": 243,
     "error": "HTTPError 403"
    }
   },
@@ -406,7 +406,7 @@
    "boxscore": {
     "kind": "boxscore",
     "httpStatus": 403,
-    "bytes": 263,
+    "bytes": 243,
     "error": "HTTPError 403"
    },
    "playbyplay": {
@@ -436,7 +436,7 @@
    "boxscore": {
     "kind": "boxscore",
     "httpStatus": 403,
-    "bytes": 263,
+    "bytes": 243,
     "error": "HTTPError 403"
    },
    "playbyplay": {
@@ -457,7 +457,7 @@
    "playbyplay": {
     "kind": "playbyplay",
     "httpStatus": 403,
-    "bytes": 263,
+    "bytes": 243,
     "error": "HTTPError 403"
    }
   },
@@ -481,7 +481,7 @@
    "boxscore": {
     "kind": "boxscore",
     "httpStatus": 403,
-    "bytes": 263,
+    "bytes": 243,
     "error": "HTTPError 403"
    },
    "playbyplay": {
@@ -497,7 +497,7 @@
    "label": "standings",
    "url": "https://www.nba.com/standings",
    "httpStatus": 200,
-   "bytes": 256803,
+   "bytes": 256822,
    "hasNextData": true,
    "nextDataKeys": [
     "props",
@@ -519,13 +519,13 @@
     "contentExpanded",
     "region"
    ],
-   "nextDataBytes": 107540
+   "nextDataBytes": 107562
   },
   {
    "label": "games",
    "url": "https://www.nba.com/games",
    "httpStatus": 200,
-   "bytes": 285692,
+   "bytes": 285674,
    "hasNextData": true,
    "nextDataKeys": [
     "props",
@@ -553,7 +553,7 @@
     "region",
     "gameCardFeed"
    ],
-   "nextDataBytes": 125397
+   "nextDataBytes": 125382
   }
  ]
 }
