@@ -1,0 +1,25 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Dependencies (none needed for static site, but ignore if added)
+node_modules/
+dist/
+build/
+
+# Env
+.env
+.env.local
+
+# Arena
+.arena/
