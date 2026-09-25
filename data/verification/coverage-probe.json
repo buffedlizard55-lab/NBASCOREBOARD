@@ -1,5 +1,5 @@
 {
- "generatedAtUtc": "2026-09-25T20:38:52.887145+00:00",
+ "generatedAtUtc": "2026-09-25T20:41:10.303979+00:00",
  "coverage": [
   {
    "gameId": "0022400247",
@@ -391,13 +391,13 @@
    "boxscore": {
     "kind": "boxscore",
     "httpStatus": 403,
-    "bytes": 243,
+    "bytes": 263,
     "error": "HTTPError 403"
    },
    "playbyplay": {
     "kind": "playbyplay",
     "httpStatus": 403,
-    "bytes": 243,
+    "bytes": 263,
     "error": "HTTPError 403"
    }
   },
@@ -406,13 +406,13 @@
    "boxscore": {
     "kind": "boxscore",
     "httpStatus": 403,
-    "bytes": 243,
+    "bytes": 263,
     "error": "HTTPError 403"
    },
    "playbyplay": {
     "kind": "playbyplay",
     "httpStatus": 403,
-    "bytes": 243,
+    "bytes": 263,
     "error": "HTTPError 403"
    }
   },
@@ -421,13 +421,13 @@
    "boxscore": {
     "kind": "boxscore",
     "httpStatus": 403,
-    "bytes": 243,
+    "bytes": 263,
     "error": "HTTPError 403"
    },
    "playbyplay": {
     "kind": "playbyplay",
     "httpStatus": 403,
-    "bytes": 243,
+    "bytes": 263,
     "error": "HTTPError 403"
    }
   },
@@ -442,7 +442,7 @@
    "playbyplay": {
     "kind": "playbyplay",
     "httpStatus": 403,
-    "bytes": 243,
+    "bytes": 263,
     "error": "HTTPError 403"
    }
   },
@@ -451,13 +451,13 @@
    "boxscore": {
     "kind": "boxscore",
     "httpStatus": 403,
-    "bytes": 243,
+    "bytes": 263,
     "error": "HTTPError 403"
    },
    "playbyplay": {
     "kind": "playbyplay",
     "httpStatus": 403,
-    "bytes": 243,
+    "bytes": 263,
     "error": "HTTPError 403"
    }
   },
@@ -481,7 +481,7 @@
    "boxscore": {
     "kind": "boxscore",
     "httpStatus": 403,
-    "bytes": 243,
+    "bytes": 263,
     "error": "HTTPError 403"
    },
    "playbyplay": {
@@ -497,7 +497,7 @@
    "label": "standings",
    "url": "https://www.nba.com/standings",
    "httpStatus": 200,
-   "bytes": 256822,
+   "bytes": 256706,
    "hasNextData": true,
    "nextDataKeys": [
     "props",
@@ -519,13 +519,13 @@
     "contentExpanded",
     "region"
    ],
-   "nextDataBytes": 107562
+   "nextDataBytes": 107445
   },
   {
    "label": "games",
    "url": "https://www.nba.com/games",
    "httpStatus": 200,
-   "bytes": 285674,
+   "bytes": 285782,
    "hasNextData": true,
    "nextDataKeys": [
     "props",
@@ -553,7 +553,7 @@
     "region",
     "gameCardFeed"
    ],
-   "nextDataBytes": 125382
+   "nextDataBytes": 125489
   }
  ]
 }
