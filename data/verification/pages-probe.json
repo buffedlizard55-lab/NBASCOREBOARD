@@ -1,10 +1,10 @@
 {
- "generatedAtUtc": "2026-09-25T21:52:12.588149+00:00",
+ "generatedAtUtc": "2026-09-25T22:07:25.384535+00:00",
  "games": [
   {
    "date": "2026-09-25",
    "url": "https://www.nba.com/games?date=2026-09-25",
-   "htmlBytes": 279181,
+   "htmlBytes": 281177,
    "hasNextData": true,
    "pagePropsKeys": [
     "hasError",
@@ -101,7 +101,7 @@
   {
    "date": "2024-11-04",
    "url": "https://www.nba.com/games?date=2024-11-04",
-   "htmlBytes": 727583,
+   "htmlBytes": 729579,
    "hasNextData": true,
    "pagePropsKeys": [
     "hasError",
@@ -204,7 +204,7 @@
   {
    "date": "2019-10-22",
    "url": "https://www.nba.com/games?date=2019-10-22",
-   "htmlBytes": 321975,
+   "htmlBytes": 323971,
    "hasNextData": true,
    "pagePropsKeys": [
     "hasError",
@@ -307,7 +307,7 @@
   {
    "date": "1996-06-16",
    "url": "https://www.nba.com/games?date=1996-06-16",
-   "htmlBytes": 287565,
+   "htmlBytes": 289561,
    "hasNextData": true,
    "pagePropsKeys": [
     "hasError",
@@ -409,7 +409,7 @@
   }
  ],
  "standings": {
-  "htmlBytes": 256867,
+  "htmlBytes": 256782,
   "hasNextData": true,
   "pagePropsKeys": [
    "layout",
@@ -583,7 +583,7 @@
   "2025-26": {
    "season": "2025-26",
    "url": "https://www.nba.com/schedule?season=2025-26",
-   "htmlBytes": 236325,
+   "htmlBytes": 236429,
    "hasNextData": true,
    "pagePropsKeys": [
     "layout",
@@ -597,7 +597,7 @@
   "2019-20": {
    "season": "2019-20",
    "url": "https://www.nba.com/schedule?season=2019-20",
-   "htmlBytes": 236325,
+   "htmlBytes": 236429,
    "hasNextData": true,
    "pagePropsKeys": [
     "layout",
@@ -607,6 +607,3333 @@
    ],
    "gameIdMatches": 0,
    "firstGameId": null
+  }
+ },
+ "gameDetails": {
+  "summerLeagueBox": {
+   "url": "https://www.nba.com/game/gsw-vs-mem-1522600076/box-score",
+   "htmlBytes": 473028,
+   "hasNextData": true,
+   "containsGameEnd": false,
+   "containsPlayerStats": true,
+   "pagePropsKeys": [
+    "layout",
+    "game",
+    "playByPlay",
+    "headline",
+    "heroImage",
+    "story",
+    "id",
+    "postId",
+    "view",
+    "region",
+    "analyticsObject",
+    "highlightVideos",
+    "seriesHubInfo",
+    "periodOptions",
+    "boxscoreParams",
+    "initialQueryParams",
+    "istGroup",
+    "_nextI18Next"
+   ],
+   "propsShape": {
+    "layout": {
+     "header": {
+      "links": {
+       "__len": 17,
+       "__item": {
+        "__keys": [
+         "id",
+         "order",
+         "text",
+         "href",
+         "type",
+         "icon",
+         "mobileOrder",
+         "children"
+        ]
+       }
+      }
+     },
+     "footer": {
+      "links": {
+       "__len": 5,
+       "__item": {
+        "__keys": [
+         "id",
+         "order",
+         "text",
+         "href",
+         "type",
+         "icon",
+         "mobile_order",
+         "children"
+        ]
+       }
+      },
+      "legal": {
+       "__len": 10,
+       "__item": {
+        "__keys": [
+         "id",
+         "order",
+         "text",
+         "href",
+         "type",
+         "icon",
+         "mobile_order",
+         "post_id",
+         "post_type"
+        ]
+       }
+      },
+      "social": {
+       "__len": 7,
+       "__item": {
+        "__keys": [
+         "id",
+         "order",
+         "text",
+         "href",
+         "type",
+         "icon"
+        ]
+       }
+      }
+     },
+     "subNav": false,
+     "adPlacements": {
+      "section": "game-details",
+      "refresh": {
+       "__len": 2,
+       "__item": {
+        "__len": 2,
+        "__item": 5
+       }
+      },
+      "responsive": true,
+      "units": {
+       "__len": 4,
+       "__item": {
+        "__keys": [
+         "adUnit",
+         "domId",
+         "posId",
+         "sizeMap",
+         "targets"
+        ]
+       }
+      },
+      "exists": true,
+      "target": {
+       "__len": 0,
+       "__item": null
+      }
+     },
+     "analytics": {
+      "page": {
+       "__keys": [
+        "pageInfo",
+        "content"
+       ]
+      },
+      "site": {
+       "__keys": [
+        "propertyName",
+        "league"
+       ]
+      },
+      "exists": true
+     }
+    },
+    "game": {
+     "gameId": "1522600076",
+     "gameCode": "20260719/GSWMEM",
+     "gameStatus": 3,
+     "gameStatusText": "Final               ",
+     "period": 4,
+     "gameClock": "PT00M00.00S",
+     "gameTimeUTC": "2026-07-20T01:00:00Z",
+     "gameEt": "2026-07-19T21:00:00Z",
+     "awayTeamId": 1610612744,
+     "homeTeamId": 1610612763,
+     "duration": "1:45",
+     "attendance": 0,
+     "sellout": 0,
+     "seriesGameNumber": "",
+     "gameLabel": "2026 NBA Summer League",
+     "gameSubLabel": "Championship",
+     "seriesText": "",
+     "ifNecessary": false,
+     "isNeutral": false,
+     "arena": {
+      "arenaId": 65,
+      "arenaName": "Thomas & Mack Center",
+      "arenaCity": "Las Vegas",
+      "arenaState": "NV",
+      "arenaCountry": "US",
+      "arenaTimezone": "Pacific",
+      "arenaStreetAddress": "",
+      "arenaPostalCode": ""
+     },
+     "officials": {
+      "__len": 3,
+      "__item": {
+       "__keys": [
+        "personId",
+        "name",
+        "nameI",
+        "firstName",
+        "familyName",
+        "jerseyNum",
+        "assignment"
+       ]
+      }
+     },
+     "broadcasters": {
+      "internationalBroadcasters": {
+       "__len": 13,
+       "__item": {
+        "__keys": [
+         "broadcasterId",
+         "broadcastDisplay",
+         "broadcasterDisplay",
+         "broadcasterVideoLink",
+         "broadcasterDescription",
+         "broadcasterTeamId",
+         "regionId"
+        ]
+       }
+      },
+      "internationalRadioBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "internationalOttBroadcasters": {
+       "__len": 6,
+       "__item": {
+        "__keys": [
+         "broadcasterId",
+         "broadcastDisplay",
+         "broadcasterDisplay",
+         "broadcasterVideoLink",
+         "broadcasterDescription",
+         "broadcasterTeamId",
+         "regionId"
+        ]
+       }
+      },
+      "nationalBroadcasters": {
+       "__len": 1,
+       "__item": {
+        "__keys": [
+         "broadcasterId",
+         "broadcastDisplay",
+         "broadcasterDisplay",
+         "broadcasterVideoLink",
+         "broadcasterDescription",
+         "broadcasterTeamId",
+         "regionId"
+        ]
+       }
+      },
+      "nationalRadioBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "nationalOttBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "homeTvBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "homeRadioBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "homeOttBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "awayTvBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "awayRadioBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "awayOttBroadcasters": {
+       "__len": 0,
+       "__item": null
+      }
+     },
+     "homeTeam": {
+      "teamId": 1610612763,
+      "teamName": "Grizzlies",
+      "teamCity": "Memphis",
+      "teamTricode": "MEM",
+      "teamSlug": "grizzlies",
+      "teamWins": 4,
+      "teamLosses": 2,
+      "score": 90,
+      "inBonus": "",
+      "timeoutsRemaining": 0,
+      "seed": 0,
+      "statistics": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points",
+        "plusMinusPoints"
+       ]
+      },
+      "periods": {
+       "__len": 4,
+       "__item": {
+        "__keys": [
+         "period",
+         "periodType",
+         "score"
+        ]
+       }
+      },
+      "players": {
+       "__len": 15,
+       "__item": {
+        "__keys": [
+         "personId",
+         "firstName",
+         "familyName",
+         "nameI",
+         "playerSlug",
+         "position",
+         "comment",
+         "jerseyNum",
+         "statistics"
+        ]
+       }
+      },
+      "inactives": {
+       "__len": 0,
+       "__item": null
+      },
+      "starters": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points"
+       ]
+      },
+      "bench": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points"
+       ]
+      }
+     },
+     "awayTeam": {
+      "teamId": 1610612744,
+      "teamName": "Warriors",
+      "teamCity": "Golden State",
+      "teamTricode": "GSW",
+      "teamSlug": "warriors",
+      "teamWins": 5,
+      "teamLosses": 1,
+      "score": 94,
+      "inBonus": "",
+      "timeoutsRemaining": 0,
+      "seed": 0,
+      "statistics": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points",
+        "plusMinusPoints"
+       ]
+      },
+      "periods": {
+       "__len": 4,
+       "__item": {
+        "__keys": [
+         "period",
+         "periodType",
+         "score"
+        ]
+       }
+      },
+      "players": {
+       "__len": 17,
+       "__item": {
+        "__keys": [
+         "personId",
+         "firstName",
+         "familyName",
+         "nameI",
+         "playerSlug",
+         "position",
+         "comment",
+         "jerseyNum",
+         "statistics"
+        ]
+       }
+      },
+      "inactives": {
+       "__len": 0,
+       "__item": null
+      },
+      "starters": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points"
+       ]
+      },
+      "bench": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points"
+       ]
+      }
+     },
+     "lastFiveMeetings": {
+      "meetings": {
+       "__len": 2,
+       "__item": {
+        "__keys": [
+         "recencyOrder",
+         "gameId",
+         "gameTimeUTC",
+         "gameEt",
+         "gameStatus",
+         "gameStatusText",
+         "gameClock",
+         "broadcasterVideoLink",
+         "awayTeam",
+         "homeTeam"
+        ]
+       }
+      }
+     }
+    },
+    "playByPlay": {
+     "gameId": "1522600076",
+     "videoAvailable": 0,
+     "actions": {
+      "__len": 438,
+      "__item": {
+       "__keys": [
+        "actionNumber",
+        "clock",
+        "period",
+        "teamId",
+        "teamTricode",
+        "personId",
+        "playerName",
+        "playerNameI",
+        "xLegacy",
+        "yLegacy",
+        "shotDistance",
+        "shotResult",
+        "isFieldGoal",
+        "scoreHome",
+        "scoreAway",
+        "pointsTotal",
+        "location",
+        "description",
+        "actionType",
+        "subType",
+        "videoAvailable",
+        "shotValue",
+        "actionId"
+       ]
+      }
+     },
+     "source": "hanaV3"
+    },
+    "headline": "Warriors Win Championship",
+    "heroImage": "https://cdn.nba.com/manage/2026/07/warriors-trophy-1920-2286",
+    "story": null,
+    "id": "gsw-vs-mem-1522600076",
+    "postId": 2280675,
+    "view": {
+     "id": "box-score",
+     "label": "Box Score"
+    },
+    "region": "united-states",
+    "analyticsObject": {
+     "gameMatchup": "GSW @ MEM, 2026-07-19",
+     "gameID": "1522600076",
+     "gameState": "ondemand",
+     "gameQuarter": "Final",
+     "gameBroadcasters": "Videoland;ESPN_I_Afr;Sport5_Isr;QQ;ESPN_I_SA;beIN_FRA;SN;Mig",
+     "venue": "Thomas & Mack Center, Las Vegas, NV",
+     "season": 2026,
+     "seasonType": "Summer League"
+    },
+    "highlightVideos": {
+     "__len": 12,
+     "__item": {
+      "id": 2282136,
+      "title": "Memphis Grizzlies vs. Golden State Warriors - 2nd Half Highl",
+      "shortTitle": "",
+      "permalink": "https://www.nba.com/watch/video/memphis-grizzlies-vs-golden-",
+      "videoDuration": "01:29",
+      "featuredImage": "https://cdn.nba.com/manage/2026/07/163fd1f1-f65e-4010-9169-3",
+      "entitlements": "free",
+      "videoFranchisesName": {
+       "__keys": [
+        "individual-top-plays-wsc"
+       ]
+      }
+     }
+    },
+    "seriesHubInfo": {
+     "season": 2026
+    },
+    "periodOptions": {
+     "__len": 7,
+     "__item": {
+      "RangeType": 0,
+      "lp": 0,
+      "isOT": false,
+      "text": "All Periods",
+      "val": "All",
+      "startTime": 0,
+      "endTime": 28800,
+      "startPeriod": 0,
+      "endPeriod": 0,
+      "json": "{\"rangeType\":0,\"startPeriod\":0,\"endPeriod\":0,\"startRange\":0,"
+     }
+    },
+    "boxscoreParams": {
+     "defaultRangeString": "0-28800",
+     "initialBoxscoreCacheKey": "{\"resource\":\"traditional\",\"gameId\":\"1522600076\",\"rangePeriod"
+    },
+    "initialQueryParams": {
+     "props": {
+      "__len": 2,
+      "__item": "gsw-vs-mem-1522600076"
+     }
+    },
+    "istGroup": {},
+    "_nextI18Next": {
+     "initialI18nStore": {
+      "en": {
+       "__keys": [
+        "member-night",
+        "member-night-international"
+       ]
+      }
+     },
+     "initialLocale": "en",
+     "ns": {
+      "__len": 2,
+      "__item": "member-night"
+     },
+     "userConfig": {
+      "i18n": {
+       "__keys": [
+        "defaultLocale",
+        "locales",
+        "localeDetection"
+       ]
+      },
+      "fallbackLng": "en",
+      "ns": {
+       "__len": 9,
+       "__item": "account"
+      },
+      "defaultNS": "common",
+      "interpolation": {
+       "__keys": [
+        "escapeValue"
+       ]
+      },
+      "react": {
+       "__keys": [
+        "useSuspense"
+       ]
+      },
+      "default": {
+       "__keys": [
+        "i18n",
+        "fallbackLng",
+        "ns",
+        "defaultNS",
+        "interpolation",
+        "react"
+       ]
+      }
+     }
+    }
+   },
+   "relevantPaths": [
+    {
+     "path": "props.game.gameStatus",
+     "shape": 3
+    },
+    {
+     "path": "props.game.gameStatusText",
+     "shape": "Final               "
+    },
+    {
+     "path": "props.game.arena.arenaState",
+     "shape": "NV"
+    },
+    {
+     "path": "props.game.homeTeam.statistics",
+     "shape": {
+      "minutes": "200:00",
+      "fieldGoalsMade": 34,
+      "fieldGoalsAttempted": 76,
+      "fieldGoalsPercentage": 0.447,
+      "threePointersMade": 14,
+      "threePointersAttempted": 37,
+      "threePointersPercentage": 0.378,
+      "freeThrowsMade": 4,
+      "freeThrowsAttempted": 8,
+      "freeThrowsPercentage": 0.5,
+      "reboundsOffensive": 13,
+      "reboundsDefensive": 20,
+      "reboundsTotal": 33,
+      "assists": 22,
+      "steals": 6,
+      "blocks": 1,
+      "turnovers": 10,
+      "foulsPersonal": 17,
+      "points": 90,
+      "plusMinusPoints": -4
+     }
+    },
+    {
+     "path": "props.game.homeTeam.players[0].statistics",
+     "shape": {
+      "minutes": "34:44",
+      "fieldGoalsMade": 7,
+      "fieldGoalsAttempted": 17,
+      "fieldGoalsPercentage": 0.412,
+      "threePointersMade": 3,
+      "threePointersAttempted": 7,
+      "threePointersPercentage": 0.429,
+      "freeThrowsMade": 1,
+      "freeThrowsAttempted": 3,
+      "freeThrowsPercentage": 0.333,
+      "reboundsOffensive": 5,
+      "reboundsDefensive": 3,
+      "reboundsTotal": 8,
+      "assists": 4,
+      "steals": 2,
+      "blocks": 0,
+      "turnovers": 4,
+      "foulsPersonal": 4,
+      "points": 19,
+      "plusMinusPoints": -1
+     }
+    },
+    {
+     "path": "props.game.homeTeam.players[1].statistics",
+     "shape": {
+      "minutes": "27:03",
+      "fieldGoalsMade": 4,
+      "fieldGoalsAttempted": 12,
+      "fieldGoalsPercentage": 0.333,
+      "threePointersMade": 0,
+      "threePointersAttempted": 7,
+      "threePointersPercentage": 0,
+      "freeThrowsMade": 0,
+      "freeThrowsAttempted": 0,
+      "freeThrowsPercentage": 0,
+      "reboundsOffensive": 0,
+      "reboundsDefensive": 3,
+      "reboundsTotal": 3,
+      "assists": 2,
+      "steals": 0,
+      "blocks": 0,
+      "turnovers": 3,
+      "foulsPersonal": 3,
+      "points": 8,
+      "plusMinusPoints": -7
+     }
+    },
+    {
+     "path": "props.game.awayTeam.statistics",
+     "shape": {
+      "minutes": "200:00",
+      "fieldGoalsMade": 37,
+      "fieldGoalsAttempted": 75,
+      "fieldGoalsPercentage": 0.493,
+      "threePointersMade": 9,
+      "threePointersAttempted": 30,
+      "threePointersPercentage": 0.3,
+      "freeThrowsMade": 8,
+      "freeThrowsAttempted": 12,
+      "freeThrowsPercentage": 0.667,
+      "reboundsOffensive": 18,
+      "reboundsDefensive": 24,
+      "reboundsTotal": 42,
+      "assists": 16,
+      "steals": 6,
+      "blocks": 3,
+      "turnovers": 14,
+      "foulsPersonal": 18,
+      "points": 94,
+      "plusMinusPoints": 4
+     }
+    },
+    {
+     "path": "props.game.awayTeam.players[0].statistics",
+     "shape": {
+      "minutes": "22:11",
+      "fieldGoalsMade": 4,
+      "fieldGoalsAttempted": 9,
+      "fieldGoalsPercentage": 0.444,
+      "threePointersMade": 0,
+      "threePointersAttempted": 5,
+      "threePointersPercentage": 0,
+      "freeThrowsMade": 1,
+      "freeThrowsAttempted": 1,
+      "freeThrowsPercentage": 1,
+      "reboundsOffensive": 1,
+      "reboundsDefensive": 2,
+      "reboundsTotal": 3,
+      "assists": 1,
+      "steals": 1,
+      "blocks": 1,
+      "turnovers": 1,
+      "foulsPersonal": 0,
+      "points": 10,
+      "plusMinusPoints": -1
+     }
+    },
+    {
+     "path": "props.game.awayTeam.players[1].statistics",
+     "shape": {
+      "minutes": "31:59",
+      "fieldGoalsMade": 9,
+      "fieldGoalsAttempted": 18,
+      "fieldGoalsPercentage": 0.5,
+      "threePointersMade": 2,
+      "threePointersAttempted": 6,
+      "threePointersPercentage": 0.333,
+      "freeThrowsMade": 1,
+      "freeThrowsAttempted": 1,
+      "freeThrowsPercentage": 1,
+      "reboundsOffensive": 4,
+      "reboundsDefensive": 6,
+      "reboundsTotal": 10,
+      "assists": 2,
+      "steals": 2,
+      "blocks": 0,
+      "turnovers": 3,
+      "foulsPersonal": 4,
+      "points": 21,
+      "plusMinusPoints": 7
+     }
+    },
+    {
+     "path": "props.game.lastFiveMeetings.meetings[0].gameStatus",
+     "shape": 3
+    },
+    {
+     "path": "props.game.lastFiveMeetings.meetings[0].gameStatusText",
+     "shape": "Final               "
+    },
+    {
+     "path": "props.game.lastFiveMeetings.meetings[1].gameStatus",
+     "shape": 3
+    },
+    {
+     "path": "props.game.lastFiveMeetings.meetings[1].gameStatusText",
+     "shape": "Final               "
+    },
+    {
+     "path": "props.game.pregameCharts.homeTeam.statistics",
+     "shape": {
+      "points": 96.3,
+      "reboundsTotal": 38.5,
+      "assists": 20.5,
+      "steals": 8,
+      "blocks": 4.7,
+      "turnovers": 14.8,
+      "fieldGoalsPercentage": 0.439,
+      "threePointersPercentage": 0.346,
+      "freeThrowsPercentage": 0.76,
+      "pointsInThePaint": 40.3,
+      "pointsSecondChance": 14.7,
+      "pointsFastBreak": 12.7,
+      "playerPtsLeaderFirstName": "Cedric",
+      "playerPtsLeaderFamilyName": "Coward",
+      "playerPtsLeaderId": 1642907,
+      "playerPtsLeaderPts": 19,
+      "playerRebLeaderFirstName": "Cameron",
+      "playerRebLeaderFamilyName": "Boozer",
+      "playerRebLeaderId": 1643409,
+      "playerRebLeaderReb": 8,
+      "playerAstLeaderFirstName": "Javon",
+      "playerAstLeaderFamilyName": "Small",
+      "playerAstLeaderId": 1642914,
+      "playerAstLeaderAst": 5.8,
+      "playerBlkLeaderFirstName": "Karim"
+     }
+    },
+    {
+     "path": "props.game.pregameCharts.awayTeam.statistics",
+     "shape": {
+      "points": 93.8,
+      "reboundsTotal": 41.2,
+      "assists": 19.5,
+      "steals": 8.5,
+      "blocks": 4,
+      "turnovers": 15,
+      "fieldGoalsPercentage": 0.456,
+      "threePointersPercentage": 0.368,
+      "freeThrowsPercentage": 0.747,
+      "pointsInThePaint": 43,
+      "pointsSecondChance": 14.2,
+      "pointsFastBreak": 9.8,
+      "playerPtsLeaderFirstName": "LJ",
+      "playerPtsLeaderFamilyName": "Cryer",
+      "playerPtsLeaderId": 1643018,
+      "playerPtsLeaderPts": 15,
+      "playerRebLeaderFirstName": "Graham",
+      "playerRebLeaderFamilyName": "Ike",
+      "playerRebLeaderId": 1643633,
+      "playerRebLeaderReb": 8,
+      "playerAstLeaderFirstName": "LJ",
+      "playerAstLeaderFamilyName": "Cryer",
+      "playerAstLeaderId": 1643018,
+      "playerAstLeaderAst": 4.2,
+      "playerBlkLeaderFirstName": "Graham"
+     }
+    },
+    {
+     "path": "props.game.postgameCharts.homeTeam.statistics",
+     "shape": {
+      "points": 90,
+      "reboundsTotal": 33,
+      "assists": 22,
+      "steals": 6,
+      "blocks": 1,
+      "turnovers": 10,
+      "fieldGoalsPercentage": 0.447,
+      "threePointersPercentage": 0.378,
+      "freeThrowsPercentage": 0.5,
+      "pointsInThePaint": 40,
+      "pointsSecondChance": 13,
+      "pointsFastBreak": 8,
+      "biggestLead": 12,
+      "leadChanges": 7,
+      "timesTied": 5,
+      "biggestScoringRun": 9,
+      "turnoversTeam": 1,
+      "turnoversTotal": 11,
+      "reboundsTeam": 7,
+      "pointsFromTurnovers": 10,
+      "benchPoints": 21,
+      "playerPtsLeaderFirstName": "Cedric",
+      "playerPtsLeaderFamilyName": "Coward",
+      "playerPtsLeaderId": 1642907,
+      "playerPtsLeaderPts": 19
+     }
+    },
+    {
+     "path": "props.game.postgameCharts.awayTeam.statistics",
+     "shape": {
+      "points": 94,
+      "reboundsTotal": 42,
+      "assists": 16,
+      "steals": 6,
+      "blocks": 3,
+      "turnovers": 14,
+      "fieldGoalsPercentage": 0.493,
+      "threePointersPercentage": 0.3,
+      "freeThrowsPercentage": 0.667,
+      "pointsInThePaint": 52,
+      "pointsSecondChance": 20,
+      "pointsFastBreak": 6,
+      "biggestLead": 4,
+      "leadChanges": 7,
+      "timesTied": 5,
+      "biggestScoringRun": 9,
+      "turnoversTeam": 0,
+      "turnoversTotal": 14,
+      "reboundsTeam": 8,
+      "pointsFromTurnovers": 13,
+      "benchPoints": 29,
+      "playerPtsLeaderFirstName": "Yaxel",
+      "playerPtsLeaderFamilyName": "Lendeborg",
+      "playerPtsLeaderId": 1642865,
+      "playerPtsLeaderPts": 21
+     }
+    },
+    {
+     "path": "props.game.whStatus",
+     "shape": 1
+    },
+    {
+     "path": "props.game.hustleStatus",
+     "shape": 1
+    },
+    {
+     "path": "props.game.historicalStatus",
+     "shape": 0
+    },
+    {
+     "path": "props.game.gameState",
+     "shape": 3
+    },
+    {
+     "path": "props.playByPlay",
+     "shape": {
+      "gameId": "1522600076",
+      "videoAvailable": 0,
+      "actions": {
+       "__len": 438,
+       "__item": {
+        "__keys": [
+         "actionNumber",
+         "clock",
+         "period",
+         "teamId",
+         "teamTricode",
+         "personId",
+         "playerName",
+         "playerNameI",
+         "xLegacy",
+         "yLegacy",
+         "shotDistance",
+         "shotResult",
+         "isFieldGoal",
+         "scoreHome",
+         "scoreAway",
+         "pointsTotal",
+         "location",
+         "description",
+         "actionType",
+         "subType",
+         "videoAvailable",
+         "shotValue",
+         "actionId"
+        ]
+       }
+      },
+      "source": "hanaV3"
+     }
+    },
+    {
+     "path": "props.playByPlay.actions",
+     "shape": {
+      "__len": 438,
+      "__item": {
+       "actionNumber": 2,
+       "clock": "PT10M00.00S",
+       "period": 1,
+       "teamId": 0,
+       "teamTricode": "",
+       "personId": 0,
+       "playerName": "",
+       "playerNameI": "",
+       "xLegacy": 0,
+       "yLegacy": 0,
+       "shotDistance": 0,
+       "shotResult": "",
+       "isFieldGoal": 0,
+       "scoreHome": "0",
+       "scoreAway": "0",
+       "pointsTotal": 0,
+       "location": "",
+       "description": "Start of 1st Period (9:04 PM EST)",
+       "actionType": "period",
+       "subType": "start",
+       "videoAvailable": 1,
+       "shotValue": 0,
+       "actionId": 1
+      }
+     }
+    },
+    {
+     "path": "props.playByPlay.actions[0].actionNumber",
+     "shape": 2
+    },
+    {
+     "path": "props.playByPlay.actions[0].actionType",
+     "shape": "period"
+    },
+    {
+     "path": "props.playByPlay.actions[0].actionId",
+     "shape": 1
+    },
+    {
+     "path": "props.playByPlay.actions[1].actionNumber",
+     "shape": 4
+    },
+    {
+     "path": "props.playByPlay.actions[1].actionType",
+     "shape": "Jump Ball"
+    },
+    {
+     "path": "props.playByPlay.actions[1].actionId",
+     "shape": 2
+    },
+    {
+     "path": "props.analyticsObject.gameState",
+     "shape": "ondemand"
+    },
+    {
+     "path": "props.boxscoreParams",
+     "shape": {
+      "defaultRangeString": "0-28800",
+      "initialBoxscoreCacheKey": "{\"resource\":\"traditional\",\"gameId\":\"1522600076\",\"rangePeriod"
+     }
+    },
+    {
+     "path": "props.boxscoreParams.initialBoxscoreCacheKey",
+     "shape": "{\"resource\":\"traditional\",\"gameId\":\"1522600076\",\"rangePeriod"
+    }
+   ]
+  },
+  "summerLeaguePbp": {
+   "url": "https://www.nba.com/game/gsw-vs-mem-1522600076/play-by-play",
+   "htmlBytes": 472989,
+   "hasNextData": true,
+   "containsGameEnd": false,
+   "containsPlayerStats": true,
+   "pagePropsKeys": [
+    "layout",
+    "game",
+    "playByPlay",
+    "headline",
+    "heroImage",
+    "story",
+    "id",
+    "postId",
+    "view",
+    "region",
+    "analyticsObject",
+    "highlightVideos",
+    "seriesHubInfo",
+    "periodOptions",
+    "boxscoreParams",
+    "initialQueryParams",
+    "istGroup",
+    "_nextI18Next"
+   ],
+   "propsShape": {
+    "layout": {
+     "header": {
+      "links": {
+       "__len": 17,
+       "__item": {
+        "__keys": [
+         "id",
+         "order",
+         "text",
+         "href",
+         "type",
+         "icon",
+         "mobileOrder",
+         "children"
+        ]
+       }
+      }
+     },
+     "footer": {
+      "links": {
+       "__len": 5,
+       "__item": {
+        "__keys": [
+         "id",
+         "order",
+         "text",
+         "href",
+         "type",
+         "icon",
+         "mobile_order",
+         "children"
+        ]
+       }
+      },
+      "legal": {
+       "__len": 10,
+       "__item": {
+        "__keys": [
+         "id",
+         "order",
+         "text",
+         "href",
+         "type",
+         "icon",
+         "mobile_order",
+         "post_id",
+         "post_type"
+        ]
+       }
+      },
+      "social": {
+       "__len": 7,
+       "__item": {
+        "__keys": [
+         "id",
+         "order",
+         "text",
+         "href",
+         "type",
+         "icon"
+        ]
+       }
+      }
+     },
+     "subNav": false,
+     "adPlacements": {
+      "section": "game-details",
+      "refresh": {
+       "__len": 2,
+       "__item": {
+        "__len": 2,
+        "__item": 5
+       }
+      },
+      "responsive": true,
+      "units": {
+       "__len": 4,
+       "__item": {
+        "__keys": [
+         "adUnit",
+         "domId",
+         "posId",
+         "sizeMap",
+         "targets"
+        ]
+       }
+      },
+      "exists": true,
+      "target": {
+       "__len": 0,
+       "__item": null
+      }
+     },
+     "analytics": {
+      "page": {
+       "__keys": [
+        "pageInfo",
+        "content"
+       ]
+      },
+      "site": {
+       "__keys": [
+        "propertyName",
+        "league"
+       ]
+      },
+      "exists": true
+     }
+    },
+    "game": {
+     "gameId": "1522600076",
+     "gameCode": "20260719/GSWMEM",
+     "gameStatus": 3,
+     "gameStatusText": "Final               ",
+     "period": 4,
+     "gameClock": "PT00M00.00S",
+     "gameTimeUTC": "2026-07-20T01:00:00Z",
+     "gameEt": "2026-07-19T21:00:00Z",
+     "awayTeamId": 1610612744,
+     "homeTeamId": 1610612763,
+     "duration": "1:45",
+     "attendance": 0,
+     "sellout": 0,
+     "seriesGameNumber": "",
+     "gameLabel": "2026 NBA Summer League",
+     "gameSubLabel": "Championship",
+     "seriesText": "",
+     "ifNecessary": false,
+     "isNeutral": false,
+     "arena": {
+      "arenaId": 65,
+      "arenaName": "Thomas & Mack Center",
+      "arenaCity": "Las Vegas",
+      "arenaState": "NV",
+      "arenaCountry": "US",
+      "arenaTimezone": "Pacific",
+      "arenaStreetAddress": "",
+      "arenaPostalCode": ""
+     },
+     "officials": {
+      "__len": 3,
+      "__item": {
+       "__keys": [
+        "personId",
+        "name",
+        "nameI",
+        "firstName",
+        "familyName",
+        "jerseyNum",
+        "assignment"
+       ]
+      }
+     },
+     "broadcasters": {
+      "internationalBroadcasters": {
+       "__len": 13,
+       "__item": {
+        "__keys": [
+         "broadcasterId",
+         "broadcastDisplay",
+         "broadcasterDisplay",
+         "broadcasterVideoLink",
+         "broadcasterDescription",
+         "broadcasterTeamId",
+         "regionId"
+        ]
+       }
+      },
+      "internationalRadioBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "internationalOttBroadcasters": {
+       "__len": 6,
+       "__item": {
+        "__keys": [
+         "broadcasterId",
+         "broadcastDisplay",
+         "broadcasterDisplay",
+         "broadcasterVideoLink",
+         "broadcasterDescription",
+         "broadcasterTeamId",
+         "regionId"
+        ]
+       }
+      },
+      "nationalBroadcasters": {
+       "__len": 1,
+       "__item": {
+        "__keys": [
+         "broadcasterId",
+         "broadcastDisplay",
+         "broadcasterDisplay",
+         "broadcasterVideoLink",
+         "broadcasterDescription",
+         "broadcasterTeamId",
+         "regionId"
+        ]
+       }
+      },
+      "nationalRadioBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "nationalOttBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "homeTvBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "homeRadioBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "homeOttBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "awayTvBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "awayRadioBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "awayOttBroadcasters": {
+       "__len": 0,
+       "__item": null
+      }
+     },
+     "homeTeam": {
+      "teamId": 1610612763,
+      "teamName": "Grizzlies",
+      "teamCity": "Memphis",
+      "teamTricode": "MEM",
+      "teamSlug": "grizzlies",
+      "teamWins": 4,
+      "teamLosses": 2,
+      "score": 90,
+      "inBonus": "",
+      "timeoutsRemaining": 0,
+      "seed": 0,
+      "statistics": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points",
+        "plusMinusPoints"
+       ]
+      },
+      "periods": {
+       "__len": 4,
+       "__item": {
+        "__keys": [
+         "period",
+         "periodType",
+         "score"
+        ]
+       }
+      },
+      "players": {
+       "__len": 15,
+       "__item": {
+        "__keys": [
+         "personId",
+         "firstName",
+         "familyName",
+         "nameI",
+         "playerSlug",
+         "position",
+         "comment",
+         "jerseyNum",
+         "statistics"
+        ]
+       }
+      },
+      "inactives": {
+       "__len": 0,
+       "__item": null
+      },
+      "starters": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points"
+       ]
+      },
+      "bench": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points"
+       ]
+      }
+     },
+     "awayTeam": {
+      "teamId": 1610612744,
+      "teamName": "Warriors",
+      "teamCity": "Golden State",
+      "teamTricode": "GSW",
+      "teamSlug": "warriors",
+      "teamWins": 5,
+      "teamLosses": 1,
+      "score": 94,
+      "inBonus": "",
+      "timeoutsRemaining": 0,
+      "seed": 0,
+      "statistics": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points",
+        "plusMinusPoints"
+       ]
+      },
+      "periods": {
+       "__len": 4,
+       "__item": {
+        "__keys": [
+         "period",
+         "periodType",
+         "score"
+        ]
+       }
+      },
+      "players": {
+       "__len": 17,
+       "__item": {
+        "__keys": [
+         "personId",
+         "firstName",
+         "familyName",
+         "nameI",
+         "playerSlug",
+         "position",
+         "comment",
+         "jerseyNum",
+         "statistics"
+        ]
+       }
+      },
+      "inactives": {
+       "__len": 0,
+       "__item": null
+      },
+      "starters": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points"
+       ]
+      },
+      "bench": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points"
+       ]
+      }
+     },
+     "lastFiveMeetings": {
+      "meetings": {
+       "__len": 2,
+       "__item": {
+        "__keys": [
+         "recencyOrder",
+         "gameId",
+         "gameTimeUTC",
+         "gameEt",
+         "gameStatus",
+         "gameStatusText",
+         "gameClock",
+         "broadcasterVideoLink",
+         "awayTeam",
+         "homeTeam"
+        ]
+       }
+      }
+     }
+    },
+    "playByPlay": {
+     "gameId": "1522600076",
+     "videoAvailable": 0,
+     "actions": {
+      "__len": 438,
+      "__item": {
+       "__keys": [
+        "actionNumber",
+        "clock",
+        "period",
+        "teamId",
+        "teamTricode",
+        "personId",
+        "playerName",
+        "playerNameI",
+        "xLegacy",
+        "yLegacy",
+        "shotDistance",
+        "shotResult",
+        "isFieldGoal",
+        "scoreHome",
+        "scoreAway",
+        "pointsTotal",
+        "location",
+        "description",
+        "actionType",
+        "subType",
+        "videoAvailable",
+        "shotValue",
+        "actionId"
+       ]
+      }
+     },
+     "source": "hanaV3"
+    },
+    "headline": "Warriors Win Championship",
+    "heroImage": "https://cdn.nba.com/manage/2026/07/warriors-trophy-1920-2286",
+    "story": null,
+    "id": "gsw-vs-mem-1522600076",
+    "postId": 2280675,
+    "view": {
+     "id": "play-by-play",
+     "label": "Play-By-Play"
+    },
+    "region": "united-states",
+    "analyticsObject": {
+     "gameMatchup": "GSW @ MEM, 2026-07-19",
+     "gameID": "1522600076",
+     "gameState": "ondemand",
+     "gameQuarter": "Final",
+     "gameBroadcasters": "Videoland;ESPN_I_Afr;Sport5_Isr;QQ;ESPN_I_SA;beIN_FRA;SN;Mig",
+     "venue": "Thomas & Mack Center, Las Vegas, NV",
+     "season": 2026,
+     "seasonType": "Summer League"
+    },
+    "highlightVideos": {
+     "__len": 12,
+     "__item": {
+      "id": 2282136,
+      "title": "Memphis Grizzlies vs. Golden State Warriors - 2nd Half Highl",
+      "shortTitle": "",
+      "permalink": "https://www.nba.com/watch/video/memphis-grizzlies-vs-golden-",
+      "videoDuration": "01:29",
+      "featuredImage": "https://cdn.nba.com/manage/2026/07/163fd1f1-f65e-4010-9169-3",
+      "entitlements": "free",
+      "videoFranchisesName": {
+       "__keys": [
+        "individual-top-plays-wsc"
+       ]
+      }
+     }
+    },
+    "seriesHubInfo": {
+     "season": 2026
+    },
+    "periodOptions": {
+     "__len": 7,
+     "__item": {
+      "RangeType": 0,
+      "lp": 0,
+      "isOT": false,
+      "text": "All Periods",
+      "val": "All",
+      "startTime": 0,
+      "endTime": 28800,
+      "startPeriod": 0,
+      "endPeriod": 0,
+      "json": "{\"rangeType\":0,\"startPeriod\":0,\"endPeriod\":0,\"startRange\":0,"
+     }
+    },
+    "boxscoreParams": {
+     "defaultRangeString": "0-28800",
+     "initialBoxscoreCacheKey": "{\"resource\":\"traditional\",\"gameId\":\"1522600076\",\"rangePeriod"
+    },
+    "initialQueryParams": {
+     "props": {
+      "__len": 2,
+      "__item": "gsw-vs-mem-1522600076"
+     }
+    },
+    "istGroup": {},
+    "_nextI18Next": {
+     "initialI18nStore": {
+      "en": {
+       "__keys": [
+        "member-night",
+        "member-night-international"
+       ]
+      }
+     },
+     "initialLocale": "en",
+     "ns": {
+      "__len": 2,
+      "__item": "member-night"
+     },
+     "userConfig": {
+      "i18n": {
+       "__keys": [
+        "defaultLocale",
+        "locales",
+        "localeDetection"
+       ]
+      },
+      "fallbackLng": "en",
+      "ns": {
+       "__len": 9,
+       "__item": "account"
+      },
+      "defaultNS": "common",
+      "interpolation": {
+       "__keys": [
+        "escapeValue"
+       ]
+      },
+      "react": {
+       "__keys": [
+        "useSuspense"
+       ]
+      },
+      "default": {
+       "__keys": [
+        "i18n",
+        "fallbackLng",
+        "ns",
+        "defaultNS",
+        "interpolation",
+        "react"
+       ]
+      }
+     }
+    }
+   },
+   "relevantPaths": [
+    {
+     "path": "props.game.gameStatus",
+     "shape": 3
+    },
+    {
+     "path": "props.game.gameStatusText",
+     "shape": "Final               "
+    },
+    {
+     "path": "props.game.arena.arenaState",
+     "shape": "NV"
+    },
+    {
+     "path": "props.game.homeTeam.statistics",
+     "shape": {
+      "minutes": "200:00",
+      "fieldGoalsMade": 34,
+      "fieldGoalsAttempted": 76,
+      "fieldGoalsPercentage": 0.447,
+      "threePointersMade": 14,
+      "threePointersAttempted": 37,
+      "threePointersPercentage": 0.378,
+      "freeThrowsMade": 4,
+      "freeThrowsAttempted": 8,
+      "freeThrowsPercentage": 0.5,
+      "reboundsOffensive": 13,
+      "reboundsDefensive": 20,
+      "reboundsTotal": 33,
+      "assists": 22,
+      "steals": 6,
+      "blocks": 1,
+      "turnovers": 10,
+      "foulsPersonal": 17,
+      "points": 90,
+      "plusMinusPoints": -4
+     }
+    },
+    {
+     "path": "props.game.homeTeam.players[0].statistics",
+     "shape": {
+      "minutes": "34:44",
+      "fieldGoalsMade": 7,
+      "fieldGoalsAttempted": 17,
+      "fieldGoalsPercentage": 0.412,
+      "threePointersMade": 3,
+      "threePointersAttempted": 7,
+      "threePointersPercentage": 0.429,
+      "freeThrowsMade": 1,
+      "freeThrowsAttempted": 3,
+      "freeThrowsPercentage": 0.333,
+      "reboundsOffensive": 5,
+      "reboundsDefensive": 3,
+      "reboundsTotal": 8,
+      "assists": 4,
+      "steals": 2,
+      "blocks": 0,
+      "turnovers": 4,
+      "foulsPersonal": 4,
+      "points": 19,
+      "plusMinusPoints": -1
+     }
+    },
+    {
+     "path": "props.game.homeTeam.players[1].statistics",
+     "shape": {
+      "minutes": "27:03",
+      "fieldGoalsMade": 4,
+      "fieldGoalsAttempted": 12,
+      "fieldGoalsPercentage": 0.333,
+      "threePointersMade": 0,
+      "threePointersAttempted": 7,
+      "threePointersPercentage": 0,
+      "freeThrowsMade": 0,
+      "freeThrowsAttempted": 0,
+      "freeThrowsPercentage": 0,
+      "reboundsOffensive": 0,
+      "reboundsDefensive": 3,
+      "reboundsTotal": 3,
+      "assists": 2,
+      "steals": 0,
+      "blocks": 0,
+      "turnovers": 3,
+      "foulsPersonal": 3,
+      "points": 8,
+      "plusMinusPoints": -7
+     }
+    },
+    {
+     "path": "props.game.awayTeam.statistics",
+     "shape": {
+      "minutes": "200:00",
+      "fieldGoalsMade": 37,
+      "fieldGoalsAttempted": 75,
+      "fieldGoalsPercentage": 0.493,
+      "threePointersMade": 9,
+      "threePointersAttempted": 30,
+      "threePointersPercentage": 0.3,
+      "freeThrowsMade": 8,
+      "freeThrowsAttempted": 12,
+      "freeThrowsPercentage": 0.667,
+      "reboundsOffensive": 18,
+      "reboundsDefensive": 24,
+      "reboundsTotal": 42,
+      "assists": 16,
+      "steals": 6,
+      "blocks": 3,
+      "turnovers": 14,
+      "foulsPersonal": 18,
+      "points": 94,
+      "plusMinusPoints": 4
+     }
+    },
+    {
+     "path": "props.game.awayTeam.players[0].statistics",
+     "shape": {
+      "minutes": "22:11",
+      "fieldGoalsMade": 4,
+      "fieldGoalsAttempted": 9,
+      "fieldGoalsPercentage": 0.444,
+      "threePointersMade": 0,
+      "threePointersAttempted": 5,
+      "threePointersPercentage": 0,
+      "freeThrowsMade": 1,
+      "freeThrowsAttempted": 1,
+      "freeThrowsPercentage": 1,
+      "reboundsOffensive": 1,
+      "reboundsDefensive": 2,
+      "reboundsTotal": 3,
+      "assists": 1,
+      "steals": 1,
+      "blocks": 1,
+      "turnovers": 1,
+      "foulsPersonal": 0,
+      "points": 10,
+      "plusMinusPoints": -1
+     }
+    },
+    {
+     "path": "props.game.awayTeam.players[1].statistics",
+     "shape": {
+      "minutes": "31:59",
+      "fieldGoalsMade": 9,
+      "fieldGoalsAttempted": 18,
+      "fieldGoalsPercentage": 0.5,
+      "threePointersMade": 2,
+      "threePointersAttempted": 6,
+      "threePointersPercentage": 0.333,
+      "freeThrowsMade": 1,
+      "freeThrowsAttempted": 1,
+      "freeThrowsPercentage": 1,
+      "reboundsOffensive": 4,
+      "reboundsDefensive": 6,
+      "reboundsTotal": 10,
+      "assists": 2,
+      "steals": 2,
+      "blocks": 0,
+      "turnovers": 3,
+      "foulsPersonal": 4,
+      "points": 21,
+      "plusMinusPoints": 7
+     }
+    },
+    {
+     "path": "props.game.lastFiveMeetings.meetings[0].gameStatus",
+     "shape": 3
+    },
+    {
+     "path": "props.game.lastFiveMeetings.meetings[0].gameStatusText",
+     "shape": "Final               "
+    },
+    {
+     "path": "props.game.lastFiveMeetings.meetings[1].gameStatus",
+     "shape": 3
+    },
+    {
+     "path": "props.game.lastFiveMeetings.meetings[1].gameStatusText",
+     "shape": "Final               "
+    },
+    {
+     "path": "props.game.pregameCharts.homeTeam.statistics",
+     "shape": {
+      "points": 96.3,
+      "reboundsTotal": 38.5,
+      "assists": 20.5,
+      "steals": 8,
+      "blocks": 4.7,
+      "turnovers": 14.8,
+      "fieldGoalsPercentage": 0.439,
+      "threePointersPercentage": 0.346,
+      "freeThrowsPercentage": 0.76,
+      "pointsInThePaint": 40.3,
+      "pointsSecondChance": 14.7,
+      "pointsFastBreak": 12.7,
+      "playerPtsLeaderFirstName": "Cedric",
+      "playerPtsLeaderFamilyName": "Coward",
+      "playerPtsLeaderId": 1642907,
+      "playerPtsLeaderPts": 19,
+      "playerRebLeaderFirstName": "Cameron",
+      "playerRebLeaderFamilyName": "Boozer",
+      "playerRebLeaderId": 1643409,
+      "playerRebLeaderReb": 8,
+      "playerAstLeaderFirstName": "Javon",
+      "playerAstLeaderFamilyName": "Small",
+      "playerAstLeaderId": 1642914,
+      "playerAstLeaderAst": 5.8,
+      "playerBlkLeaderFirstName": "Karim"
+     }
+    },
+    {
+     "path": "props.game.pregameCharts.awayTeam.statistics",
+     "shape": {
+      "points": 93.8,
+      "reboundsTotal": 41.2,
+      "assists": 19.5,
+      "steals": 8.5,
+      "blocks": 4,
+      "turnovers": 15,
+      "fieldGoalsPercentage": 0.456,
+      "threePointersPercentage": 0.368,
+      "freeThrowsPercentage": 0.747,
+      "pointsInThePaint": 43,
+      "pointsSecondChance": 14.2,
+      "pointsFastBreak": 9.8,
+      "playerPtsLeaderFirstName": "LJ",
+      "playerPtsLeaderFamilyName": "Cryer",
+      "playerPtsLeaderId": 1643018,
+      "playerPtsLeaderPts": 15,
+      "playerRebLeaderFirstName": "Graham",
+      "playerRebLeaderFamilyName": "Ike",
+      "playerRebLeaderId": 1643633,
+      "playerRebLeaderReb": 8,
+      "playerAstLeaderFirstName": "LJ",
+      "playerAstLeaderFamilyName": "Cryer",
+      "playerAstLeaderId": 1643018,
+      "playerAstLeaderAst": 4.2,
+      "playerBlkLeaderFirstName": "Graham"
+     }
+    },
+    {
+     "path": "props.game.postgameCharts.homeTeam.statistics",
+     "shape": {
+      "points": 90,
+      "reboundsTotal": 33,
+      "assists": 22,
+      "steals": 6,
+      "blocks": 1,
+      "turnovers": 10,
+      "fieldGoalsPercentage": 0.447,
+      "threePointersPercentage": 0.378,
+      "freeThrowsPercentage": 0.5,
+      "pointsInThePaint": 40,
+      "pointsSecondChance": 13,
+      "pointsFastBreak": 8,
+      "biggestLead": 12,
+      "leadChanges": 7,
+      "timesTied": 5,
+      "biggestScoringRun": 9,
+      "turnoversTeam": 1,
+      "turnoversTotal": 11,
+      "reboundsTeam": 7,
+      "pointsFromTurnovers": 10,
+      "benchPoints": 21,
+      "playerPtsLeaderFirstName": "Cedric",
+      "playerPtsLeaderFamilyName": "Coward",
+      "playerPtsLeaderId": 1642907,
+      "playerPtsLeaderPts": 19
+     }
+    },
+    {
+     "path": "props.game.postgameCharts.awayTeam.statistics",
+     "shape": {
+      "points": 94,
+      "reboundsTotal": 42,
+      "assists": 16,
+      "steals": 6,
+      "blocks": 3,
+      "turnovers": 14,
+      "fieldGoalsPercentage": 0.493,
+      "threePointersPercentage": 0.3,
+      "freeThrowsPercentage": 0.667,
+      "pointsInThePaint": 52,
+      "pointsSecondChance": 20,
+      "pointsFastBreak": 6,
+      "biggestLead": 4,
+      "leadChanges": 7,
+      "timesTied": 5,
+      "biggestScoringRun": 9,
+      "turnoversTeam": 0,
+      "turnoversTotal": 14,
+      "reboundsTeam": 8,
+      "pointsFromTurnovers": 13,
+      "benchPoints": 29,
+      "playerPtsLeaderFirstName": "Yaxel",
+      "playerPtsLeaderFamilyName": "Lendeborg",
+      "playerPtsLeaderId": 1642865,
+      "playerPtsLeaderPts": 21
+     }
+    },
+    {
+     "path": "props.game.whStatus",
+     "shape": 1
+    },
+    {
+     "path": "props.game.hustleStatus",
+     "shape": 1
+    },
+    {
+     "path": "props.game.historicalStatus",
+     "shape": 0
+    },
+    {
+     "path": "props.game.gameState",
+     "shape": 3
+    },
+    {
+     "path": "props.playByPlay",
+     "shape": {
+      "gameId": "1522600076",
+      "videoAvailable": 0,
+      "actions": {
+       "__len": 438,
+       "__item": {
+        "__keys": [
+         "actionNumber",
+         "clock",
+         "period",
+         "teamId",
+         "teamTricode",
+         "personId",
+         "playerName",
+         "playerNameI",
+         "xLegacy",
+         "yLegacy",
+         "shotDistance",
+         "shotResult",
+         "isFieldGoal",
+         "scoreHome",
+         "scoreAway",
+         "pointsTotal",
+         "location",
+         "description",
+         "actionType",
+         "subType",
+         "videoAvailable",
+         "shotValue",
+         "actionId"
+        ]
+       }
+      },
+      "source": "hanaV3"
+     }
+    },
+    {
+     "path": "props.playByPlay.actions",
+     "shape": {
+      "__len": 438,
+      "__item": {
+       "actionNumber": 2,
+       "clock": "PT10M00.00S",
+       "period": 1,
+       "teamId": 0,
+       "teamTricode": "",
+       "personId": 0,
+       "playerName": "",
+       "playerNameI": "",
+       "xLegacy": 0,
+       "yLegacy": 0,
+       "shotDistance": 0,
+       "shotResult": "",
+       "isFieldGoal": 0,
+       "scoreHome": "0",
+       "scoreAway": "0",
+       "pointsTotal": 0,
+       "location": "",
+       "description": "Start of 1st Period (9:04 PM EST)",
+       "actionType": "period",
+       "subType": "start",
+       "videoAvailable": 1,
+       "shotValue": 0,
+       "actionId": 1
+      }
+     }
+    },
+    {
+     "path": "props.playByPlay.actions[0].actionNumber",
+     "shape": 2
+    },
+    {
+     "path": "props.playByPlay.actions[0].actionType",
+     "shape": "period"
+    },
+    {
+     "path": "props.playByPlay.actions[0].actionId",
+     "shape": 1
+    },
+    {
+     "path": "props.playByPlay.actions[1].actionNumber",
+     "shape": 4
+    },
+    {
+     "path": "props.playByPlay.actions[1].actionType",
+     "shape": "Jump Ball"
+    },
+    {
+     "path": "props.playByPlay.actions[1].actionId",
+     "shape": 2
+    },
+    {
+     "path": "props.analyticsObject.gameState",
+     "shape": "ondemand"
+    },
+    {
+     "path": "props.boxscoreParams",
+     "shape": {
+      "defaultRangeString": "0-28800",
+      "initialBoxscoreCacheKey": "{\"resource\":\"traditional\",\"gameId\":\"1522600076\",\"rangePeriod"
+     }
+    },
+    {
+     "path": "props.boxscoreParams.initialBoxscoreCacheKey",
+     "shape": "{\"resource\":\"traditional\",\"gameId\":\"1522600076\",\"rangePeriod"
+    }
+   ]
+  },
+  "regularBox": {
+   "url": "https://www.nba.com/game/mil-vs-cle-0022400154/box-score",
+   "htmlBytes": 484372,
+   "hasNextData": true,
+   "containsGameEnd": false,
+   "containsPlayerStats": true,
+   "pagePropsKeys": [
+    "layout",
+    "game",
+    "playByPlay",
+    "headline",
+    "heroImage",
+    "story",
+    "id",
+    "postId",
+    "view",
+    "region",
+    "analyticsObject",
+    "highlightVideos",
+    "seriesHubInfo",
+    "periodOptions",
+    "boxscoreParams",
+    "initialQueryParams",
+    "istGroup",
+    "_nextI18Next"
+   ],
+   "propsShape": {
+    "layout": {
+     "header": {
+      "links": {
+       "__len": 17,
+       "__item": {
+        "__keys": [
+         "id",
+         "order",
+         "text",
+         "href",
+         "type",
+         "icon",
+         "mobileOrder",
+         "children"
+        ]
+       }
+      }
+     },
+     "footer": {
+      "links": {
+       "__len": 5,
+       "__item": {
+        "__keys": [
+         "id",
+         "order",
+         "text",
+         "href",
+         "type",
+         "icon",
+         "mobile_order",
+         "children"
+        ]
+       }
+      },
+      "legal": {
+       "__len": 10,
+       "__item": {
+        "__keys": [
+         "id",
+         "order",
+         "text",
+         "href",
+         "type",
+         "icon",
+         "mobile_order",
+         "post_id",
+         "post_type"
+        ]
+       }
+      },
+      "social": {
+       "__len": 7,
+       "__item": {
+        "__keys": [
+         "id",
+         "order",
+         "text",
+         "href",
+         "type",
+         "icon"
+        ]
+       }
+      }
+     },
+     "subNav": false,
+     "adPlacements": {
+      "section": "game-details",
+      "refresh": {
+       "__len": 2,
+       "__item": {
+        "__len": 2,
+        "__item": 5
+       }
+      },
+      "responsive": true,
+      "units": {
+       "__len": 4,
+       "__item": {
+        "__keys": [
+         "adUnit",
+         "domId",
+         "posId",
+         "sizeMap",
+         "targets"
+        ]
+       }
+      },
+      "exists": true,
+      "target": {
+       "__len": 0,
+       "__item": null
+      }
+     },
+     "analytics": {
+      "page": {
+       "__keys": [
+        "pageInfo",
+        "content"
+       ]
+      },
+      "site": {
+       "__keys": [
+        "propertyName",
+        "league"
+       ]
+      },
+      "exists": true
+     }
+    },
+    "game": {
+     "gameId": "0022400154",
+     "gameCode": "20241104/MILCLE",
+     "gameStatus": 3,
+     "gameStatusText": "Final",
+     "period": 4,
+     "gameClock": "PT00M00.00S",
+     "gameTimeUTC": "2024-11-05T00:00:00Z",
+     "gameEt": "2024-11-04T19:00:00Z",
+     "awayTeamId": 1610612749,
+     "homeTeamId": 1610612739,
+     "duration": "2:03",
+     "attendance": 19432,
+     "sellout": 1,
+     "seriesGameNumber": "",
+     "gameLabel": "",
+     "gameSubLabel": "",
+     "seriesText": "",
+     "ifNecessary": false,
+     "isNeutral": false,
+     "arena": {
+      "arenaId": 1000006,
+      "arenaName": "Rocket Mortgage FieldHouse",
+      "arenaCity": "Cleveland",
+      "arenaState": "OH",
+      "arenaCountry": "US",
+      "arenaTimezone": "Eastern",
+      "arenaStreetAddress": "",
+      "arenaPostalCode": ""
+     },
+     "officials": {
+      "__len": 3,
+      "__item": {
+       "__keys": [
+        "personId",
+        "name",
+        "nameI",
+        "firstName",
+        "familyName",
+        "jerseyNum",
+        "assignment"
+       ]
+      }
+     },
+     "broadcasters": {
+      "internationalBroadcasters": {
+       "__len": 9,
+       "__item": {
+        "__keys": [
+         "broadcasterId",
+         "broadcastDisplay",
+         "broadcasterDisplay",
+         "broadcasterVideoLink",
+         "broadcasterDescription",
+         "broadcasterTeamId",
+         "regionId"
+        ]
+       }
+      },
+      "internationalRadioBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "internationalOttBroadcasters": {
+       "__len": 1,
+       "__item": {
+        "__keys": [
+         "broadcasterId",
+         "broadcastDisplay",
+         "broadcasterDisplay",
+         "broadcasterVideoLink",
+         "broadcasterDescription",
+         "broadcasterTeamId",
+         "regionId"
+        ]
+       }
+      },
+      "nationalBroadcasters": {
+       "__len": 1,
+       "__item": {
+        "__keys": [
+         "broadcasterId",
+         "broadcastDisplay",
+         "broadcasterDisplay",
+         "broadcasterVideoLink",
+         "broadcasterDescription",
+         "broadcasterTeamId",
+         "regionId"
+        ]
+       }
+      },
+      "nationalRadioBroadcasters": {
+       "__len": 1,
+       "__item": {
+        "__keys": [
+         "broadcasterId",
+         "broadcastDisplay",
+         "broadcasterDisplay",
+         "broadcasterVideoLink",
+         "broadcasterDescription",
+         "broadcasterTeamId",
+         "regionId"
+        ]
+       }
+      },
+      "nationalOttBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "homeTvBroadcasters": {
+       "__len": 1,
+       "__item": {
+        "__keys": [
+         "broadcasterId",
+         "broadcastDisplay",
+         "broadcasterDisplay",
+         "broadcasterVideoLink",
+         "broadcasterDescription",
+         "broadcasterTeamId",
+         "regionId"
+        ]
+       }
+      },
+      "homeRadioBroadcasters": {
+       "__len": 1,
+       "__item": {
+        "__keys": [
+         "broadcasterId",
+         "broadcastDisplay",
+         "broadcasterDisplay",
+         "broadcasterVideoLink",
+         "broadcasterDescription",
+         "broadcasterTeamId",
+         "regionId"
+        ]
+       }
+      },
+      "homeOttBroadcasters": {
+       "__len": 0,
+       "__item": null
+      },
+      "awayTvBroadcasters": {
+       "__len": 1,
+       "__item": {
+        "__keys": [
+         "broadcasterId",
+         "broadcastDisplay",
+         "broadcasterDisplay",
+         "broadcasterVideoLink",
+         "broadcasterDescription",
+         "broadcasterTeamId",
+         "regionId"
+        ]
+       }
+      },
+      "awayRadioBroadcasters": {
+       "__len": 1,
+       "__item": {
+        "__keys": [
+         "broadcasterId",
+         "broadcastDisplay",
+         "broadcasterDisplay",
+         "broadcasterVideoLink",
+         "broadcasterDescription",
+         "broadcasterTeamId",
+         "regionId"
+        ]
+       }
+      },
+      "awayOttBroadcasters": {
+       "__len": 0,
+       "__item": null
+      }
+     },
+     "homeTeam": {
+      "teamId": 1610612739,
+      "teamName": "Cavaliers",
+      "teamCity": "Cleveland",
+      "teamTricode": "CLE",
+      "teamSlug": "cavaliers",
+      "teamWins": 8,
+      "teamLosses": 0,
+      "score": 116,
+      "inBonus": "",
+      "timeoutsRemaining": 1,
+      "seed": 0,
+      "statistics": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points",
+        "plusMinusPoints"
+       ]
+      },
+      "periods": {
+       "__len": 4,
+       "__item": {
+        "__keys": [
+         "period",
+         "periodType",
+         "score"
+        ]
+       }
+      },
+      "players": {
+       "__len": 12,
+       "__item": {
+        "__keys": [
+         "personId",
+         "firstName",
+         "familyName",
+         "nameI",
+         "playerSlug",
+         "position",
+         "comment",
+         "jerseyNum",
+         "statistics"
+        ]
+       }
+      },
+      "inactives": {
+       "__len": 5,
+       "__item": {
+        "__keys": [
+         "personId",
+         "firstName",
+         "familyName",
+         "jerseyNum"
+        ]
+       }
+      },
+      "starters": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points"
+       ]
+      },
+      "bench": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points"
+       ]
+      }
+     },
+     "awayTeam": {
+      "teamId": 1610612749,
+      "teamName": "Bucks",
+      "teamCity": "Milwaukee",
+      "teamTricode": "MIL",
+      "teamSlug": "bucks",
+      "teamWins": 1,
+      "teamLosses": 6,
+      "score": 114,
+      "inBonus": "",
+      "timeoutsRemaining": 0,
+      "seed": 0,
+      "statistics": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points",
+        "plusMinusPoints"
+       ]
+      },
+      "periods": {
+       "__len": 4,
+       "__item": {
+        "__keys": [
+         "period",
+         "periodType",
+         "score"
+        ]
+       }
+      },
+      "players": {
+       "__len": 13,
+       "__item": {
+        "__keys": [
+         "personId",
+         "firstName",
+         "familyName",
+         "nameI",
+         "playerSlug",
+         "position",
+         "comment",
+         "jerseyNum",
+         "statistics"
+        ]
+       }
+      },
+      "inactives": {
+       "__len": 5,
+       "__item": {
+        "__keys": [
+         "personId",
+         "firstName",
+         "familyName",
+         "jerseyNum"
+        ]
+       }
+      },
+      "starters": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points"
+       ]
+      },
+      "bench": {
+       "__keys": [
+        "minutes",
+        "fieldGoalsMade",
+        "fieldGoalsAttempted",
+        "fieldGoalsPercentage",
+        "threePointersMade",
+        "threePointersAttempted",
+        "threePointersPercentage",
+        "freeThrowsMade",
+        "freeThrowsAttempted",
+        "freeThrowsPercentage",
+        "reboundsOffensive",
+        "reboundsDefensive",
+        "reboundsTotal",
+        "assists",
+        "steals",
+        "blocks",
+        "turnovers",
+        "foulsPersonal",
+        "points"
+       ]
+      }
+     },
+     "lastFiveMeetings": {
+      "meetings": {
+       "__len": 5,
+       "__item": {
+        "__keys": [
+         "recencyOrder",
+         "gameId",
+         "gameTimeUTC",
+         "gameEt",
+         "gameStatus",
+         "gameStatusText",
+         "gameClock",
+         "broadcasterVideoLink",
+         "awayTeam",
+         "homeTeam"
+        ]
+       }
+      }
+     }
+    },
+    "playByPlay": {
+     "gameId": "0022400154",
+     "videoAvailable": 1,
+     "actions": {
+      "__len": 459,
+      "__item": {
+       "__keys": [
+        "actionNumber",
+        "clock",
+        "period",
+        "teamId",
+        "teamTricode",
+        "personId",
+        "playerName",
+        "playerNameI",
+        "xLegacy",
+        "yLegacy",
+        "shotDistance",
+        "shotResult",
+        "isFieldGoal",
+        "scoreHome",
+        "scoreAway",
+        "pointsTotal",
+        "location",
+        "description",
+        "actionType",
+        "subType",
+        "videoAvailable",
+        "shotValue",
+        "actionId"
+       ]
+      }
+     },
+     "source": "hanaV3"
+    },
+    "headline": "Garland lifts Cavs to 8-0",
+    "heroImage": "https://cdn.nba.com/manage/2024/11/GettyImages-2182959234-1.",
+    "story": {
+     "header": {
+      "headline": "Darius Garland scores 39, Cavs improve to 8-0 with 116-114 w",
+      "byline": "By TOM WITHERS",
+      "bytitle": "AP Sports Writer"
+     },
+     "date": "2024-11-04T21:31:00",
+     "content": {
+      "__len": 15,
+      "__item": "CLEVELAND (AP)  Darius Garland scored 39 points, Evan Mobley"
+     },
+     "storyType": "recap"
+    },
+    "id": "mil-vs-cle-0022400154",
+    "postId": 1472802,
+    "view": {
+     "id": "box-score",
+     "label": "Box Score"
+    },
+    "region": "united-states",
+    "analyticsObject": {
+     "gameMatchup": "MIL @ CLE, 2024-11-04",
+     "gameID": "0022400154",
+     "gameState": "ondemand",
+     "gameQuarter": "Final",
+     "gameBroadcasters": "QQ;Now TV;Cosmote TV;SN;Champions TV 3;SiTV;TNT Sports 2 UK;",
+     "venue": "Rocket Mortgage FieldHouse, Cleveland, OH",
+     "season": 2024,
+     "seasonType": "Regular Season"
+    },
+    "highlightVideos": {
+     "__len": 12,
+     "__item": {
+      "id": 1473691,
+      "title": "Darius Garland with 39 Points vs. Milwaukee Bucks",
+      "shortTitle": "",
+      "permalink": "https://www.nba.com/watch/video/darius-garland-with-39-point",
+      "videoDuration": "01:54",
+      "featuredImage": "https://cdn.nba.com/manage/2024/11/Darius_Garland_with_39_Po",
+      "entitlements": "free",
+      "videoFranchisesName": {
+       "__keys": [
+        "25-pts-gm"
+       ]
+      }
+     }
+    },
+    "seriesHubInfo": {
+     "season": 2024
+    },
+    "periodOptions": {
+     "__len": 7,
+     "__item": {
+      "RangeType": 0,
+      "lp": 0,
+      "isOT": false,
+      "text": "All Periods",
+      "val": "All",
+      "startTime": 0,
+      "endTime": 28800,
+      "startPeriod": 0,
+      "endPeriod": 0,
+      "json": "{\"rangeType\":0,\"startPeriod\":0,\"endPeriod\":0,\"startRange\":0,"
+     }
+    },
+    "boxscoreParams": {
+     "defaultRangeString": "0-28800",
+     "initialBoxscoreCacheKey": "{\"resource\":\"traditional\",\"gameId\":\"0022400154\",\"rangePeriod"
+    },
+    "initialQueryParams": {
+     "props": {
+      "__len": 2,
+      "__item": "mil-vs-cle-0022400154"
+     }
+    },
+    "istGroup": {},
+    "_nextI18Next": {
+     "initialI18nStore": {
+      "en": {
+       "__keys": [
+        "member-night",
+        "member-night-international"
+       ]
+      }
+     },
+     "initialLocale": "en",
+     "ns": {
+      "__len": 2,
+      "__item": "member-night"
+     },
+     "userConfig": {
+      "i18n": {
+       "__keys": [
+        "defaultLocale",
+        "locales",
+        "localeDetection"
+       ]
+      },
+      "fallbackLng": "en",
+      "ns": {
+       "__len": 9,
+       "__item": "account"
+      },
+      "defaultNS": "common",
+      "interpolation": {
+       "__keys": [
+        "escapeValue"
+       ]
+      },
+      "react": {
+       "__keys": [
+        "useSuspense"
+       ]
+      },
+      "default": {
+       "__keys": [
+        "i18n",
+        "fallbackLng",
+        "ns",
+        "defaultNS",
+        "interpolation",
+        "react"
+       ]
+      }
+     }
+    }
+   },
+   "relevantPaths": [
+    {
+     "path": "props.game.gameStatus",
+     "shape": 3
+    },
+    {
+     "path": "props.game.gameStatusText",
+     "shape": "Final"
+    },
+    {
+     "path": "props.game.arena.arenaState",
+     "shape": "OH"
+    },
+    {
+     "path": "props.game.homeTeam.statistics",
+     "shape": {
+      "minutes": "240:00",
+      "fieldGoalsMade": 46,
+      "fieldGoalsAttempted": 91,
+      "fieldGoalsPercentage": 0.505,
+      "threePointersMade": 17,
+      "threePointersAttempted": 37,
+      "threePointersPercentage": 0.459,
+      "freeThrowsMade": 7,
+      "freeThrowsAttempted": 13,
+      "freeThrowsPercentage": 0.538,
+      "reboundsOffensive": 5,
+      "reboundsDefensive": 34,
+      "reboundsTotal": 39,
+      "assists": 28,
+      "steals": 10,
+      "blocks": 4,
+      "turnovers": 10,
+      "foulsPersonal": 15,
+      "points": 116,
+      "plusMinusPoints": 2
+     }
+    },
+    {
+     "path": "props.game.homeTeam.players[0].statistics",
+     "shape": {
+      "minutes": "26:18",
+      "fieldGoalsMade": 2,
+      "fieldGoalsAttempted": 5,
+      "fieldGoalsPercentage": 0.4,
+      "threePointersMade": 1,
+      "threePointersAttempted": 3,
+      "threePointersPercentage": 0.333,
+      "freeThrowsMade": 0,
+      "freeThrowsAttempted": 0,
+      "freeThrowsPercentage": 0,
+      "reboundsOffensive": 2,
+      "reboundsDefensive": 1,
+      "reboundsTotal": 3,
+      "assists": 2,
+      "steals": 1,
+      "blocks": 0,
+      "turnovers": 1,
+      "foulsPersonal": 4,
+      "points": 5,
+      "plusMinusPoints": 20
+     }
+    },
+    {
+     "path": "props.game.homeTeam.players[1].statistics",
+     "shape": {
+      "minutes": "31:51",
+      "fieldGoalsMade": 6,
+      "fieldGoalsAttempted": 15,
+      "fieldGoalsPercentage": 0.4,
+      "threePointersMade": 1,
+      "threePointersAttempted": 3,
+      "threePointersPercentage": 0.333,
+      "freeThrowsMade": 4,
+      "freeThrowsAttempted": 6,
+      "freeThrowsPercentage": 0.667,
+      "reboundsOffensive": 1,
+      "reboundsDefensive": 4,
+      "reboundsTotal": 5,
+      "assists": 3,
+      "steals": 0,
+      "blocks": 3,
+      "turnovers": 0,
+      "foulsPersonal": 1,
+      "points": 17,
+      "plusMinusPoints": 1
+     }
+    },
+    {
+     "path": "props.game.awayTeam.statistics",
+     "shape": {
+      "minutes": "240:00",
+      "fieldGoalsMade": 42,
+      "fieldGoalsAttempted": 86,
+      "fieldGoalsPercentage": 0.488,
+      "threePointersMade": 17,
+      "threePointersAttempted": 35,
+      "threePointersPercentage": 0.486,
+      "freeThrowsMade": 13,
+      "freeThrowsAttempted": 15,
+      "freeThrowsPercentage": 0.867,
+      "reboundsOffensive": 7,
+      "reboundsDefensive": 42,
+      "reboundsTotal": 49,
+      "assists": 21,
+      "steals": 6,
+      "blocks": 6,
+      "turnovers": 14,
+      "foulsPersonal": 15,
+      "points": 114,
+      "plusMinusPoints": -2
+     }
+    },
+    {
+     "path": "props.game.awayTeam.players[0].statistics",
+     "shape": {
+      "minutes": "14:42",
+      "fieldGoalsMade": 1,
+      "fieldGoalsAttempted": 1,
+      "fieldGoalsPercentage": 1,
+      "threePointersMade": 1,
+      "threePointersAttempted": 1,
+      "threePointersPercentage": 1,
+      "freeThrowsMade": 0,
+      "freeThrowsAttempted": 0,
+      "freeThrowsPercentage": 0,
+      "reboundsOffensive": 0,
+      "reboundsDefensive": 1,
+      "reboundsTotal": 1,
+      "assists": 3,
+      "steals": 0,
+      "blocks": 0,
+      "turnovers": 0,
+      "foulsPersonal": 3,
+      "points": 3,
+      "plusMinusPoints": -8
+     }
+    },
+    {
+     "path": "props.game.awayTeam.players[1].statistics",
+     "shape": {
+      "minutes": "38:54",
+      "fieldGoalsMade": 10,
+      "fieldGoalsAttempted": 21,
+      "fieldGoalsPercentage": 0.476,
+      "threePointersMade": 0,
+      "threePointersAttempted": 2,
+      "threePointersPercentage": 0,
+      "freeThrowsMade": 1,
+      "freeThrowsAttempted": 2,
+      "freeThrowsPercentage": 0.5,
+      "reboundsOffensive": 3,
+      "reboundsDefensive": 15,
+      "reboundsTotal": 18,
+      "assists": 1,
+      "steals": 0,
+      "blocks": 3,
+      "turnovers": 1,
+      "foulsPersonal": 3,
+      "points": 21,
+      "plusMinusPoints": -3
+     }
+    },
+    {
+     "path": "props.game.lastFiveMeetings.meetings[0].gameStatus",
+     "shape": 3
+    },
+    {
+     "path": "props.game.lastFiveMeetings.meetings[0].gameStatusText",
+     "shape": "Final"
+    },
+    {
+     "path": "props.game.lastFiveMeetings.meetings[1].gameStatus",
+     "shape": 3
+    },
+    {
+     "path": "props.game.lastFiveMeetings.meetings[1].gameStatusText",
+     "shape": "Final"
+    },
+    {
+     "path": "props.game.pregameCharts.homeTeam.statistics",
+     "shape": {
+      "points": 121.9,
+      "reboundsTotal": 45.4,
+      "assists": 28.1,
+      "steals": 8.2,
+      "blocks": 4.3,
+      "turnovers": 13.2,
+      "fieldGoalsPercentage": 0.491,
+      "threePointersPercentage": 0.383,
+      "freeThrowsPercentage": 0.776,
+      "pointsInThePaint": 51.3,
+      "pointsSecondChance": 14,
+      "pointsFastBreak": 14.9,
+      "playerPtsLeaderFirstName": "Donovan",
+      "playerPtsLeaderFamilyName": "Mitchell",
+      "playerPtsLeaderId": 1628378,
+      "playerPtsLeaderPts": 24,
+      "playerRebLeaderFirstName": "Jarrett",
+      "playerRebLeaderFamilyName": "Allen",
+      "playerRebLeaderId": 1628386,
+      "playerRebLeaderReb": 9.7,
+      "playerAstLeaderFirstName": "Darius",
+      "playerAstLeaderFamilyName": "Garland",
+      "playerAstLeaderId": 1629636,
+      "playerAstLeaderAst": 6.7,
+      "playerBlkLeaderFirstName": "Evan"
+     }
+    },
+    {
+     "path": "props.game.pregameCharts.awayTeam.statistics",
+     "shape": {
+      "points": 115.5,
+      "reboundsTotal": 43.4,
+      "assists": 25.5,
+      "steals": 7.3,
+      "blocks": 4.7,
+      "turnovers": 13.4,
+      "fieldGoalsPercentage": 0.486,
+      "threePointersPercentage": 0.387,
+      "freeThrowsPercentage": 0.75,
+      "pointsInThePaint": 44.3,
+      "pointsSecondChance": 11.6,
+      "pointsFastBreak": 13.5,
+      "playerPtsLeaderFirstName": "Giannis",
+      "playerPtsLeaderFamilyName": "Antetokounmpo",
+      "playerPtsLeaderId": 203507,
+      "playerPtsLeaderPts": 30.4,
+      "playerRebLeaderFirstName": "Giannis",
+      "playerRebLeaderFamilyName": "Antetokounmpo",
+      "playerRebLeaderId": 203507,
+      "playerRebLeaderReb": 11.9,
+      "playerAstLeaderFirstName": "Damian",
+      "playerAstLeaderFamilyName": "Lillard",
+      "playerAstLeaderId": 203081,
+      "playerAstLeaderAst": 7.1,
+      "playerBlkLeaderFirstName": "Brook"
+     }
+    },
+    {
+     "path": "props.game.postgameCharts.homeTeam.statistics",
+     "shape": {
+      "points": 116,
+      "reboundsTotal": 39,
+      "assists": 28,
+      "steals": 10,
+      "blocks": 4,
+      "turnovers": 10,
+      "fieldGoalsPercentage": 0.505,
+      "threePointersPercentage": 0.459,
+      "freeThrowsPercentage": 0.538,
+      "pointsInThePaint": 52,
+      "pointsSecondChance": 12,
+      "pointsFastBreak": 16,
+      "biggestLead": 19,
+      "leadChanges": 6,
+      "timesTied": 6,
+      "biggestScoringRun": 11,
+      "turnoversTeam": 0,
+      "turnoversTotal": 10,
+      "reboundsTeam": 5,
+      "pointsFromTurnovers": 24,
+      "benchPoints": 27,
+      "playerPtsLeaderFirstName": "Darius",
+      "playerPtsLeaderFamilyName": "Garland",
+      "playerPtsLeaderId": 1629636,
+      "playerPtsLeaderPts": 39
+     }
+    },
+    {
+     "path": "props.game.postgameCharts.awayTeam.statistics",
+     "shape": {
+      "points": 114,
+      "reboundsTotal": 49,
+      "assists": 21,
+      "steals": 6,
+      "blocks": 6,
+      "turnovers": 14,
+      "fieldGoalsPercentage": 0.488,
+      "threePointersPercentage": 0.486,
+      "freeThrowsPercentage": 0.867,
+      "pointsInThePaint": 38,
+      "pointsSecondChance": 8,
+      "pointsFastBreak": 6,
+      "biggestLead": 8,
+      "leadChanges": 6,
+      "timesTied": 6,
+      "biggestScoringRun": 8,
+      "turnoversTeam": 1,
+      "turnoversTotal": 15,
+      "reboundsTeam": 4,
+      "pointsFromTurnovers": 19,
+      "benchPoints": 37,
+      "playerPtsLeaderFirstName": "Damian",
+      "playerPtsLeaderFamilyName": "Lillard",
+      "playerPtsLeaderId": 203081,
+      "playerPtsLeaderPts": 36
+     }
+    },
+    {
+     "path": "props.game.whStatus",
+     "shape": 1
+    },
+    {
+     "path": "props.game.hustleStatus",
+     "shape": 1
+    },
+    {
+     "path": "props.game.historicalStatus",
+     "shape": 0
+    },
+    {
+     "path": "props.game.gameState",
+     "shape": 3
+    },
+    {
+     "path": "props.playByPlay",
+     "shape": {
+      "gameId": "0022400154",
+      "videoAvailable": 1,
+      "actions": {
+       "__len": 459,
+       "__item": {
+        "__keys": [
+         "actionNumber",
+         "clock",
+         "period",
+         "teamId",
+         "teamTricode",
+         "personId",
+         "playerName",
+         "playerNameI",
+         "xLegacy",
+         "yLegacy",
+         "shotDistance",
+         "shotResult",
+         "isFieldGoal",
+         "scoreHome",
+         "scoreAway",
+         "pointsTotal",
+         "location",
+         "description",
+         "actionType",
+         "subType",
+         "videoAvailable",
+         "shotValue",
+         "actionId"
+        ]
+       }
+      },
+      "source": "hanaV3"
+     }
+    },
+    {
+     "path": "props.playByPlay.actions",
+     "shape": {
+      "__len": 459,
+      "__item": {
+       "actionNumber": 2,
+       "clock": "PT12M00.00S",
+       "period": 1,
+       "teamId": 0,
+       "teamTricode": "",
+       "personId": 0,
+       "playerName": "",
+       "playerNameI": "",
+       "xLegacy": 0,
+       "yLegacy": 0,
+       "shotDistance": 0,
+       "shotResult": "",
+       "isFieldGoal": 0,
+       "scoreHome": "0",
+       "scoreAway": "0",
+       "pointsTotal": 0,
+       "location": "",
+       "description": "Start of 1st Period (7:01 PM EST)",
+       "actionType": "period",
+       "subType": "start",
+       "videoAvailable": 1,
+       "shotValue": 0,
+       "actionId": 1
+      }
+     }
+    },
+    {
+     "path": "props.playByPlay.actions[0].actionNumber",
+     "shape": 2
+    },
+    {
+     "path": "props.playByPlay.actions[0].actionType",
+     "shape": "period"
+    },
+    {
+     "path": "props.playByPlay.actions[0].actionId",
+     "shape": 1
+    },
+    {
+     "path": "props.playByPlay.actions[1].actionNumber",
+     "shape": 4
+    },
+    {
+     "path": "props.playByPlay.actions[1].actionType",
+     "shape": "Jump Ball"
+    },
+    {
+     "path": "props.playByPlay.actions[1].actionId",
+     "shape": 2
+    },
+    {
+     "path": "props.analyticsObject.gameState",
+     "shape": "ondemand"
+    },
+    {
+     "path": "props.boxscoreParams",
+     "shape": {
+      "defaultRangeString": "0-28800",
+      "initialBoxscoreCacheKey": "{\"resource\":\"traditional\",\"gameId\":\"0022400154\",\"rangePeriod"
+     }
+    },
+    {
+     "path": "props.boxscoreParams.initialBoxscoreCacheKey",
+     "shape": "{\"resource\":\"traditional\",\"gameId\":\"0022400154\",\"rangePeriod"
+    }
+   ]
   }
  }
 }
