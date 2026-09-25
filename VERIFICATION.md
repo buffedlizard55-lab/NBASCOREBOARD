@@ -46,7 +46,7 @@ Machine-readable evidence lives in [`data/verification/`](../data/verification/)
 3. **No synthesis:** the pipeline never adds numbers that are not in the official payload. Derived values (e.g. a percentage formatted for display) are computed in the browser from official fields only.
 4. **Cross-check on final:** when a game reaches "Final", the digest is re-read and the stored row is verified against the official box score (scores, team ids) — mismatches are written to `sync-log.json` as `MISMATCH` instead of being silently kept.
 5. **Append-only evidence:** probe workflows add timestamped result files; they never edit previous results.
-6. **Failure visibility:** every fetch attempt, its HTTP status, and the byte count land in [`sync-log.json`](../data/verification/sync-log.json), including failures.
+6. **Failure visibility:** every stored run records the endpoint, HTTP status and byte count — runs that wrote a file or failed are always stored, and live checks that changed nothing update an hourly heartbeat (`heartbeat.lastCheckedUtc`) instead of adding a run entry. That keeps the evidence complete while stopping the log itself from committing every 10 minutes.
 7. **No churn:** the live feed is gated on game data only — the feed's own `meta.time` (which changes on every request even when nothing else does) cannot create a commit, keeping the pipeline inside GitHub Pages' build-rate limit.
 
 ---
