@@ -15,7 +15,7 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
 H = {"User-Agent": UA, "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
      "Accept-Language": "en-US,en;q=0.9", "Accept-Encoding": "gzip, deflate",
      "Referer": "https://www.nba.com/", "Sec-Fetch-Dest": "document",
-     "Sec-Fetch-Mode: navigate": "navigate", "Sec-Fetch-Site": "same-origin",
+     "Sec-Fetch-Mode": "navigate", "Sec-Fetch-Site": "same-origin",
      "sec-ch-ua": '"Chromium";v="126", "Google Chrome";v="126", "Not-A.Brand";v="99"',
      "sec-ch-ua-mobile": "?0", "sec-ch-ua-platform": '"Windows"', "Upgrade-Insecure-Requests": "1"}
 
