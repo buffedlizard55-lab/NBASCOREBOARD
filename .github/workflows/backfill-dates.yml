@@ -82,3 +82,5 @@ jobs:
             echo "retry ${attempt}"; sleep 5
           done
           exit 1
+
+# (touch: run the backfill after the 2019-20 detail support was added)
