@@ -798,6 +798,17 @@ def refresh_stored(log: dict, max_dates: int = 40, max_games: int = 40) -> None:
         sync_date_digest(date_str, log, season=None, force=True)
     print(f"[refresh] dates pending={len(pending_dates)} refreshed={min(len(pending_dates), max_dates)}", flush=True)
 
+    # The season schedule is one big file (4.7 MB official) — re-read it only when its
+    # provenance block is missing the official-bytes hash.
+    sched_dir = os.path.join(DATA, "schedule")
+    if os.path.isdir(sched_dir):
+        stale = [n for n in sorted(os.listdir(sched_dir))
+                 if n.endswith(".json")
+                 and "sourceSha256" not in (load_json(os.path.join(sched_dir, n)) or {}).get("_sync", {})]
+        if stale:
+            print(f"[refresh] refreshing season schedule ({', '.join(stale)})", flush=True)
+            sync_schedule(log)
+
     games_dir = os.path.join(DATA, "games")
     pending_games = []
     if os.path.isdir(games_dir):
