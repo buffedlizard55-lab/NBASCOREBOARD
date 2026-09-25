@@ -61,6 +61,7 @@ MAX_LOG_RUNS = 30
 PLAYS_PER_GAME = 80
 HISTORY_DAYS_DEFAULT = 14
 BACKFILL_MAX_DATES = 60
+BACKFILL_BATCH = 6
 PIPELINE = "scripts/sync_nba_data.py"
 
 # Player statistics fields kept from the official box score (subset = smaller files).
@@ -511,64 +512,139 @@ def game_ids_for_date_from_schedule(date_str: str, season: str) -> list:
     return ids
 
 
-def game_ids_for_date_from_cards(date_str: str, log: dict) -> list:
-    """Official www.nba.com/games page server-renders the day's cards (measured)."""
+def compact_card(cd: dict) -> dict | None:
+    """One scoreboard row, copied from an official www.nba.com game card."""
+    if not isinstance(cd, dict) or not cd.get("gameId"):
+        return None
+
+    def team(t: dict) -> dict:
+        t = t or {}
+        leader = t.get("teamLeader") or {}
+        return {
+            "teamId": t.get("teamId"), "tricode": t.get("teamTricode"),
+            "name": t.get("teamName"), "slug": t.get("teamSlug"),
+            "wins": t.get("wins"), "losses": t.get("losses"),
+            "score": t.get("score"), "inBonus": t.get("inBonus"),
+            "timeoutsRemaining": t.get("timeoutsRemaining"),
+            "periods": [{"period": p_.get("period"), "score": p_.get("score")}
+                        for p_ in (t.get("periods") or []) if isinstance(p_, dict)],
+            "leader": {
+                "personId": leader.get("personId"), "name": leader.get("name"),
+                "jerseyNum": leader.get("jerseyNum"), "position": leader.get("position"),
+                "points": leader.get("points"), "rebounds": leader.get("rebounds"),
+                "assists": leader.get("assists"), "blocks": leader.get("blocks"),
+                "steals": leader.get("steals"),
+            } if leader else None,
+        }
+
+    bcs = cd.get("broadcasters") or {}
+    broadcasters = [b.get("broadcasterDisplayName") for b in (bcs.get("nationalBroadcasters") or [])]
+    for key in ("homeTvBroadcasters", "awayTvBroadcasters"):
+        for b in (bcs.get(key) or [])[:1]:
+            broadcasters.append(b.get("broadcasterDisplayName"))
+    return {
+        "gameId": cd.get("gameId"),
+        "leagueId": cd.get("leagueId"),
+        "seasonYear": cd.get("seasonYear"),
+        "seasonType": cd.get("seasonType"),
+        "gameStatus": cd.get("gameStatus"),
+        "gameStatusText": cd.get("gameStatusText"),
+        "gameClock": cd.get("gameClock"),
+        "period": cd.get("period"),
+        "gameTimeEastern": cd.get("gameTimeEastern"),
+        "gameTimeUtc": cd.get("gameTimeUtc"),
+        "gameSubtype": cd.get("gameSubtype"),
+        "ifNecessary": cd.get("ifNecessary"),
+        "isNeutral": cd.get("isNeutral"),
+        "home": team(cd.get("homeTeam")),
+        "away": team(cd.get("awayTeam")),
+        "broadcasters": [b for b in broadcasters if b],
+        "shareUrl": cd.get("shareUrl"),
+    }
+
+
+def cards_for_date(date_str: str, log: dict):
+    """Read the official www.nba.com/games?date=<date> page.
+
+    Measured (data/verification/cards-probe.json): the page server-renders every
+    game of that date in __NEXT_DATA__, with period scores, team records, leaders
+    and broadcasters — for any date, including the 1990s.
+    """
     import re
     html, meta = http_get_html(games_page_url(date_str))
     if not html:
         log["steps"].append({"step": "cards", "date": date_str, **meta, "result": "FAILED"})
-        return []
+        return None, meta
     m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.S)
     if not m:
-        log["steps"].append({"step": "cards", "date": date_str, **meta,
-                             "result": "NO_NEXT_DATA"})
-        return []
+        log["steps"].append({"step": "cards", "date": date_str, **meta, "result": "NO_NEXT_DATA"})
+        return None, meta
     try:
         nd = json.loads(m.group(1))
     except Exception as exc:
         log["steps"].append({"step": "cards", "date": date_str, **meta,
                              "result": f"PARSE_ERROR {exc}"})
-        return []
-    raw = json.dumps(((nd.get("props") or {}).get("pageProps") or {}))
-    ids = sorted(set(re.findall(r'"gameId"\s*:\s*"(\d{10})"', raw)))
+        return None, meta
+    props = ((nd.get("props") or {}).get("pageProps") or {})
+    feed = props.get("gameCardFeed") or {}
+    cards = [c for mod in (feed.get("modules") or []) for c in (mod.get("cards") or [])]
+    rows = [r for r in (compact_card((c or {}).get("cardData") or {}) for c in cards) if r]
     log["steps"].append({"step": "cards", "date": date_str, **meta, "result": "OK",
-                         "gameCount": len(ids)})
-    print(f"[cards] {date_str} found {len(ids)} official game ids", flush=True)
-    return ids
+                         "gameCount": len(rows)})
+    print(f"[cards] {date_str} cards={len(rows)}", flush=True)
+    return rows, meta
 
 
 def sync_date_digest(date_str: str, log: dict, season: str, force: bool = False) -> bool:
+    """Archive the official scoreboard for one date (live, historical or future)."""
     path = os.path.join(DATA, "scoreboard", f"{date_str}.json")
     if not force and os.path.exists(path):
         return False
-    ids = game_ids_for_date_from_schedule(date_str, season) or game_ids_for_date_from_cards(date_str, log)
-    if not ids:
-        log["steps"].append({"step": "digest", "date": date_str, "result": "NO_GAMES"})
-        print(f"[digest] {date_str}: no official game ids", flush=True)
+    rows, meta = cards_for_date(date_str, log)
+    if rows is None:
         return False
-    rows = []
-    for gid in ids:
-        box, meta = http_get(live_boxscore_url(gid), CDN_HEADERS)
-        if box and isinstance(box.get("game"), dict) and box["game"].get("gameId"):
-            rows.append(digest_game(box, live_boxscore_url(gid)))
-            log["steps"].append({"step": "digestGame", "gameId": gid, **meta, "result": "OK"})
-        else:
-            log["steps"].append({"step": "digestGame", "gameId": gid, **meta, "result": "FAILED"})
-    if not rows:
-        return False
-    rows.sort(key=lambda r: (r.get("gameEt") or "", r.get("gameId") or ""))
+    rows.sort(key=lambda r: (r.get("gameTimeUtc") or "", r.get("gameId") or ""))
     content = {
         "gameDate": date_str,
         "gameCount": len(rows),
         "games": rows,
-        "sources": [live_boxscore_url(r["gameId"]) for r in rows],
+        "sourcePage": games_page_url(date_str),
     }
     written = store_compact(path, games_page_url(date_str), rows, content,
-                            "rows copied from official box scores (per-game _source listed)")
+                            "rows copied from the official NBA.com game cards for this date")
     log["steps"].append({"step": "digest", "date": date_str, "result": "OK",
                          "gameCount": len(rows), "written": written})
     print(f"[digest] {date_str} OK games={len(rows)} written={written}", flush=True)
     return written
+
+
+def verify_digest_against_boxscore(date_str: str, log: dict) -> None:
+    """Cross-check an archived date against official CDN box scores (2019-20+ only).
+
+    Independent-source check: the card digest comes from www.nba.com HTML, the box
+    score from cdn.nba.com JSON. If the final scores disagree, the run is flagged.
+    """
+    digest = load_json(os.path.join(DATA, "scoreboard", f"{date_str}.json"))
+    if not digest:
+        return
+    for g in digest.get("games", []):
+        gid = g.get("gameId")
+        if not gid or str(gid) < "0021900001":  # CDN game files start with 2019-20
+            continue
+        box, meta = http_get(live_boxscore_url(gid), CDN_HEADERS)
+        if not box or not isinstance(box.get("game"), dict):
+            continue
+        official = box["game"]
+        hb = (official.get("homeTeam") or {}).get("score")
+        ab = (official.get("awayTeam") or {}).get("score")
+        hd = (g.get("home") or {}).get("score")
+        ad = (g.get("away") or {}).get("score")
+        match = (hb == hd and ab == ad)
+        log["steps"].append({"step": "verifyScore", "gameId": gid, "result": "OK" if match else "MISMATCH",
+                             "cards": f"{ad}-{hd}", "cdnBoxscore": f"{ab}-{hb}",
+                             **{k: meta.get(k) for k in ("httpStatus", "bytes")}})
+        if not match:
+            print(f"[verify] MISMATCH {gid}: cards {ad}-{hd} vs boxscore {ab}-{hb} — flagged", flush=True)
 
 
 def sync_schedule(log: dict) -> None:
@@ -605,6 +681,46 @@ def sync_archive_pending(log: dict, days: int) -> None:
             if os.path.exists(os.path.join(DATA, "games", gid, "boxscore.json")):
                 continue
             archive_game(gid, log)
+
+
+def backfill_history_step(log: dict, batch: int = 6) -> None:
+    """Walk backwards through the calendar a few dates per run.
+
+    Every official date page is archived once, so the historical scoreboard grows
+    by itself with no manual work. Dates with no games are recorded too, which
+    stops us re-fetching them forever.
+    """
+    cursor_path = os.path.join(DATA, "verification", "backfill-cursor.json")
+    state = load_json(cursor_path) or {}
+    cursor = state.get("nextDate") or (dt.datetime.now(dt.timezone.utc).date() - dt.timedelta(days=1)).isoformat()
+    stop_before = state.get("earliestTarget") or "1946-11-01"  # BAA/NBA first season
+    fetched = 0
+    while fetched < batch:
+        if cursor < stop_before:
+            print("[backfill] reached earliest target", flush=True)
+            break
+        path = os.path.join(DATA, "scoreboard", f"{cursor}.json")
+        if os.path.exists(path):
+            cursor = (dt.date.fromisoformat(cursor) - dt.timedelta(days=1)).isoformat()
+            continue
+        rows, meta = cards_for_date(cursor, log)
+        if rows is None:
+            break  # network problem: try again next run
+        content = {"gameDate": cursor, "gameCount": len(rows), "games": rows,
+                   "sourcePage": games_page_url(cursor)}
+        store_compact(path, games_page_url(cursor), rows, content,
+                      "rows copied from the official NBA.com game cards for this date")
+        if rows:
+            verify_digest_against_boxscore(cursor, log)
+        fetched += 1
+        cursor = (dt.date.fromisoformat(cursor) - dt.timedelta(days=1)).isoformat()
+    state["nextDate"] = cursor
+    state["earliestTarget"] = stop_before
+    state["lastRunUtc"] = now_utc()
+    state["note"] = ("Progressive archive cursor: the pipeline walks backwards through "
+                     "the calendar, storing each official date page once.")
+    write_json(cursor_path, state)
+    print(f"[backfill] fetched {fetched} dates, next={cursor}", flush=True)
 
 
 def build_index(log: dict) -> None:
@@ -746,6 +862,7 @@ def main() -> int:
 
     if args.mode == "full":
         sync_schedule(log)
+        backfill_history_step(log, batch=BACKFILL_BATCH)
         # One-time backfill of this season's finished dates (bounded).
         sched = load_json(os.path.join(DATA, "schedule", f"{season}.json"))
         if sched:

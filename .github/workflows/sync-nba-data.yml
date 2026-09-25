@@ -51,14 +51,21 @@ jobs:
       - name: Decide sync mode
         id: mode
         run: |
+          set -euo pipefail
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            # Nightly (UTC 06:00 = 02:00 ET) does the heavy full pass; other runs are light.
-            if [ "$(date -u +%H%M)" \< "0700" ]; then echo "mode=full" >> "$GITHUB_OUTPUT";
+            # One heavy pass a day at 06:00 UTC (02:00 ET, after the last game);
+            # the rest of the day only refreshes the live feed.
+            if [ "$(date -u +%H)" = "06" ]; then echo "mode=full" >> "$GITHUB_OUTPUT";
             else echo "mode=daily" >> "$GITHUB_OUTPUT"; fi
           elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "mode=${{ inputs.mode }}" >> "$GITHUB_OUTPUT"
           else
-            echo "mode=live" >> "$GITHUB_OUTPUT"
+            # Maintainers can request a specific mode from the commit message:
+            #   [sync:full] or [sync:daily]   (default on push is live)
+            msg="${{ github.event.head_commit.message }}"
+            if printf '%s' "$msg" | grep -q '\[sync:full\]'; then echo "mode=full" >> "$GITHUB_OUTPUT";
+            elif printf '%s' "$msg" | grep -q '\[sync:daily\]'; then echo "mode=daily" >> "$GITHUB_OUTPUT";
+            else echo "mode=live" >> "$GITHUB_OUTPUT"; fi
           fi
 
       - name: Sync official NBA data
