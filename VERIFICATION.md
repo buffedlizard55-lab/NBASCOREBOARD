@@ -3,7 +3,7 @@
 This file verifies every claim in the project with official sources and manual review links.
 
 ## Date: 2026-09-25
-## Session: arena/01a0d9ed-nbascoreboard
+## Sessions: arena/01a0d9ed-nbascoreboard (Passes 1–3) → arena/01a0d9f3-nbascoreboard (Strip view, schema, standings correction)
 
 ### Endpoint Verification
 
@@ -65,7 +65,39 @@ This file verifies every claim in the project with official sources and manual r
 #### 8. Player Headshot, Logos (Additional)
 - **Claim:** `https://cdn.nba.com/headshots/nba/latest/260x190/{playerId}.png`
 - **Source:** Go package: https://pkg.go.dev/github.com/drewthor/wolves_reddit_bot/apis/nba — "const PlayerHeadshotURL = "https://cdn.nba.com/headshots/nba/latest/260x190/%d.png""
-- **Status:** ✅ VERIFIED (not yet implemented, flagged for next session)
+- **Status:** ✅ VERIFIED (implemented: headshots in box score, logos on rows/cards/standings)
+
+#### 9. Scoreboard Full Schema — gameLeaders, seriesText, gameEt, pbOdds, periods (Added 2026-09-25)
+- **Claim:** Each game in `todaysScoreboard_00.json` carries `gameLeaders.{homeLeaders,awayLeaders}{personId,name,jerseyNum,position,teamTricode,points,rebounds,assists}`, `seriesText`, `gameEt`, `regulationPeriods`, `pbOdds{team,odds,suspended}`, team `inBonus/timeoutsRemaining`, and `periods[{period,periodType,score}]`
+- **Sources (3 independent, all mirroring the official feed):**
+  - nba_api source: https://github.com/swar/nba_api/blob/master/src/nba_api/live/nba/endpoints/scoreboard.py — full `expected_data` dict pins every field above
+  - Go client: https://pkg.go.dev/github.com/utkonoser/nba-api-go/endpoints/live — `ScoreboardGame`, `GameLeaders`, `PlayerLeader` structs
+  - Go client: https://pkg.go.dev/github.com/n-ae/nba-api-go/v3/pkg/live/endpoints — `Game`, `GameLeader`, `ScoreboardResponse` structs
+- **Clock format:** `gameClock` is ISO-8601 duration (`PT02M15.00S`) — confirmed by schema consumers; parsed client-side to `2:15`
+- **Status:** ✅ VERIFIED (powers Strip view: leaders, Q1–Q4/OT/T columns, live clock, series line)
+
+#### 10. LeagueStandingsV3 — Verified Standings Endpoint (Added 2026-09-25, corrects prior listing)
+- **Claim:** `https://stats.nba.com/stats/leaguestandingsv3?LeagueID=00&Season=YYYY-YY&SeasonType=Regular+Season` is the official standings endpoint returning `resultSets` with headers `TeamCity, TeamName, Conference, PlayoffRank, WINS, LOSSES, WinPCT, ConferenceGamesBack, HOME, ROAD, L10, strCurrentStreak…`
+- **Sources:**
+  - nba_api docs: https://github.com/swar/nba_api/blob/master/docs/nba_api/stats/endpoints/leaguestandingsv3.md — "Valid URL: https://stats.nba.com/stats/leaguestandingsv3?LeagueID=00&Season=2019-20&SeasonType=Regular+Season&SeasonYear="
+  - hoopR docs: https://hoopr.sportsdataverse.org/reference/nba_leaguestandingsv3.html — full column list
+  - Community: https://www.reddit.com/r/NBAanalytics/comments/1gwsikx/yooooooo_found_a_few_new_nba_endpoints_plus_all/ — "Update: found this standings endpoint https://stats.nba.com/stats/leaguestandingsv3"
+- **Correction:** prior listing `cdn.nba.com/static/json/liveData/standings/standings.json` had NO citable source — now flagged UNVERIFIED and kept only as experimental fallback (code + UI + README all label it as such)
+- **Status:** ✅ VERIFIED (with CORS limitation flagged; East/West table renderer added)
+
+#### 11. Feed Date vs Local Date — 12pm ET Refresh (Added 2026-09-25)
+- **Claim:** CDN feed refreshes ~12pm ET; `gameDate` in feed may differ from viewer local date
+- **Sources:**
+  - Reddit: https://www.reddit.com/r/NBAanalytics/comments/1gwsikx/yooooooo_found_a_few_new_nba_endpoints_plus_all/ — "Today's Scoreboard (12pm EST refresh)"
+  - Bug report: https://github.com/swar/nba_api/issues/573 — feed showed Oct 20 while local date was Oct 21 (timezone handling)
+- **Mitigation:** feed `gameDate` treated as authoritative, shown in UI date pill with explanatory note
+- **Status:** ✅ VERIFIED (flagged as irregularity, handled in UI)
+
+#### 12. Normal Scoreboard Layout Reference — NBA.com/ESPN (Added 2026-09-25, UI ONLY)
+- **Claim:** NBA.com uses a list view and ESPN a grid view with nearly identical info (teams, icons, scores, final status); game views show quarter breakdown + TV info
+- **Source:** https://medium.com/@makeshowlearn/material-design-exploration-nba-scores-aab151d169da — "NBA.com has a list view of games and ESPN.com has a grid view. The information is nearly the same…" and "NBA.com presents the scoring breakdown by quarter… television network information"
+- **Data rule:** layout reference ONLY — no ESPN endpoints are called anywhere in the codebase (verified by grep: zero `espn` network calls; only mention is in explanatory text)
+- **Status:** ✅ VERIFIED (Strip view implements this layout with official data only)
 
 ### Irregularities Flagged
 
