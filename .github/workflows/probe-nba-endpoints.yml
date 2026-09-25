@@ -1,0 +1,54 @@
+name: Probe official NBA endpoints (verification)
+
+# Runs the empirical endpoint probe on a GitHub-hosted runner (real internet egress)
+# and commits the evidence to data/verification/. The scoreboard must never use an
+# endpoint that has not been probed and recorded here.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/probe_endpoints.py'
+      - '.github/workflows/probe-nba-endpoints.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: probe-nba-endpoints
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Probe official NBA endpoints
+        run: python3 scripts/probe_endpoints.py --out data/verification/endpoint-probe.json
+
+      - name: Show coverage matrix
+        run: |
+          python3 - <<'PY'
+          import json
+          r = json.load(open('data/verification/endpoint-probe.json'))
+          print("date        gameId        kind        status  bytes")
+          for c in r.get('coverage', []):
+              print(f"{c['date']:11} {c['gameId']:13} {c['kind']:11} {c['httpStatus']}   {c['bytes']}")
+          PY
+
+      - name: Commit evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/verification/endpoint-probe.json data/verification/endpoint-probe.md
+          if git diff --cached --quiet; then
+            echo "No evidence changes to commit"
+          else
+            git commit -m "chore(verify): endpoint probe evidence [skip ci]"
+            git push
+          fi
