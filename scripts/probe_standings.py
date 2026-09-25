@@ -177,3 +177,5 @@ with open(OUT, "w", encoding="utf-8") as fh:
     json.dump(report, fh, indent=1, ensure_ascii=False)
     fh.write("\n")
 print(f"[done] wrote {OUT}: {report['conclusion']}")
+
+# Candidates are official hosts only; anything non-NBA is never queried.

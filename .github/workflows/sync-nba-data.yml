@@ -103,3 +103,7 @@ jobs:
             echo "push attempt ${attempt} failed, retrying"; sleep 5
           done
           echo "could not push data"; exit 1
+
+# Trigger notes: this workflow runs on schedule (every 10 min), on dispatch, and when
+# the sync script or this file changes. Data commits it makes carry [skip ci] so they
+# never re-trigger themselves or the probe workflows.
