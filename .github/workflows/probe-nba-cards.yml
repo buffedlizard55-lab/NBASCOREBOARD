@@ -2,6 +2,7 @@ name: Probe NBA game cards (verification)
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - 'scripts/probe_cards.py'
       - '.github/workflows/probe-nba-cards.yml'

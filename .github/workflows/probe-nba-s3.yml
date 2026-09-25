@@ -3,6 +3,7 @@ name: Probe NBA S3 mirror (verification)
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - 'scripts/probe_s3_mirror.py'
       - '.github/workflows/probe-nba-s3.yml'

@@ -2,6 +2,7 @@ name: Probe NBA pages (verification)
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - 'scripts/probe_pages.py'
       - '.github/workflows/probe-nba-pages.yml'

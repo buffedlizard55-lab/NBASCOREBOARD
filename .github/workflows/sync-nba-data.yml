@@ -24,6 +24,7 @@ on:
         options: [live, daily, full, refresh]
         default: daily
   push:
+    branches: [main]
     paths:
       - 'scripts/sync_nba_data.py'
       - 'scripts/nba_official.py'
