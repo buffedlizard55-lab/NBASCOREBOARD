@@ -116,6 +116,21 @@
     </div>
   </section>
 
+  <!-- Standings (Bonus) -->
+  <section id="standings" class="section">
+    <div class="section-header">
+      <h2>Standings (Bonus — Official CDN)</h2>
+      <div class="section-actions">
+        <button id="loadStandingsBtn" class="btn small">Load Standings</button>
+        <span class="pill">cdn.nba.com/static/json/liveData/standings/standings.json</span>
+      </div>
+    </div>
+    <div class="card">
+      <p style="font-size:12px; color:var(--muted);">Attempts to load official standings from CDN. May be empty in offseason. Verified endpoint pattern from community.</p>
+      <div id="standingsContent" class="loading">Click Load Standings to fetch from official NBA CDN</div>
+    </div>
+  </section>
+
   <!-- Historical -->
   <section id="historical" class="section">
     <div class="section-header">
