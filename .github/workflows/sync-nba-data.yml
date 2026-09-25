@@ -67,8 +67,7 @@ jobs:
         id: ingest
         continue-on-error: true # commit the failure evidence, then fail the job below
         env:
-          # One real NBA Summer League final/PBP test for this PR's temporary audit.
-          AUDIT_GAME: ${{ inputs.game || (github.ref_name == 'arena/01a0da68-nbascoreboard' && '1522600076') }}
+          AUDIT_GAME: ${{ inputs.game }}
           SYNC_MODE: ${{ steps.mode.outputs.mode }}
         run: |
           set -euo pipefail
