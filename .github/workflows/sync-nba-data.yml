@@ -19,9 +19,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'live = today only, daily = + standings/recent history, full = + schedule/backfill'
+        description: 'live = today only, daily = + recent history, full = + schedule/backfill, refresh = re-read stored files to add provenance'
         type: choice
-        options: [live, daily, full]
+        options: [live, daily, full, refresh]
         default: daily
   push:
     paths:
@@ -62,10 +62,11 @@ jobs:
             echo "mode=${{ inputs.mode }}" >> "$GITHUB_OUTPUT"
           else
             # Maintainers can request a specific mode from the commit message:
-            #   [sync:full] or [sync:daily]   (default on push is live)
+            #   [sync:full], [sync:daily] or [sync:refresh]   (default on push is live)
             msg="${{ github.event.head_commit.message }}"
             if printf '%s' "$msg" | grep -q '\[sync:full\]'; then echo "mode=full" >> "$GITHUB_OUTPUT";
             elif printf '%s' "$msg" | grep -q '\[sync:daily\]'; then echo "mode=daily" >> "$GITHUB_OUTPUT";
+            elif printf '%s' "$msg" | grep -q '\[sync:refresh\]'; then echo "mode=refresh" >> "$GITHUB_OUTPUT";
             else echo "mode=live" >> "$GITHUB_OUTPUT"; fi
           fi
 

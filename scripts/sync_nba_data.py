@@ -753,6 +753,34 @@ def backfill_history_step(log: dict, batch: int = 6) -> None:
     print(f"[backfill] fetched {fetched} dates, next={cursor}", flush=True)
 
 
+def refresh_stored(log: dict, max_dates: int = 40, max_games: int = 40) -> None:
+    """Re-fetch already-stored files so each one carries the current `_sync` schema.
+
+    Files written before `sourceSha256`/`sourceBytes` existed only prove the stored
+    content hash; re-reading the official source is the only honest way to add the
+    hash of the official bytes. It also re-verifies archived games against the live
+    official files, which is exactly what the audit trail promises.
+    """
+    sb_dir = os.path.join(DATA, "scoreboard")
+    all_dates = sorted(n[:-5] for n in os.listdir(sb_dir) if n.endswith(".json")) if os.path.isdir(sb_dir) else []
+    pending_dates = [d for d in all_dates
+                     if "sourceSha256" not in (load_json(os.path.join(sb_dir, f"{d}.json")) or {}).get("_sync", {})]
+    for date_str in pending_dates[:max_dates]:
+        sync_date_digest(date_str, log, season=None, force=True)
+    print(f"[refresh] dates pending={len(pending_dates)} refreshed={min(len(pending_dates), max_dates)}", flush=True)
+
+    games_dir = os.path.join(DATA, "games")
+    pending_games = []
+    if os.path.isdir(games_dir):
+        for gid in sorted(os.listdir(games_dir)):
+            box = load_json(os.path.join(games_dir, gid, "boxscore.json")) or {}
+            if "sourceSha256" not in (box.get("_sync") or {}):
+                pending_games.append(gid)
+    for gid in pending_games[:max_games]:
+        archive_game(gid, log, force=True)
+    print(f"[refresh] games pending={len(pending_games)} refreshed={min(len(pending_games), max_games)}", flush=True)
+
+
 def build_index(log: dict) -> None:
     index = {
         "generatedBy": PIPELINE,
@@ -867,7 +895,7 @@ def default_season() -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mode", choices=["live", "daily", "full"], default="live")
+    ap.add_argument("--mode", choices=["live", "daily", "full", "refresh"], default="live")
     ap.add_argument("--date", help="build data/scoreboard/<date>.json for this date")
     ap.add_argument("--season", default=None)
     ap.add_argument("--history-days", type=int, default=HISTORY_DAYS_DEFAULT)
@@ -894,13 +922,16 @@ def main() -> int:
             for g in (digest or {}).get("games", []):
                 gid = str(g.get("gameId") or "")
                 if gid and gid >= "0021900001":  # CDN game files exist from 2019-20 on
-                    archive_game(gid, log)
+                    archive_game(gid, log, force=args.force)
 
     if args.mode in ("daily", "full"):
         today = dt.datetime.now(dt.timezone.utc).date()
         for offset in range(1, args.history_days + 1):
             sync_date_digest((today - dt.timedelta(days=offset)).isoformat(), log, season)
         sync_archive_pending(log, args.history_days)
+
+    if args.mode == "refresh":
+        refresh_stored(log)
 
     if args.mode == "full":
         sync_schedule(log)
