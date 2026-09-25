@@ -1,0 +1,220 @@
+{
+ "generatedAtUtc": "2026-09-25T20:12:13.713222+00:00",
+ "question": "Which official endpoint can supply standings?",
+ "candidates": [
+  {
+   "label": "cdn standings/leagueStandings.json",
+   "url": "https://cdn.nba.com/static/json/staticData/standings/leagueStandings.json",
+   "httpStatus": 403,
+   "bytes": 0,
+   "error": "HTTPError 403",
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>73G5WFW9Z79VZNRM</RequestId><HostId>DoA47cOkmE"
+  },
+  {
+   "label": "cdn standings/standings.json",
+   "url": "https://cdn.nba.com/static/json/staticData/standings/standings.json",
+   "httpStatus": 403,
+   "bytes": 0,
+   "error": "HTTPError 403",
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>8NP95MK95T12J5Z5</RequestId><HostId>51zbg6juGO"
+  },
+  {
+   "label": "cdn staticData/leagueStandings.json",
+   "url": "https://cdn.nba.com/static/json/staticData/leagueStandings.json",
+   "httpStatus": 403,
+   "bytes": 0,
+   "error": "HTTPError 403",
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>8NP7V4BMJ7DJDMAD</RequestId><HostId>SZrX2qY/gj"
+  },
+  {
+   "label": "cdn liveData/standings/standings_00.json",
+   "url": "https://cdn.nba.com/static/json/liveData/standings/standings_00.json",
+   "httpStatus": 403,
+   "bytes": 0,
+   "error": "HTTPError 403",
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>8NPDDMW1ZWHB9FKJ</RequestId><HostId>2hUBy4G5rG"
+  },
+  {
+   "label": "cdn staticData/standings_2025_26.json",
+   "url": "https://cdn.nba.com/static/json/staticData/standings/standings_2025_26.json",
+   "httpStatus": 403,
+   "bytes": 0,
+   "error": "HTTPError 403",
+   "bodyPrefix": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>T543RR65TCMZKS6F</RequestId><HostId>Srvdth/yys"
+  },
+  {
+   "label": "stats leaguestandingsv3",
+   "url": "https://stats.nba.com/stats/leaguestandingsv3?LeagueID=00&Season=2025-26&SeasonType=Regular%20Season",
+   "httpStatus": null,
+   "bytes": 0,
+   "error": "TimeoutError: The read operation timed out"
+  },
+  {
+   "label": "stats leaguestandings",
+   "url": "https://stats.nba.com/stats/leaguestandings?LeagueID=00&Season=2025-26&SeasonType=Regular%20Season",
+   "httpStatus": null,
+   "bytes": 0,
+   "error": "TimeoutError: The read operation timed out"
+  },
+  {
+   "label": "www standings page",
+   "url": "https://www.nba.com/standings",
+   "httpStatus": 200,
+   "bytes": 256596,
+   "error": null,
+   "contentType": "text/html; charset=utf-8",
+   "cacheControl": "max-age=0, no-cache, no-store",
+   "looksLikeStandings": false,
+   "htmlBytes": 256553,
+   "hasTableRows": false,
+   "mentionsStandings": true,
+   "scriptSrcs": [
+    "https://cdn.nba.com/user-consent/index-gam.min.js",
+    "/theme-loader.js",
+    "/_next/static/chunks/polyfills-42372ed130431b0a.js",
+    "/_next/static/chunks/17360.e4c3c202bf394adf.js",
+    "/_next/static/chunks/19061.1d9f2dd9a13505d1.js",
+    "/_next/static/chunks/95711.74576fd68ed6236b.js",
+    "/_next/static/chunks/73527.aa36b55fbcef807a.js",
+    "/_next/static/chunks/10708.6ecb12d80a4cdaed.js",
+    "/_next/static/chunks/webpack-6e3f0e05b49989e3.js",
+    "/_next/static/chunks/framework-ad7abf312d5d61d4.js",
+    "/_next/static/chunks/main-196c53f13b153e43.js",
+    "/_next/static/chunks/pages/_app-f31363c7185906d8.js",
+    "/_next/static/chunks/94463-b80c0ce4f0ed269b.js",
+    "/_next/static/chunks/85246-8f4d03fb8b8434f9.js",
+    "/_next/static/chunks/32044-414cc822cb5f5824.js",
+    "/_next/static/chunks/92590-4117aaa2b753056c.js",
+    "/_next/static/chunks/21293-e9f85ca75bc67996.js",
+    "/_next/static/chunks/18138-295e10460a7a3412.js",
+    "/_next/static/chunks/62458-10a555232b693ce6.js",
+    "/_next/static/chunks/2712-e9b10d910a2b5f46.js",
+    "/_next/static/chunks/44072-0d2dc0aaf6cfb251.js",
+    "/_next/static/chunks/84106-e77160ee977ccd9d.js",
+    "/_next/static/chunks/54361-8abb810257195775.js",
+    "/_next/static/chunks/pages/standings-da27d8efc58f9647.js",
+    "/_next/static/C0E7a9q2u2RKy38vn91Q2/_buildManifest.js",
+    "/_next/static/C0E7a9q2u2RKy38vn91Q2/_ssgManifest.js",
+    "https://www.nba.com/akam/13/a716916",
+    "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
+    "https://tags.nba.com/nba-web/prod/utag.js",
+    "/Vn1nLrjALZIO/WCkQ23/eWPfta/a9Ybmc5EOhz1zY/Ay4KP0QVAw/Ng5fW/SguRHA",
+    "/Vn1nLrjALZIO/WCkQ23/eWPfta/ppYbmc5E/ECISP0QVAw/BF4na/lAXIws6?v=8b23e198-d586-4f37-06ef-cee3cfd017dc"
+   ]
+  },
+  {
+   "label": "www standings page (season)",
+   "url": "https://www.nba.com/standings?season=2025-26",
+   "httpStatus": 200,
+   "bytes": 256831,
+   "error": null,
+   "contentType": "text/html; charset=utf-8",
+   "cacheControl": "max-age=0, no-cache, no-store",
+   "looksLikeStandings": false,
+   "htmlBytes": 256788,
+   "hasTableRows": false,
+   "mentionsStandings": true,
+   "scriptSrcs": [
+    "https://cdn.nba.com/user-consent/index-gam.min.js",
+    "/theme-loader.js",
+    "/_next/static/chunks/polyfills-42372ed130431b0a.js",
+    "/_next/static/chunks/17360.e4c3c202bf394adf.js",
+    "/_next/static/chunks/19061.1d9f2dd9a13505d1.js",
+    "/_next/static/chunks/95711.74576fd68ed6236b.js",
+    "/_next/static/chunks/73527.aa36b55fbcef807a.js",
+    "/_next/static/chunks/10708.6ecb12d80a4cdaed.js",
+    "/_next/static/chunks/webpack-6e3f0e05b49989e3.js",
+    "/_next/static/chunks/framework-ad7abf312d5d61d4.js",
+    "/_next/static/chunks/main-196c53f13b153e43.js",
+    "/_next/static/chunks/pages/_app-f31363c7185906d8.js",
+    "/_next/static/chunks/94463-b80c0ce4f0ed269b.js",
+    "/_next/static/chunks/85246-8f4d03fb8b8434f9.js",
+    "/_next/static/chunks/32044-414cc822cb5f5824.js",
+    "/_next/static/chunks/92590-4117aaa2b753056c.js",
+    "/_next/static/chunks/21293-e9f85ca75bc67996.js",
+    "/_next/static/chunks/18138-295e10460a7a3412.js",
+    "/_next/static/chunks/62458-10a555232b693ce6.js",
+    "/_next/static/chunks/2712-e9b10d910a2b5f46.js",
+    "/_next/static/chunks/44072-0d2dc0aaf6cfb251.js",
+    "/_next/static/chunks/84106-e77160ee977ccd9d.js",
+    "/_next/static/chunks/54361-8abb810257195775.js",
+    "/_next/static/chunks/pages/standings-da27d8efc58f9647.js",
+    "/_next/static/C0E7a9q2u2RKy38vn91Q2/_buildManifest.js",
+    "/_next/static/C0E7a9q2u2RKy38vn91Q2/_ssgManifest.js",
+    "https://www.nba.com/akam/13/a716916",
+    "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
+    "https://tags.nba.com/nba-web/prod/utag.js",
+    "/Vn1nLrjALZIO/WCkQ23/eWPfta/a9Ybmc5EOhz1zY/Ay4KP0QVAw/Ng5fW/SguRHA",
+    "/Vn1nLrjALZIO/WCkQ23/eWPfta/ppYbmc5E/ECISP0QVAw/BF4na/lAXIws6?v=b632490d-74fb-142c-de61-ea0b4a5a17dc"
+   ]
+  }
+ ],
+ "bundles": [
+  {
+   "url": "https://cdn.nba.com/user-consent/index-gam.min.js",
+   "httpStatus": 200,
+   "bytes": 18292,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 18142
+  },
+  {
+   "url": "https://www.nba.com/theme-loader.js",
+   "httpStatus": 200,
+   "bytes": 361,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 361
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/polyfills-42372ed130431b0a.js",
+   "httpStatus": 200,
+   "bytes": 112594,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 112541
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/17360.e4c3c202bf394adf.js",
+   "httpStatus": 200,
+   "bytes": 27277,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 27277
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/19061.1d9f2dd9a13505d1.js",
+   "httpStatus": 200,
+   "bytes": 2097,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 2097
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/95711.74576fd68ed6236b.js",
+   "httpStatus": 200,
+   "bytes": 1955,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 1955
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/73527.aa36b55fbcef807a.js",
+   "httpStatus": 200,
+   "bytes": 917,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 917
+  },
+  {
+   "url": "https://www.nba.com/_next/static/chunks/10708.6ecb12d80a4cdaed.js",
+   "httpStatus": 200,
+   "bytes": 1288,
+   "error": null,
+   "matches": [],
+   "scannedBytes": 1288
+  }
+ ],
+ "conclusion": "Official JSON candidates that look like standings: none. Endpoint strings found inside nba.com's own JS: 0.",
+ "endpointHints": []
+}
