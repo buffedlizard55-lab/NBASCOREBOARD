@@ -18,9 +18,7 @@ on:
         required: false
         type: string
   push:
-    # Temporary verification run on this PR branch: dispatch API is unavailable to
-    # our GitHub integration. Remove this branch before merging to main.
-    branches: [main, arena/01a0da68-nbascoreboard]
+    branches: [main]
     paths:
       - 'scripts/sync_nba_data.py'
       - 'scripts/nba_official.py'
