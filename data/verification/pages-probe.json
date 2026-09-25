@@ -1,0 +1,40 @@
+{
+ "generatedAtUtc": "2026-09-25T19:44:02.714809+00:00",
+ "games": [
+  {
+   "date": "2026-09-25",
+   "url": "https://www.nba.com/games?date=2026-09-25",
+   "error": "ValueError: Invalid header name b'Sec-Fetch-Mode: Navigate'"
+  },
+  {
+   "date": "2024-11-04",
+   "url": "https://www.nba.com/games?date=2024-11-04",
+   "error": "ValueError: Invalid header name b'Sec-Fetch-Mode: Navigate'"
+  },
+  {
+   "date": "2019-10-22",
+   "url": "https://www.nba.com/games?date=2019-10-22",
+   "error": "ValueError: Invalid header name b'Sec-Fetch-Mode: Navigate'"
+  },
+  {
+   "date": "1996-06-16",
+   "url": "https://www.nba.com/games?date=1996-06-16",
+   "error": "ValueError: Invalid header name b'Sec-Fetch-Mode: Navigate'"
+  }
+ ],
+ "standings": {
+  "error": "ValueError: Invalid header name b'Sec-Fetch-Mode: Navigate'"
+ },
+ "schedule": {
+  "2025-26": {
+   "season": "2025-26",
+   "url": "https://www.nba.com/schedule?season=2025-26",
+   "error": "ValueError: Invalid header name b'Sec-Fetch-Mode: Navigate'"
+  },
+  "2019-20": {
+   "season": "2019-20",
+   "url": "https://www.nba.com/schedule?season=2019-20",
+   "error": "ValueError: Invalid header name b'Sec-Fetch-Mode: Navigate'"
+  }
+ }
+}
