@@ -99,7 +99,7 @@ Human-review links: [today's raw feed](https://cdn.nba.com/static/json/liveData/
 | `data/games/<gameId>/boxscore.json` | Player/team box score | official box score |
 | `data/games/<gameId>/playbyplay.json` | Every action with clock and running score | official play-by-play |
 | `data/schedule/<season>.json` | Whole season, including future games | `scheduleLeagueV2_1.json` |
-| `data/verification/*.json` | Probe evidence and the per-run fetch log | probe workflows + pipeline |
+| `data/verification/*.json` | Probe evidence and the fetch log (meaningful runs + an hourly liveness heartbeat) | probe workflows + pipeline |
 
 Files are only rewritten when the content the site depends on changes: the write gate hashes the stored content and, for the live feed, ignores the feed's own `meta.time` (measured to change on every request while the game data is identical), so an unchanged feed never produces a commit. Each file records the official source URL, the sha256 of what it shows, and the sha256 + size of the exact official response behind it.
 

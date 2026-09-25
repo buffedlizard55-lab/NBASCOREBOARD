@@ -304,8 +304,11 @@ function updateFreshness() {
   el('provLive').textContent = `${live.fetchedAtUtc || '—'} (UTC) · ${live.gameCount ?? 0} games`;
   el('liveDatePill').textContent = live.feedDate ? `feed date ${live.feedDate}` : '—';
   el('liveCountPill').textContent = `${live.liveCount ?? 0} live / ${live.gameCount ?? 0} games`;
+  const hb = state.index?.heartbeat;
+  const checked = hb?.lastCheckedUtc ? `pipeline checked ${timeAgo(hb.lastCheckedUtc)}` : null;
   el('buildInfo').textContent = `Published data: ${live.fetchedAtUtc || '—'} · archived dates: ${Object.keys(state.index?.scoreboards || {}).length} · archived games: ${Object.keys(state.index?.games || {}).length}` +
-    ` · data path: ${state.sourceMode === 'direct' ? (state.relay ? `your relay (${state.relay})` : 'direct from cdn.nba.com') : 'published snapshot'}${state.relay ? ' · relay configured' : ''}`;
+    ` · data path: ${state.sourceMode === 'direct' ? (state.relay ? `your relay (${state.relay})` : 'direct from cdn.nba.com') : 'published snapshot'}` +
+    `${checked ? ` · ${checked} (${hb.mode || 'live'})` : ''}${state.relay ? ' · relay configured' : ''}`;
 }
 
 /* -------------------------------------------------------------- rendering */

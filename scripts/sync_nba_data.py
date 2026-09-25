@@ -860,6 +860,8 @@ def refresh_stored(log: dict, max_dates: int = 40, max_games: int = 40) -> None:
 
 
 def build_index(log: dict) -> None:
+    history = load_json(LOG_PATH) or {}
+    heartbeat = history.get("heartbeat") or {}
     index = {
         "generatedBy": PIPELINE,
         "rules": {
@@ -871,6 +873,11 @@ def build_index(log: dict) -> None:
         },
         "live": None,
         "plays": None,
+        "heartbeat": {
+            "lastCheckedUtc": log.get("runStartedUtc"),
+            "lastMeaningfulUtc": heartbeat.get("lastMeaningfulUtc"),
+            "mode": log.get("mode"),
+        },
         "scoreboards": {},
         "games": {},
         "schedules": {},
@@ -933,6 +940,7 @@ def build_index(log: dict) -> None:
                 "hasPlaybyplay": os.path.exists(os.path.join(games_dir, gid, "playbyplay.json")),
                 "officialBoxscore": box["_sync"]["source"],
             }
+    del heartbeat
     for name in sorted(os.listdir(os.path.join(DATA, "schedule"))) if os.path.isdir(os.path.join(DATA, "schedule")) else []:
         if not name.endswith(".json"):
             continue
@@ -956,14 +964,39 @@ def build_index(log: dict) -> None:
           f"games={len(index['games'])} seasons={len(index['schedules'])}", flush=True)
 
 
-def append_log(log: dict) -> None:
+def append_log(log: dict) -> bool:
+    """Store the run record — but only when storing it says something new.
+
+    Every run is a fetch worth recording, yet a run that changed nothing and failed
+    nothing is identical in substance to the one before it (the 10-minute live check of
+    an empty offseason feed). Storing those one by one produced a commit every 10
+    minutes and, with it, a Pages build every 10 minutes. So: runs that wrote files or
+    failed are always stored, and runs that changed nothing update a single hourly
+    heartbeat instead. Full detail is kept for the last 30 stored runs.
+    """
     history = load_json(LOG_PATH) or {"runs": []}
     runs = history.get("runs") or []
+    summary = log.get("summary") or {}
+    meaningful = (summary.get("written") or 0) > 0 or (summary.get("failed") or 0) > 0 \
+        or log.get("mode") != "live"
+    hour = (log.get("runStartedUtc") or "")[:13]
+    previous = history.get("heartbeat") or {}
+    history["heartbeat"] = {
+        "hour": hour,
+        "lastCheckedUtc": log.get("runStartedUtc"),
+        "lastMeaningfulUtc": log.get("runStartedUtc") if meaningful else previous.get("lastMeaningfulUtc"),
+        "liveChecksCounted": ((previous.get("liveChecksCounted") or 0) + 1) if not meaningful else 0,
+        "note": "Live checks that changed no file and failed nothing are counted here by hour "
+                "instead of being stored run by run; runs that changed something are below.",
+    }
+    history["_note"] = ("Machine-written record of each run: official endpoint called, HTTP "
+                        "status, bytes, and how many games/actions came back.")
+    if not meaningful and previous.get("hour") == hour:
+        return False  # nothing new to say this hour: leave the file (and the repo) alone
     runs.insert(0, log)
     history["runs"] = runs[:MAX_LOG_RUNS]
-    history["_note"] = ("Machine-written record of each run: official endpoint called, "
-                        "HTTP status, bytes, and how many games/actions came back.")
     write_json(LOG_PATH, history)
+    return True
 
 
 def default_season() -> str:
@@ -1034,8 +1067,8 @@ def main() -> int:
         "failed": sum(1 for s in log["steps"] if s.get("result") == "FAILED"),
         "written": sum(1 for s in log["steps"] if s.get("written")),
     }
-    append_log(log)
-    print(f"[done] {log['summary']}", flush=True)
+    logged = append_log(log)
+    print(f"[done] {log['summary']} log={logged}", flush=True)
     return 0
 
 
