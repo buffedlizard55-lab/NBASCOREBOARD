@@ -120,9 +120,9 @@ These were wrong or unsupported and are now fixed in code and docs:
 
 ## Limitations (measured — not assumptions)
 
-1. **Freshness is bounded by the pipeline cadence (10 minutes).** The browser cannot call the official feeds itself (see table above). Each snapshot shows its capture time. If you want true 10-second freshness, deploy your own pass-through relay and load the page with `?relay=https://your-relay/?url=`; the page then reads the official feeds through it (see below).
+1. **Freshness depends on the path in use.** Server-side probes show the CDN refusing every non-`nba.com` origin, so the committed snapshot (refreshed every 10 minutes by the pipeline) is the guaranteed path in any browser. The page also ships a **Test direct CDN access** button: where a browser *can* read the official feed — or where you point it at your own relay with `?relay=` — it switches itself to 10-second live reads and says which path is active. A direct read that starts failing falls back to the snapshot instead of breaking.
 2. **`stats.nba.com` is unreachable from cloud runners**, so historical stats outside the CDN live-data era (2018-19 and older box scores/play-by-play) are not available here. Older **scoreboards** (quarter scores, records, leaders) *are* available and archived.
-3. **Detail archives are intentionally bounded.** A box score is ~24 KB and a play-by-play ~160 KB per game; the pipeline archives new finals automatically (last 14 days, max 24 games per run) and any date you ask for with the backfill workflow, but it does not bulk-archive every game ever played.
+3. **Detail archives are intentionally bounded.** A box score is ~24 KB and a play-by-play ~160 KB per game, so the pipeline archives new finals automatically (last 14 days, max 24 games per run), keeps play-by-play for the last 60 days plus every playoff game, and prunes older regular-season play-by-play (the box score stays). Re-archive any night with `--date YYYY-MM-DD --with-games --force`.
 4. **No standings.** No official standings source answered (stats API blocked; `nba.com/standings` loads its numbers client-side). Shown as "not published" instead of substituting another provider.
 5. **Playoff/finals dates before 1996** are whatever `nba.com/games?date=…` serves — the archive grows backwards one date at a time, so older nights appear as the cursor reaches them.
 6. **This is a read-only mirror of public endpoints.** It is not affiliated with the NBA; respect NBA's terms and rate limits.
@@ -179,7 +179,14 @@ python3 -m http.server 8000
 python3 scripts/sync_nba_data.py --mode live            # today's feed + today's finals
 python3 scripts/sync_nba_data.py --mode daily           # + last 14 days of scoreboards
 python3 scripts/sync_nba_data.py --mode full            # + season schedule + history walk
+python3 scripts/sync_nba_data.py --mode refresh         # re-read stored files (provenance + drift check)
 python3 scripts/sync_nba_data.py --date 2024-11-04 --with-games   # one date, with box score + PBP
+
+# 3. Run the page's own test suite (jsdom, no browser needed)
+npm --prefix tests install && node tests/ui_smoke.mjs
+#   → boots the real index.html + app.js against the committed data/ files and
+#     asserts 31 behaviours (live view, archived dates, game detail, filters, schedule,
+#     missing-file fallbacks, the direct-access self-test)
 
 # 3. Re-run the verification probes (records fresh evidence)
 python3 scripts/probe_endpoints.py       # which official hosts answer, and how
@@ -189,6 +196,8 @@ python3 scripts/probe_coverage.py        # how far back game data goes
 python3 scripts/probe_cards.py           # structure of the official date pages
 python3 scripts/probe_s3_mirror.py       # S3 mirror behaviour
 python3 scripts/probe_browser_transport.py  # browser-reachable transport shapes
+python3 scripts/probe_standings.py      # official standings candidates + nba.com's own JS
+python3 scripts/probe_core_api.py       # the API nba.com's front end calls (core-api.nba.com)
 ```
 
 Workflows: [`sync-nba-data.yml`](.github/workflows/sync-nba-data.yml) (publication, every 10 min) ·
@@ -212,8 +221,8 @@ the `probe-*.yml` verification workflows (evidence) ·
 
 ## Next steps (prioritised, each with its blocker stated)
 
-1. **Relay-based real-time board (highest value).** Ship the Worker template above as a one-click deploy and auto-detect it; freshness goes from 10 minutes to 10 seconds. *Blocker:* needs a place to host the relay (we cannot create accounts).
-2. **Standings without third parties.** Options: (a) compute conference standings from official team records on the archived date pages (would need every team's latest record, which the date pages do carry), or (b) find an official endpoint that answers cloud IPs. *Blocker:* (a) is a derived table and must be labelled as computed-from-official-records; (b) unproven.
+1. **Real-time board without any third party (highest value).** The page now ships a **`Test direct CDN access`** button: if your browser can read `cdn.nba.com` (the CDN may trust a real browser where it refuses our server-side probes), the board switches itself to 10-second live reads from the official feed and says so in the header. The same test runs through a visitor relay if one is configured (`?relay=…`). *Blocker:* the CDN returned 403 for every non-nba.com origin we could measure from a server; only a real browser can settle how it treats an ordinary reader.
+2. **Standings without third parties.** *New evidence:* nba.com's own front end calls **`core-api.nba.com`** (with `Core-Api-Key`/`Core-Api-Version` headers) and one of its chunks references the Stats endpoint `leaguestandingsv3`; every CDN standings path tried is a missing-object `403` and the Stats API still times out from cloud. Next: read `data/verification/core-api-probe.json` — if a `core-api.nba.com` route answers a foreign origin with `Access-Control-Allow-Origin`, standings (and possibly truly live data) can be read straight from the browser. *Blocker:* the route names and key are embedded in minified JS; only what the probe extracts can be called.
 3. **Wider detail archive.** Bulk-archive box scores + play-by-play for whole past seasons from the CDN (2019-20+). *Blocker:* size — ~200 MB per season of play-by-play; needs a size policy (e.g. current season only, or external storage).
 4. **Shot charts.** Play-by-play actions carry `x`/`y` and `shotDistance`; render a half-court chart per game. *Blocker:* none — data is already in `data/games/*/playbyplay.json`.
 5. **In-game win probability.** `pbOdds` exists in the live feed; decide whether to surface official odds. *Blocker:* product decision (betting-adjacent).

@@ -63,6 +63,10 @@ HISTORY_DAYS_DEFAULT = 14
 BACKFILL_MAX_DATES = 60
 BACKFILL_BATCH = 6
 ARCHIVE_MAX_GAMES_PER_RUN = 24
+# Play-by-play is ~160 KB per game, so the repo keeps it for recent games and every
+# playoff game, and drops it for older regular-season games (a box score stays, and
+# any pruned night can be re-archived with: --date YYYY-MM-DD --with-games --force).
+PBP_RETENTION_DAYS = 60
 PIPELINE = "scripts/sync_nba_data.py"
 
 # Player statistics fields kept from the official box score (subset = smaller files).
@@ -753,6 +757,31 @@ def backfill_history_step(log: dict, batch: int = 6) -> None:
     print(f"[backfill] fetched {fetched} dates, next={cursor}", flush=True)
 
 
+def prune_details(log: dict, days: int = PBP_RETENTION_DAYS) -> None:
+    """Keep play-by-play for recent and playoff games; drop older regular-season files."""
+    games_dir = os.path.join(DATA, "games")
+    if not os.path.isdir(games_dir):
+        return
+    cutoff = (dt.datetime.now(dt.timezone.utc).date() - dt.timedelta(days=days)).isoformat()
+    pruned = 0
+    for gid in sorted(os.listdir(games_dir)):
+        if gid.startswith("004"):  # playoffs / finals: keep forever
+            continue
+        box = load_json(os.path.join(games_dir, gid, "boxscore.json")) or {}
+        game_et = ((box.get("game") or {}).get("gameEt") or "")[:10]
+        if not game_et or game_et >= cutoff:
+            continue
+        pbp_path = os.path.join(games_dir, gid, "playbyplay.json")
+        if os.path.exists(pbp_path):
+            size = os.path.getsize(pbp_path)
+            os.remove(pbp_path)
+            pruned += 1
+            log["steps"].append({"step": "prunePlaybyplay", "gameId": gid, "result": "OK",
+                                 "note": f"removed {size} B; box score kept, re-archive with --with-games"})
+    if pruned:
+        print(f"[prune] removed play-by-play for {pruned} older regular-season games", flush=True)
+
+
 def refresh_stored(log: dict, max_dates: int = 40, max_games: int = 40) -> None:
     """Re-fetch already-stored files so each one carries the current `_sync` schema.
 
@@ -787,7 +816,8 @@ def build_index(log: dict) -> None:
         "rules": {
             "dataOwner": "NBA — only official endpoints are used",
             "evidence": "data/verification/",
-            "docs": "README.md#verified-data-sources",
+            "docs": "README.md#official-data-sources-used",
+            "verification": "VERIFICATION.md",
             "note": "Every file keeps the official source URL and a sha256 of the payload it was built from.",
         },
         "live": None,
@@ -929,6 +959,9 @@ def main() -> int:
         for offset in range(1, args.history_days + 1):
             sync_date_digest((today - dt.timedelta(days=offset)).isoformat(), log, season)
         sync_archive_pending(log, args.history_days)
+
+    if args.mode in ("full", "refresh"):
+        prune_details(log)
 
     if args.mode == "refresh":
         refresh_stored(log)

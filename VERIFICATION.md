@@ -31,15 +31,18 @@ Machine-readable evidence lives in [`data/verification/`](../data/verification/)
 | 2.2 | Historical scoreboards before 2019-20 | **Available for any date** via the official date page (quarter scores, records, leaders, TV); verified for 1996-06-16, 2003-06-15, 2010-06-17, 2016-06-19, 2020-10-11, 2024-06-17, 2024-11-04 | [`cards-probe.json`](../data/verification/cards-probe.json) + archived `data/scoreboard/*.json` |
 | 2.3 | Live feed cache/freshness | `cache-control: max-age=10` with etag/last-modified; the pipeline samples it every 10 minutes | [`endpoint-probe.json`](../data/verification/endpoint-probe.json) |
 | 2.4 | Schedule includes future games | **Yes** — 1274 games for 2026-27 with dates through 2027-04-11, read by the pipeline | [`deep-probe.json`](../data/verification/deep-probe.json) → `scheduleFiles`; `data/schedule/2026-27.json` |
-| 2.5 | Standings | **Unavailable.** `cdn.nba.com` standings paths 403; `stats.nba.com` times out; `nba.com/standings` page data doesn't contain the table server-side | [`deep-probe.json`](../data/verification/deep-probe.json) → `staticCandidates`, [`pages-probe.json`](../data/verification/pages-probe.json) → `standings` |
+| 2.5 | Standings | **Unavailable from the paths tried.** 5 CDN standings paths → missing-object `403`; both Stats API recipes → read timeout; `nba.com/standings` HTML → 200 but no standings data in `__NEXT_DATA__` and no standings-shaped node anywhere in `pageProps` | [`standings-probe.json`](../data/verification/standings-probe.json) |
+| 2.7 | What nba.com's own front end calls | Its `_app` bundle references **`core-api.nba.com`** with `Core-Api-Key` / `Core-Api-Version` headers and `/api/v1/...` routes, and one chunk references the Stats endpoint `leaguestandingsv3`. `core-api.nba.com` is therefore the official app backend — being tested in [`core-api-probe.json`](../data/verification/core-api-probe.json) | [`standings-probe.json`](../data/verification/standings-probe.json) → `endpointHints`, [`deep-probe.json`](../data/verification/deep-probe.json) |
 | 2.6 | Older seasons' schedules | Not published on the CDN (only the current one). Future/deeper seasons need the Stats API or the date pages | [`deep-probe.json`](../data/verification/deep-probe.json) |
 
 ---
 
 ## 3. Data integrity rules enforced by the pipeline
 
-1. **`_sync` provenance on every file:** `{source, fetchedAtUtc, contentHash, officialBytes, compacted}` — `contentHash` is a sha256 of the *official* payload, so any edit after the fact is detectable.
-2. **Hash-gated writes:** a file is only rewritten when the official payload's hash changes → no churn commits, and "changed at" means "the NBA actually published something new".
+1. **`_sync` provenance on every file:** `{source, fetchedAtUtc, contentHash, sourceSha256, sourceBytes, note, pipeline}`.
+   `contentHash` is a sha256 of the **stored content** (so "unchanged" means nothing the site shows moved) and `sourceSha256`/`sourceBytes` are the sha256 and size of the **exact official response** the file was built from. Both together make every number reproducible: fetch `source`, hash it, compare.
+   Every one of the 67 stored artifacts carries this block (verified by `--mode refresh`, run 2026-09-25: 97 fetches, 0 failures, 49 files rewritten onto the current schema).
+2. **Hash-gated writes:** a file is only rewritten when its stored content changes → no churn commits, and `fetchedAtUtc` means "the moment this content was captured".
 3. **No synthesis:** the pipeline never adds numbers that are not in the official payload. Derived values (e.g. a percentage formatted for display) are computed in the browser from official fields only.
 4. **Cross-check on final:** when a game reaches "Final", the digest is re-read and the stored row is verified against the official box score (scores, team ids) — mismatches are written to `sync-log.json` as `MISMATCH` instead of being silently kept.
 5. **Append-only evidence:** probe workflows add timestamped result files; they never edit previous results.

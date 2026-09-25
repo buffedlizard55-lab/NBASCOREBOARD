@@ -451,6 +451,19 @@ async function loadLive({ quiet = false } = {}) {
     loadPlays();
     return games;
   } catch (e) {
+    if (direct && state.sourceMode === 'direct') {
+      // A relay can disappear or the CDN can start refusing; never leave the board
+      // broken — drop to the published snapshot and say so.
+      state.directOk = false;
+      state.directError = String(e.message || e);
+      state.sourceMode = 'snapshot';
+      const out = el('directResult');
+      if (out) out.innerHTML = `<span class="warn">direct read failed</span> — ${esc(state.directError)}. Switched back to the published official snapshot.`;
+      const pill = el('sourceModePill');
+      if (pill) pill.textContent = 'published snapshot';
+      if (!quiet) setStatus('warn', 'Direct read failed — using the published snapshot', state.directError);
+      return loadLive({ quiet: true });
+    }
     if (!quiet) setStatus('error', `Could not read ${PUBLISHED.live}`, String(e.message || e));
     const html = `<div class="card"><h3>No published live feed yet</h3>
       <p>The pipeline has not committed <code>${esc(PUBLISHED.live)}</code> in this checkout. Every fetch it makes is recorded in
