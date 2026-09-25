@@ -12,8 +12,11 @@ Thumbs.db
 *.log
 npm-debug.log*
 
-# Dependencies (none needed for static site, but ignore if added)
+# Generated artifacts / local preview
 node_modules/
+__pycache__/
+*.py[cod]
+site/
 dist/
 build/
 

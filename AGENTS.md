@@ -1,0 +1,3 @@
+# NBA Scoreboard working agreement
+
+Before changing this repository, read **README.md from the project charter onward**. It is the recurring user brief and records current limitations. Use only NBA.com / NBA-owned feeds for scores, box scores and play-by-play. Verify what is available, link every official source, fail closed on unknown data, and flag gaps instead of guessing. Run Python unit tests, `tests/verify_data.py`, and the jsdom smoke test before publication. Consult `VERIFICATION.md` for dated evidence, not as a guarantee of future NBA access. Own the outcome through implementation, bug review and final verification.

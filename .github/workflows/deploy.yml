@@ -11,7 +11,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: false
 
 jobs:
@@ -21,22 +21,20 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Verify files
-        run: |
-          ls -la
-          echo "Checking index.html exists..."
-          test -f index.html
-          echo "Checking README..."
-          test -f README.md
-          echo "All verified - no hallucinations"
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          path: '.'
-      - name: Deploy to GitHub Pages
+          python-version: '3.12'
+      - name: Verify published NBA data before deploying
+        run: python3 tests/verify_data.py
+      - name: Assemble only website files (never ship .git, tests or Python code)
+        run: |
+          mkdir -p site
+          cp index.html style.css app.js .nojekyll site/
+          cp -R data site/data
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - uses: actions/deploy-pages@v4
         id: deployment
-        uses: actions/deploy-pages@v4

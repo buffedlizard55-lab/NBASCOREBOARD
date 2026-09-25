@@ -52,7 +52,8 @@ def describe(obj, depth=0, max_depth=3):
     return obj
 
 
-report = {"generatedAtUtc": dt.datetime.now(dt.timezone.utc).isoformat(), "games": [], "standings": {}, "schedule": {}}
+report = {"generatedAtUtc": dt.datetime.now(dt.timezone.utc).isoformat(), "games": [],
+          "standings": {}, "schedule": {}, "gameDetails": {}}
 
 print("== /games?date=... __NEXT_DATA__ per date ==", flush=True)
 for date in ["2026-09-25", "2024-11-04", "2019-10-22", "1996-06-16"]:
@@ -66,6 +67,14 @@ for date in ["2026-09-25", "2024-11-04", "2019-10-22", "1996-06-16"]:
         if nd:
             props = ((nd.get("props") or {}).get("pageProps") or {})
             rec["pagePropsKeys"] = list(props.keys())
+            rec["selectedDate"] = props.get("selectedDate")
+            rec["allGamesInCurrentYearShape"] = describe(props.get("allGamesInCurrentYear"), 0, 4)
+            years = props.get("allGamesInCurrentYear") or {}
+            rec["calendarYears"] = {year: {
+                "count": len(days), "first": min(days, default=None), "last": max(days, default=None),
+                "gameDates": sum(isinstance(c, int) and c > 0 for c in days.values()),
+                "zeros": sum(c == 0 for c in days.values()), "selectedDateCount": days.get(date),
+            } for year, days in years.items() if isinstance(days, dict)} if isinstance(years, dict) else {}
             events = props.get("events")
             feed = props.get("gameCardFeed")
             rec["eventsType"] = type(events).__name__
@@ -135,6 +144,45 @@ for season in ["2025-26", "2019-20"]:
         rec["error"] = f"{type(e).__name__}: {e}"
         print(f"  {season}: ERROR {rec['error']}", flush=True)
     report["schedule"][season] = rec
+
+print("== /game NBA.com-rendered box/PBP when CDN rejects a Summer League ID ==", flush=True)
+for kind, url in {
+    "summerLeagueBox": "https://www.nba.com/game/gsw-vs-mem-1522600076/box-score",
+    "summerLeaguePbp": "https://www.nba.com/game/gsw-vs-mem-1522600076/play-by-play",
+    "regularBox": "https://www.nba.com/game/mil-vs-cle-0022400154/box-score",
+}.items():
+    rec = {"url": url}
+    try:
+        html = fetch_html(url)
+        nd = next_data(html)
+        rec["htmlBytes"] = len(html)
+        rec["hasNextData"] = bool(nd)
+        rec["containsGameEnd"] = 'Game End' in html
+        rec["containsPlayerStats"] = any(s in html for s in ('"threePointersMade"', '"reboundsTotal"'))
+        if nd:
+            props = ((nd.get("props") or {}).get("pageProps") or {})
+            rec["pagePropsKeys"] = list(props.keys())
+            rec["propsShape"] = describe(props, 0, 3)
+            hits = []
+            def find_relevant(obj, where="props", level=0):
+                if level >= 6 or len(hits) >= 45:
+                    return
+                if isinstance(obj, dict):
+                    for key, val in obj.items():
+                        loc = f"{where}.{key}"
+                        if any(s in key.lower() for s in ("box", "stat", "action", "playbyplay", "pbp")):
+                            hits.append({"path": loc, "shape": describe(val, 0, 2)})
+                        find_relevant(val, loc, level + 1)
+                elif isinstance(obj, list):
+                    for i, val in enumerate(obj[:2]):
+                        find_relevant(val, f"{where}[{i}]", level + 1)
+            find_relevant(props)
+            rec["relevantPaths"] = hits
+        print(f"  {kind}: bytes={rec.get('htmlBytes')} next={rec.get('hasNextData')} keys={rec.get('pagePropsKeys')}", flush=True)
+    except Exception as e:
+        rec["error"] = f"{type(e).__name__}: {e}"
+        print(f"  {kind}: ERROR {rec['error']}", flush=True)
+    report["gameDetails"][kind] = rec
 
 os.makedirs("data/verification", exist_ok=True)
 json.dump(report, open("data/verification/pages-probe.json", "w"), indent=1)

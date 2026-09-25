@@ -1,9 +1,7 @@
 name: Verify
 
-# The gate: every pull request (and every push to main) must show that the Python
-# tools compile, that the page actually boots against the committed data, and that
-# every stored artifact still carries its official provenance block.
-
+# Offline checks are not proof of live NBA access. They check that published files
+# have NBA-source provenance, consistent hashes/counts/scores, and a working UI.
 on:
   pull_request:
   push:
@@ -11,7 +9,6 @@ on:
 
 permissions:
   contents: read
-
 concurrency:
   group: verify-${{ github.ref }}
   cancel-in-progress: true
@@ -21,63 +18,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
-      - name: Python syntax (every script)
+      - name: Python syntax and ingestion edge cases
         run: |
-          for f in scripts/*.py; do python3 -m py_compile "$f"; echo "ok $f"; done
-
+          python3 -m compileall -q scripts tests
+          python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Validate EVERY published NBA JSON file and cross-source final scores
+        run: python3 tests/verify_data.py
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
-
-      - name: UI smoke test (real index.html + app.js + committed data)
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tests/package-lock.json
+      - name: Browser behavior (real page, archived NBA examples and synthetic live game)
         run: |
-          npm --prefix tests install --silent
-          node tests/ui_smoke.mjs
-
-      - name: Data integrity (provenance + parseable JSON)
-        run: |
-          python3 - <<'PY'
-          import glob, json, os, sys
-
-          files = sorted(glob.glob('data/**/*.json', recursive=True))
-          missing_sync, missing_source, bad = [], [], []
-          for path in files:
-              try:
-                  with open(path, encoding='utf-8') as fh:
-                      payload = json.load(fh)
-              except Exception as exc:
-                  bad.append(f"{path}: {exc}")
-                  continue
-              if not isinstance(payload, dict) or '_sync' not in payload:
-                  continue
-              sync = payload['_sync']
-              if not sync.get('sourceSha256'):
-                  missing_sync.append(path)
-              if not sync.get('source'):
-                  missing_source.append(path)
-
-          print(f"json files: {len(files)}")
-          print(f"files without a sourceSha256: {len(missing_sync)}")
-          for p in missing_sync[:10]:
-              print(f"  - {p}")
-          print(f"files without a source URL: {len(missing_source)}")
-          for p in missing_source[:10]:
-              print(f"  - {p}")
-          if bad:
-              print("UNPARSEABLE:")
-              for b in bad:
-                  print(f"  - {b}")
-
-          index = json.load(open('data/index.json', encoding='utf-8'))
-          print(f"index: live={'yes' if index.get('live') else 'no'} "
-                f"dates={len(index.get('scoreboards') or {})} "
-                f"games={len(index.get('games') or {})} "
-                f"schedules={list((index.get('schedules') or {}).keys())}")
-          if bad or missing_sync or missing_source:
-              sys.exit(1)
-          PY
+          npm --prefix tests ci --silent
+          npm --prefix tests test

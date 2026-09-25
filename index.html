@@ -1,259 +1,156 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NBA Scoreboard — Official Live &amp; Historical Data</title>
-<meta name="description" content="Live and historical NBA scoreboard built from 100% official NBA data: cdn.nba.com live feeds and nba.com game pages. Play-by-play, box scores, schedule — no third-party data.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏀</text></svg>">
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#13213a">
+  <meta name="description" content="NBA scores, official box scores and play-by-play. Read-only snapshots of NBA.com and NBA CDN data, with capture times and links to the sources.">
+  <title>NBA Scoreboard | Official-source scores &amp; play-by-play</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏀</text></svg>">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
 </head>
 <body>
 <header class="header">
   <div class="container header-inner">
-    <div class="brand">
-      <span class="logo">🏀</span>
-      <div>
-        <h1>NBA SCOREBOARD</h1>
-        <p class="subtitle">Official live &amp; historical data · published by a GitHub Actions pipeline that reads only NBA endpoints</p>
-      </div>
-    </div>
-    <nav class="nav">
-      <a href="#live" class="active">Live</a>
-      <a href="#date">By date</a>
-      <a href="#schedule">Schedule</a>
-      <a href="#sources">Sources</a>
-      <a href="#limits">Limits</a>
+    <a class="brand" href="#live" aria-label="NBA Scoreboard, go to scores">
+      <span class="brand-icon" aria-hidden="true">🏀</span>
+      <span><strong>NBA SCOREBOARD</strong><small>Official NBA data · independent viewer</small></span>
+    </a>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="#live">Scores</a><a href="#schedule">Schedule</a><a href="#date">Archive</a><a href="#sources">Data &amp; sources</a>
     </nav>
   </div>
 </header>
 
 <main class="container">
-  <!-- Data status -->
-  <section class="status-bar" id="statusBar">
+  <section class="status-bar" id="statusBar" aria-live="polite" aria-atomic="true">
     <div class="status-left">
-      <span class="dot" id="statusDot"></span>
-      <span id="statusText">Loading published data…</span>
-      <span class="meta" id="statusMeta"></span>
+      <span class="dot loading" id="statusDot" aria-hidden="true"></span>
+      <div><strong id="statusText">Loading NBA snapshot…</strong><span class="meta" id="statusMeta"></span></div>
     </div>
     <div class="status-right">
-      <span class="pill" id="freshnessPill">—</span>
-      <label class="toggle" title="Re-read the published data every 60 seconds">
-        <input type="checkbox" id="autoRefresh" checked>
-        <span>Auto-refresh</span>
-      </label>
-      <button id="refreshBtn" class="btn small">↻ Refresh now</button>
+      <span class="pill" id="freshnessPill">Checking capture time…</span>
+      <label class="toggle"><input type="checkbox" id="autoRefresh" checked> Refresh display automatically</label>
+      <button type="button" id="refreshBtn" class="btn secondary small">↻ Refresh</button>
     </div>
   </section>
+  <div id="freshnessAlert" class="alert hidden" role="alert"></div>
 
-  <section class="card provenance">
-    <h3>How this page gets its data</h3>
-    <p>
-      NBA's own CDN refuses every origin except <code>nba.com</code> (measured: <span class="warn">HTTP 403</span> for this site's
-      origin), NBA's S3 mirror sends no CORS header, and <code>stats.nba.com</code> never answers a cloud runner.
-      So a <strong>GitHub Actions pipeline fetches the official feeds server-side</strong> and commits the responses next to this
-      page. The browser then reads them same-origin — 100% official NBA data, no third-party aggregator, no manual checking.
-    </p>
-    <div class="provenance-grid">
-      <div class="provenance-item"><span class="k">Data path</span><span class="v" id="sourceModePill">published snapshot</span></div>
-      <div class="provenance-item"><span class="k">Live feed</span><span class="v" id="provLive">—</span></div>
-      <div class="provenance-item"><span class="k">Pipeline</span><span class="v">runs every 10 min · heavy pass 06:00 UTC</span></div>
-      <div class="provenance-item"><span class="k">Evidence</span><span class="v"><a href="data/verification/sync-log.json" target="_blank" rel="noopener">fetch log</a> · <a href="data/verification/" target="_blank" rel="noopener">probe results</a></span></div>
-    </div>
-    <p class="note">
-      <button id="testDirectBtn" class="btn small">Test direct CDN access</button>
-      <span id="directResult">—</span>
-    </p>
-  </section>
-
-  <!-- Live -->
   <section id="live" class="section">
     <div class="section-header">
-      <h2>Live scoreboard</h2>
-      <div class="section-actions">
-        <span class="pill" id="liveDatePill">—</span>
-        <span class="pill" id="liveCountPill">—</span>
-        <input type="text" id="gameSearch" class="search" placeholder="Filter team or player…">
-      </div>
+      <div><span class="eyebrow">NBA SCORES</span><h1>Today's scoreboard</h1><p class="section-subtitle" id="liveNote">Official NBA snapshots, not a guaranteed real-time stream.</p></div>
+      <div class="section-actions"><span class="pill" id="liveDatePill">—</span><span class="pill" id="liveCountPill">—</span></div>
     </div>
     <div class="scoreboard-controls">
-      <div class="date-nav">
-        <button id="prevDayBtn" class="btn small secondary">‹ Previous day</button>
-        <button id="todayBtn" class="btn small">Today</button>
-        <button id="nextDayBtn" class="btn small secondary">Next day ›</button>
-        <span class="pill" id="viewDatePill">—</span>
+      <div class="date-nav" aria-label="Change game date">
+        <button type="button" id="prevDayBtn" class="btn secondary small" aria-label="Previous NBA date">←</button>
+        <button type="button" id="todayBtn" class="btn small">Today</button>
+        <button type="button" id="nextDayBtn" class="btn secondary small" aria-label="Next NBA date">→</button>
+        <span class="view-date" id="viewDatePill">—</span>
       </div>
-      <div class="view-toggle" role="group" aria-label="Scoreboard view">
-        <button id="stripViewBtn" class="tab active" aria-pressed="true">▤ Rows</button>
-        <button id="cardsViewBtn" class="tab" aria-pressed="false">▦ Cards</button>
+      <div class="board-tools">
+        <label class="sr-only" for="gameSearch">Filter teams or players</label>
+        <input type="search" id="gameSearch" class="search" placeholder="Find a team or player">
+        <div class="view-toggle" role="group" aria-label="Scoreboard layout">
+          <button type="button" id="stripViewBtn" class="tab active" aria-pressed="true">Rows</button>
+          <button type="button" id="cardsViewBtn" class="tab" aria-pressed="false">Cards</button>
+        </div>
       </div>
     </div>
-    <p class="note" id="liveNote">
-      Rows show the official quarter-by-quarter line: status &amp; clock, both teams with records, Q1–Q4 + OT, totals, top scorers, TV.
-    </p>
-    <div id="gamesStrip" class="games-strip"><div class="loading">Reading published live feed…</div></div>
-    <div id="gamesGrid" class="games-grid hidden"><div class="loading">Reading published live feed…</div></div>
+    <div id="gamesStrip" class="games-strip" aria-live="polite"><div class="loading">Loading official games…</div></div>
+    <div id="gamesGrid" class="games-grid hidden"></div>
+    <div id="upcomingPreview" class="upcoming-preview hidden"></div>
   </section>
 
-  <!-- Game detail -->
-  <section id="gameDetail" class="section hidden">
-    <div class="section-header">
-      <h2 id="detailTitle">Game</h2>
-      <button id="closeDetail" class="btn small">✕ Close</button>
+  <section id="gameDetail" class="section detail hidden" aria-label="Game detail">
+    <div class="section-header"><div><span class="eyebrow">GAME CENTER</span><h2 id="detailTitle">Game</h2></div>
+      <button type="button" id="closeDetail" class="btn secondary small">Close ×</button></div>
+    <div class="detail-tabs" role="group" aria-label="Game details">
+      <button type="button" class="tab active" data-tab="boxscore" aria-pressed="true">Box score</button>
+      <button type="button" class="tab" data-tab="playbyplay" aria-pressed="false">Play-by-play</button>
+      <button type="button" class="tab" data-tab="info" aria-pressed="false">Game info &amp; links</button>
     </div>
-    <div class="detail-tabs">
-      <button class="tab active" data-tab="boxscore">Box score</button>
-      <button class="tab" data-tab="playbyplay">Play-by-play</button>
-      <button class="tab" data-tab="info">Game info</button>
-    </div>
-    <div class="endpoint-info" id="detailEndpoints"></div>
-    <div id="boxscorePanel" class="panel active"><div id="boxscoreContent" class="loading">Select a game…</div></div>
+    <div id="detailEndpoints" class="endpoint-info"></div>
+    <div id="boxscorePanel" class="panel active"><div id="boxscoreContent" class="loading">Choose a game.</div></div>
     <div id="playbyplayPanel" class="panel">
       <div class="filter-bar">
-        <select id="periodFilter"><option value="all">All periods</option></select>
-        <select id="teamFilter"><option value="all">Both teams</option></select>
-        <input type="text" id="searchActions" placeholder="Search actions…">
+        <label class="sr-only" for="periodFilter">Period</label><select id="periodFilter"><option value="all">All periods</option></select>
+        <label class="sr-only" for="teamFilter">Team</label><select id="teamFilter"><option value="all">Both teams</option></select>
+        <label class="sr-only" for="searchActions">Search plays</label><input type="search" id="searchActions" placeholder="Search plays">
+        <button type="button" id="pbpOrderBtn" class="btn secondary small" aria-pressed="true">Latest first</button>
       </div>
-      <div id="playbyplayContent" class="loading">Select a game…</div>
+      <div id="playbyplayContent" class="loading">Choose a game.</div>
     </div>
     <div id="infoPanel" class="panel"><div id="infoContent"></div></div>
   </section>
 
-  <!-- By date -->
-  <section id="date" class="section">
-    <div class="section-header">
-      <h2>Historical scoreboard by date</h2>
-    </div>
-    <div class="card">
-      <p>
-        Every archived date is the official <code>nba.com/games?date=…</code> page for that night, captured by the pipeline
-        (quarter scores, records, leaders, TV). Verification examples already in the archive:
-        <strong>1996-06-16</strong> SEA 75 @ CHI 87 · <strong>2010-06-17</strong> BOS 79 @ LAL 83 ·
-        <strong>2016-06-19</strong> CLE 93 @ GSW 89 · <strong>2020-10-11</strong> LAL 106 @ MIA 93 ·
-        <strong>2024-06-17</strong> DAL 88 @ BOS 106.
-      </p>
-      <div class="input-row">
-        <input type="date" id="dateInput">
-        <button id="loadByDateBtn" class="btn">Show this date</button>
-        <button id="yesterdayBtn" class="btn secondary">Yesterday</button>
-        <button id="lastFinalsBtn" class="btn secondary">2024-06-17</button>
-        <a id="nbaGamesLink" class="btn secondary" href="https://www.nba.com/games" target="_blank" rel="noopener">Open on NBA.com ↗</a>
+  <section id="schedule" class="section">
+    <div class="section-header"><div><span class="eyebrow">LOOK AHEAD</span><h2>NBA schedule</h2></div>
+      <div class="section-actions">
+        <label class="sr-only" for="seasonSelect">Season</label><select id="seasonSelect" class="search"></select>
+        <label class="sr-only" for="scheduleRange">Date range</label><select id="scheduleRange" class="search"><option value="next">Next 7 game days</option><option value="all">Full published season</option></select>
+        <label class="sr-only" for="scheduleFilter">Filter schedule by team</label><input type="search" id="scheduleFilter" class="search" placeholder="Filter team">
       </div>
-      <div id="dateResult" class="date-result"></div>
+    </div>
+    <p class="section-subtitle">Tip-off times are in your local timezone. Scheduled times and matchups can change. <a href="https://cdn.nba.com/static/json/staticData/scheduleLeagueV2_1.json" target="_blank" rel="noopener noreferrer">NBA schedule source ↗</a></p>
+    <div id="scheduleContent" class="loading">Loading the published schedule…</div>
+  </section>
+
+  <section id="date" class="section">
+    <div class="section-header"><div><span class="eyebrow">LOOK BACK</span><h2>Historical scores</h2></div><span class="pill" id="archiveCount">—</span></div>
+    <div class="card">
+      <p>Pick a date to see NBA.com scores already captured here. An unarchived date is <strong>not</strong> a no-game date; follow the NBA.com link to review it there.</p>
+      <div class="input-row">
+        <label class="sr-only" for="dateInput">Game date</label><input type="date" id="dateInput">
+        <button type="button" id="loadByDateBtn" class="btn">Show scores</button>
+        <button type="button" id="yesterdayBtn" class="btn secondary">Yesterday (ET)</button>
+        <a id="nbaGamesLink" class="btn secondary" href="https://www.nba.com/games" target="_blank" rel="noopener noreferrer">Check on NBA.com ↗</a>
+      </div>
+      <div id="dateResult" class="date-result" aria-live="polite"></div>
     </div>
     <div class="card">
-      <h3>Archived dates <span class="pill" id="archiveCount">—</span></h3>
-      <p class="note">The pipeline walks backwards through the calendar a few dates per run, so this archive keeps filling in by itself.</p>
+      <h3>Captured game dates</h3><p class="note">A growing sample, not a complete all-time archive. For some unarchived past dates, NBA.com's year calendar provides an explicit game count, not scores. A missing count is unknown; use the date picker or NBA.com.</p>
       <div id="archiveList" class="chip-row"></div>
     </div>
   </section>
 
-  <!-- Schedule -->
-  <section id="schedule" class="section">
-    <div class="section-header">
-      <h2>Season schedule (official, includes upcoming games)</h2>
-      <div class="section-actions">
-        <select id="seasonSelect" class="search"></select>
-        <input type="text" id="scheduleFilter" class="search" placeholder="Filter team…">
-      </div>
-    </div>
-    <p class="note">
-      Source: <code>cdn.nba.com/static/json/staticData/scheduleLeagueV2_1.json</code> — measured to contain the whole season
-      including future games (this corrects the earlier claim that public NBA endpoints have no future schedule).
-    </p>
-    <div id="scheduleContent" class="loading">Loading schedule…</div>
-  </section>
-
-  <!-- Sources -->
   <section id="sources" class="section">
-    <div class="section-header"><h2>Official sources &amp; verification evidence</h2></div>
-    <div class="card">
-      <h3>Endpoints the project actually uses</h3>
-      <table class="sources-table">
-        <thead><tr><th>Endpoint</th><th>Used for</th><th>Access</th><th>Verify</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><code>cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json</code></td>
-            <td>Live scoreboard</td>
-            <td>Server-side only (403 for other origins)</td>
-            <td><a href="https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json" target="_blank" rel="noopener">open raw ↗</a></td>
-          </tr>
-          <tr>
-            <td><code>cdn.nba.com/static/json/liveData/boxscore/boxscore_{gameId}.json</code></td>
-            <td>Box scores (2019-20 → today)</td>
-            <td>Server-side only</td>
-            <td><a href="https://cdn.nba.com/static/json/liveData/boxscore/boxscore_0022400247.json" target="_blank" rel="noopener">example ↗</a></td>
-          </tr>
-          <tr>
-            <td><code>cdn.nba.com/static/json/liveData/playbyplay/playbyplay_{gameId}.json</code></td>
-            <td>Play-by-play (2019-20 → today)</td>
-            <td>Server-side only</td>
-            <td><a href="https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_0022400247.json" target="_blank" rel="noopener">example ↗</a></td>
-          </tr>
-          <tr>
-            <td><code>cdn.nba.com/static/json/staticData/scheduleLeagueV2_1.json</code></td>
-            <td>Season schedule (incl. future games)</td>
-            <td>Server-side only</td>
-            <td><a href="https://cdn.nba.com/static/json/staticData/scheduleLeagueV2_1.json" target="_blank" rel="noopener">open raw ↗</a></td>
-          </tr>
-          <tr>
-            <td><code>www.nba.com/games?date=YYYY-MM-DD</code></td>
-            <td>Historical / future scoreboards, any date</td>
-            <td>Server-side (server-rendered JSON)</td>
-            <td><a href="https://www.nba.com/games?date=1996-06-16" target="_blank" rel="noopener">1996 example ↗</a></td>
-          </tr>
-          <tr>
-            <td><code>cdn.nba.com/logos/… · cdn.nba.com/headshots/…</code></td>
-            <td>Team logos, player headshots</td>
-            <td>Any origin (images load fine)</td>
-            <td><a href="https://cdn.nba.com/logos/nba/1610612747/primary/L/logo.svg" target="_blank" rel="noopener">logo ↗</a></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="card">
-      <h3>Measured access evidence</h3>
-      <p class="note">These files are written by the probe workflows on a real network egress — every status code in them is a recorded response, not an assumption.</p>
-      <ul class="evidence-list">
-        <li><a href="data/verification/endpoint-probe.json" target="_blank" rel="noopener">endpoint-probe.json</a> — first pass: which official hosts answer at all (CDN 200/403 pattern, stats.nba.com timeouts, data.nba.net TLS failure).</li>
-        <li><a href="data/verification/access-probe.json" target="_blank" rel="noopener">access-probe.json</a> — proves the 403 is triggered by the request's <code>Origin</code>, and which header set unlocks HTTP 200.</li>
-        <li><a href="data/verification/browser-transport-probe.json" target="_blank" rel="noopener">browser-transport-probe.json</a> — a page like this one cannot read the CDN (403 with its own Origin, HTTP/1.1 and HTTP/2).</li>
-        <li><a href="data/verification/s3-probe.json" target="_blank" rel="noopener">s3-probe.json</a> — NBA's S3 mirror returns identical bytes but no CORS header.</li>
-        <li><a href="data/verification/deep-probe.json" target="_blank" rel="noopener">deep-probe.json</a> — header sensitivity, stats.nba.com recipes, schedule file contents.</li>
-        <li><a href="data/verification/coverage-probe.json" target="_blank" rel="noopener">coverage-probe.json</a> — how far back CDN game files go (2019-20 confirmed; 2018-19 and older absent).</li>
-        <li><a href="data/verification/cards-probe.json" target="_blank" rel="noopener">cards-probe.json</a> — the nba.com game page server-renders full cards for any date (1996 example included).</li>
-        <li><a href="data/verification/sync-log.json" target="_blank" rel="noopener">sync-log.json</a> — every pipeline fetch: endpoint, HTTP status, bytes, games/actions.</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h3>Game ID format (used in links and archives)</h3>
-      <p><code>00X YY NNNNN</code> — 001 preseason · 002 regular season · 003 All-Star · 004 playoffs · 005 play-in · 006 NBA Cup final; <code>YY</code> = season ending year. Example: <code>0041500407</code> = 2015-16 playoffs, Game 7.</p>
+    <div class="section-header"><div><span class="eyebrow">TRANSPARENT BY DESIGN</span><h2>Where every number comes from</h2></div></div>
+    <div class="card source-summary">
+      <p>The site reads <strong>published copies of NBA-owned feeds</strong>, not ESPN or other aggregators. An automated GitHub Actions job fetches NBA.com / cdn.nba.com; the browser reads the copies here. This is a <strong>snapshot</strong>, not a guaranteed live connection. Click a game's NBA link to review the original.</p>
+      <div class="provenance-grid">
+        <div><span class="k">Source mode</span><strong id="sourceModePill">Published NBA snapshot</strong></div>
+        <div><span class="k">Scoreboard captured</span><strong id="provLive">—</strong></div>
+        <div><span class="k">Last successful fetch</span><strong id="lastVerified">—</strong></div>
+        <div><span class="k">Fetch evidence</span><a href="data/verification/sync-log.json" target="_blank" rel="noopener noreferrer">Open sync log ↗</a></div>
+      </div>
+      <details><summary>Official endpoints and independent review links</summary>
+        <div class="table-wrap"><table class="sources-table"><thead><tr><th>Official source</th><th>Used for</th><th>Review</th></tr></thead><tbody>
+          <tr><td><code>cdn.nba.com /liveData/scoreboard</code></td><td>NBA game status and scores</td><td><a href="https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json" target="_blank" rel="noopener noreferrer">Today’s raw feed ↗</a></td></tr>
+          <tr><td><code>cdn.nba.com /liveData/boxscore</code></td><td>Team and player box score</td><td><a href="https://www.nba.com/game/mil-vs-cle-0022400154/box-score" target="_blank" rel="noopener noreferrer">NBA.com example ↗</a></td></tr>
+          <tr><td><code>cdn.nba.com /liveData/playbyplay</code></td><td>Each official game action</td><td><a href="https://www.nba.com/game/mil-vs-cle-0022400154/play-by-play" target="_blank" rel="noopener noreferrer">NBA.com example ↗</a></td></tr>
+          <tr><td><code>cdn.nba.com /staticData/scheduleLeagueV2_1.json</code></td><td>Current season schedule</td><td><a href="https://cdn.nba.com/static/json/staticData/scheduleLeagueV2_1.json" target="_blank" rel="noopener noreferrer">Raw schedule ↗</a></td></tr>
+          <tr><td><code>nba.com/games?date=…</code></td><td>Captured historical date cards</td><td><a href="https://www.nba.com/games?date=1996-06-16" target="_blank" rel="noopener noreferrer">1996 example ↗</a></td></tr>
+        </tbody></table></div>
+        <p class="note">Some raw NBA CDN links may be blocked in a browser on this origin; the human-facing NBA.com links and the stored <code>_sync.source</code> URLs are provided for review. Hashes are fingerprints of captured responses, not independent certification.</p>
+        <p><a href="data/verification/cards-probe.json">Date-page evidence</a> · <a href="data/verification/browser-transport-probe.json">Browser access evidence</a> · <a href="https://github.com/buffedlizard55-lab/NBASCOREBOARD/blob/main/VERIFICATION.md">Verification notes</a></p>
+        <button type="button" id="testDirectBtn" class="btn secondary small">Test browser access to NBA CDN</button> <span id="directResult" class="note" aria-live="polite"></span>
+      </details>
     </div>
   </section>
 
-  <!-- Limitations -->
-  <section id="limits" class="section">
-    <div class="section-header"><h2>Known limitations (measured, not assumed)</h2></div>
-    <div class="card warn-card">
-      <ol class="limits-list">
-        <li><strong>Browsers cannot read NBA JSON directly — but this page tests yours.</strong> cdn.nba.com answers <code>403</code> to any request whose <code>Origin</code> is not nba.com (measured with and without a referer, over HTTP/1.1 and HTTP/2), which is why the board reads committed data. The <em>Test direct CDN access</em> button checks your own browser: if the CDN ever allows this origin (or you point the page at your own relay with <code>?relay=…</code>), the board switches itself to 10-second live reads straight from the official feed.</li>
-        <li><strong>stats.nba.com is unreachable from cloud runners.</strong> Every documented header recipe timed out (45 s) from GitHub Actions; historical stats beyond the CDN live-data era (2018-19 and earlier for box scores) are therefore not available here.</li>
-        <li><strong>Freshness is bounded by the path in use.</strong> Published snapshots land every ~10 minutes; the direct path refreshes every 10 seconds. The pill in the header always names which path is active, and every snapshot shows its capture time.</li>
-        <li><strong>Standings are not published.</strong> The official standings come from stats.nba.com (blocked) and nba.com/standings loads its table client-side; no official standings source answered, so none is shown — instead of showing numbers from a third party.</li>
-        <li><strong>Full play-by-play archives start at final.</strong> Box scores and play-by-play are archived for games from 2019-20 onwards once a game is final; for other dates the board shows period scores, leaders and a link to the official game page.</li>
-      </ol>
-    </div>
-  </section>
-
-  <footer class="footer">
-    <div class="card">
-      <p><strong>Data ownership:</strong> all data belongs to the NBA. This project reads official public endpoints that nba.com itself uses, stores the responses unchanged (or with a documented field subset), and links every number back to its source.</p>
-      <p><strong>Repository:</strong> <a href="https://github.com/buffedlizard55-lab/NBASCOREBOARD" target="_blank" rel="noopener">buffedlizard55-lab/NBASCOREBOARD</a> · <a href="https://www.nba.com" target="_blank" rel="noopener">NBA.com</a> · <a href="https://www.nba.com/games" target="_blank" rel="noopener">Official games page</a></p>
-      <p class="note" id="buildInfo">—</p>
-    </div>
+  <section id="limits" class="section"><details class="card limits-card"><summary><strong>Coverage and reliability limitations</strong></summary>
+    <ul>
+      <li>GitHub Actions schedules may be delayed or skipped. Refreshing this page cannot make a stale publication newer. The capture/check time and any ingestion failures are shown above; <a href="https://www.nba.com/games">NBA.com</a> is the live reference.</li>
+      <li>Full game detail is attempted while games are in progress and at final for the NBA CDN era (sampled from 2019–20). Older seasons have date-level scores when archived, but no confirmed CDN play-by-play here. Some older regular-season detail is pruned to fit the repository.</li>
+      <li>Not all historical game dates have captured scorecards. NBA.com's sparse year calendar provides counts for some dates; a missing key is unknown, never zero. Only an explicit official zero or captured empty date card is labelled “no games.” We do not publish unverified standings.</li>
+    </ul>
+  </details></section>
+  <footer class="footer"><span>Independent, read-only project · NBA owns its data · Not affiliated with the NBA</span>
+    <span><a href="https://github.com/buffedlizard55-lab/NBASCOREBOARD">Repository</a> · <a href="https://www.nba.com/games">NBA games</a></span>
+    <p class="note" id="buildInfo">—</p>
   </footer>
 </main>
-
-<script src="app.js"></script>
 </body>
 </html>
