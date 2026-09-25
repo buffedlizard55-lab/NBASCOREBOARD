@@ -68,6 +68,12 @@ for date in ["2026-09-25", "2024-11-04", "2019-10-22", "1996-06-16"]:
             rec["pagePropsKeys"] = list(props.keys())
             rec["selectedDate"] = props.get("selectedDate")
             rec["allGamesInCurrentYearShape"] = describe(props.get("allGamesInCurrentYear"), 0, 4)
+            years = props.get("allGamesInCurrentYear") or {}
+            rec["calendarYears"] = {year: {
+                "count": len(days), "first": min(days, default=None), "last": max(days, default=None),
+                "gameDates": sum(isinstance(c, int) and c > 0 for c in days.values()),
+                "zeros": sum(c == 0 for c in days.values()), "selectedDateCount": days.get(date),
+            } for year, days in years.items() if isinstance(days, dict)} if isinstance(years, dict) else {}
             events = props.get("events")
             feed = props.get("gameCardFeed")
             rec["eventsType"] = type(events).__name__
