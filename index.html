@@ -55,10 +55,15 @@
       page. The browser then reads them same-origin — 100% official NBA data, no third-party aggregator, no manual checking.
     </p>
     <div class="provenance-grid">
+      <div class="provenance-item"><span class="k">Data path</span><span class="v" id="sourceModePill">published snapshot</span></div>
       <div class="provenance-item"><span class="k">Live feed</span><span class="v" id="provLive">—</span></div>
       <div class="provenance-item"><span class="k">Pipeline</span><span class="v">runs every 10 min · heavy pass 06:00 UTC</span></div>
       <div class="provenance-item"><span class="k">Evidence</span><span class="v"><a href="data/verification/sync-log.json" target="_blank" rel="noopener">fetch log</a> · <a href="data/verification/" target="_blank" rel="noopener">probe results</a></span></div>
     </div>
+    <p class="note">
+      <button id="testDirectBtn" class="btn small">Test direct CDN access</button>
+      <span id="directResult">—</span>
+    </p>
   </section>
 
   <!-- Live -->
@@ -231,9 +236,9 @@
     <div class="section-header"><h2>Known limitations (measured, not assumed)</h2></div>
     <div class="card warn-card">
       <ol class="limits-list">
-        <li><strong>Browsers cannot read NBA JSON directly.</strong> cdn.nba.com answers <code>403</code> to any request whose <code>Origin</code> is not nba.com — measured with and without a referer, over HTTP/1.1 and HTTP/2. That is why this page reads committed data instead of calling the CDN itself.</li>
+        <li><strong>Browsers cannot read NBA JSON directly — but this page tests yours.</strong> cdn.nba.com answers <code>403</code> to any request whose <code>Origin</code> is not nba.com (measured with and without a referer, over HTTP/1.1 and HTTP/2), which is why the board reads committed data. The <em>Test direct CDN access</em> button checks your own browser: if the CDN ever allows this origin (or you point the page at your own relay with <code>?relay=…</code>), the board switches itself to 10-second live reads straight from the official feed.</li>
         <li><strong>stats.nba.com is unreachable from cloud runners.</strong> Every documented header recipe timed out (45 s) from GitHub Actions; historical stats beyond the CDN live-data era (2018-19 and earlier for box scores) are therefore not available here.</li>
-        <li><strong>Freshness is bounded by the pipeline.</strong> Live reads land in the published snapshot every ~10 minutes. A 10-second-refresh page is possible only with your own relay in front of the official feeds (see README).</li>
+        <li><strong>Freshness is bounded by the path in use.</strong> Published snapshots land every ~10 minutes; the direct path refreshes every 10 seconds. The pill in the header always names which path is active, and every snapshot shows its capture time.</li>
         <li><strong>Standings are not published.</strong> The official standings come from stats.nba.com (blocked) and nba.com/standings loads its table client-side; no official standings source answered, so none is shown — instead of showing numbers from a third party.</li>
         <li><strong>Full play-by-play archives start at final.</strong> Box scores and play-by-play are archived for games from 2019-20 onwards once a game is final; for other dates the board shows period scores, leaders and a link to the official game page.</li>
       </ol>

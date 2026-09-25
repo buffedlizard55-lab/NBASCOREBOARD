@@ -1,133 +1,96 @@
-# Verification — Line by Line, No Hallucinations
+# VERIFICATION — every claim, and how to check it by hand
 
-This file verifies every claim in the project with official sources and manual review links.
+This file is the audit trail for the project. **Rule: no number on the site may exist without a source URL recorded here or inside the data file's `_sync` block.** If a claim could not be verified, it is listed as a limitation, not shown as data.
 
-## Date: 2026-09-25
-## Sessions: arena/01a0d9ed-nbascoreboard (Passes 1–3) → arena/01a0d9f3-nbascoreboard (Strip view, schema, standings correction)
-
-### Endpoint Verification
-
-#### 1. Today's Scoreboard
-- **Claim:** `https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json` is official live feed used by NBA.com, cache 10s, CORS enabled
-- **Verification Method:** Multiple independent sources + header analysis
-- **Sources:**
-  - StackOverflow answer: https://stackoverflow.com/questions/69675783/webscraping-nba-results — shows `import requests; jsonData = requests.get("https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json").json()` and parsing `scoreboard['games']`
-  - Reddit r/NBAanalytics: https://www.reddit.com/r/NBAanalytics/comments/1gwsikx/yooooooo_found_a_few_new_nba_endpoints_plus_all/ — lists "Today's Scoreboard (12pm EST refresh): https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json"
-  - Yutori blog: https://yutori.com/blog/the-bitter-lesson-for-web-agents — shows response headers `cache-control: max-age=10`, structure with `meta`, `scoreboard`, `games`, example gameId `0022500156`
-  - nba_api issue #573: https://github.com/swar/nba_api/issues/573 — states "If you check the official NBA static JSON: https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json …it also shows the date"
-- **Manual Review:** Open link in browser — should return JSON. In sandbox, fails with SSL_ERROR_SYSCALL (flagged irregularity). On real machine/browser, works.
-- **Status:** ✅ VERIFIED
-
-#### 2. Play-by-Play
-- **Claim:** `https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_0022400247.json` is official PBP
-- **Sources:**
-  - Same Reddit post: "*Play by Play: https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_0022400247.json"
-  - Example 2: https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_0022400196.json
-  - Tutorial: https://thef5.substack.com/p/how-to-pbp2 — code `url <- "https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_0042000404.json"` and `df <- data.frame(json_resp[["game"]][["actions"]])`
-  - Medium: https://jman4190.medium.com/how-to-accessing-live-nba-play-by-play-data-f24e02b0a976 — `play_by_play_url = "https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_0042000404.json"`
-- **Structure Verified:** `game.actions[]` with period, clock, description, team, player
-- **Coverage:** Back to 2019-20 per Reddit: "These two endpoints only go back to 2019-2020 I believe."
-- **Status:** ✅ VERIFIED
-
-#### 3. Box Score
-- **Claim:** `https://cdn.nba.com/static/json/liveData/boxscore/boxscore_0022400247.json`
-- **Sources:**
-  - nba_api docs: https://github.com/swar/nba_api/blob/master/docs/nba_api/live/endpoints/boxscore.md — states "Endpoint URL: https://cdn.nba.com/static/json/liveData/boxscore/boxscore_{game_id}.json" and valid example "https://cdn.nba.com/static/json/liveData/boxscore/boxscore_0022000181.json"
-  - Reddit same post lists box score with same pattern
-  - Go pkg: https://pkg.go.dev/github.com/drewthor/wolves_reddit_bot/apis/nba — constant `const BoxscoreURL = "https://cdn.nba.com/static/json/liveData/boxscore/boxscore_%s.json"`
-- **Status:** ✅ VERIFIED
-
-#### 4. ScoreboardV3
-- **Claim:** `https://stats.nba.com/stats/scoreboardv3?GameDate=YYYY-MM-DD&LeagueID=00` provides historical
-- **Sources:**
-  - Go package docs: https://pkg.go.dev/github.com/darin-patton-hpe/nbalive — table: "ScoreboardV3 | scoreboardv3?GameDate=YYYY-MM-DD&LeagueID=00" and "Base URL: https://stats.nba.com/stats"
-  - MCP server docs: https://lobehub.com/mcp/labeveryday-nba_mcp_server — lists "Live Data API: https://cdn.nba.com/static/json/liveData - For live scores and game data" and "Stats API: https://stats.nba.com/stats - For player stats, team info, standings, and historical data"
-- **CORS Note:** PlayCaller guide 2026: https://playcallerapp.com/blog/nba-api-for-developers — states "CORS is blocked from the browser — you have to proxy through a server. Headers require browser spoofing." and shows headers `Host: stats.nba.com, Referer: https://www.nba.com/, x-nba-stats-origin: stats, x-nba-stats-token: true`
-- **Status:** ✅ VERIFIED (with CORS limitation flagged)
-
-#### 5. Game ID Format
-- **Claim:** Format `00X YYZZ GGGG` where X=game type, YY=season ending year
-- **Source:** https://github.com/ines-alessandra/nba-data — table: "| 001 | Preseason | 0012500068 | | 002 | Regular Season | 0022400123 | | 003 | All-Star | 0032400001 | | 004 | Playoffs | 0042400101 | | 005 | Play-In Tournament | 0052400101 | | 006 | NBA Cup (In-Season Tournament) Final | 0062500001 |" and "The full game ID format is: 00X YYZZ GGGG"
-- **Additional verification:** Reddit post: "In most cases, the game_id will be between 2__00001 and - 2__01230. replace __ with the last two digits of the year the season ends in (24, 23, 22, etc...)."
-- **Status:** ✅ VERIFIED
-
-#### 6. Historical Legacy Endpoint
-- **Claim:** `https://data.nba.net/data/10s/prod/v1/YYYYMMDD/scoreboard.json` for historical
-- **Source:** StackOverflow answer: https://stackoverflow.com/questions/73028029/how-to-get-stats-games-of-a-specific-date-using-data-nba-net — "The data you seem to be after can be accessed using the https://data.nba.net/data/10s/prod/v1/{{date}}/scoreboard.json endpoint, replacing {{date}} with the date you're interested in (specified in YYYYMMDD format). For example, for games occurring on January 1st, 2020, you'd request the URL https://data.nba.net/data/10s/prod/v1/20200102/scoreboard.json."
-- **Deprecation Note:** Reddit r/fantasybball: https://www.reddit.com/r/fantasybball/comments/yf377j/is_the_nba_stats_api_datanbanet_no_longer_updated/ — "It seemed to work fine all through the 2022 playoffs. I'll leave two examples below, the first working as expected and the second showing the empty stats: [WORKS] ORL vs ATL, December 13th 2020 - http://data.nba.net/prod/v1/20201213/scoreboard.json [EMPTY] ORL vs CLE, October 26th 2022"
-- **Status:** ✅ VERIFIED (with deprecation flagged)
-
-#### 7. NBA.com Games Page
-- **Claim:** `https://www.nba.com/games?date=YYYY-MM-DD` is official human verification
-- **Source:** GitHub issue https://github.com/swar/nba_api/issues/573 — "Reference On the official NBA website, there are 2 games scheduled for October 21, 2025: https://www.nba.com/games?date=2025-10-21"
-- **Status:** ✅ VERIFIED
-
-#### 8. Player Headshot, Logos (Additional)
-- **Claim:** `https://cdn.nba.com/headshots/nba/latest/260x190/{playerId}.png`
-- **Source:** Go package: https://pkg.go.dev/github.com/drewthor/wolves_reddit_bot/apis/nba — "const PlayerHeadshotURL = "https://cdn.nba.com/headshots/nba/latest/260x190/%d.png""
-- **Status:** ✅ VERIFIED (implemented: headshots in box score, logos on rows/cards/standings)
-
-#### 9. Scoreboard Full Schema — gameLeaders, seriesText, gameEt, pbOdds, periods (Added 2026-09-25)
-- **Claim:** Each game in `todaysScoreboard_00.json` carries `gameLeaders.{homeLeaders,awayLeaders}{personId,name,jerseyNum,position,teamTricode,points,rebounds,assists}`, `seriesText`, `gameEt`, `regulationPeriods`, `pbOdds{team,odds,suspended}`, team `inBonus/timeoutsRemaining`, and `periods[{period,periodType,score}]`
-- **Sources (3 independent, all mirroring the official feed):**
-  - nba_api source: https://github.com/swar/nba_api/blob/master/src/nba_api/live/nba/endpoints/scoreboard.py — full `expected_data` dict pins every field above
-  - Go client: https://pkg.go.dev/github.com/utkonoser/nba-api-go/endpoints/live — `ScoreboardGame`, `GameLeaders`, `PlayerLeader` structs
-  - Go client: https://pkg.go.dev/github.com/n-ae/nba-api-go/v3/pkg/live/endpoints — `Game`, `GameLeader`, `ScoreboardResponse` structs
-- **Clock format:** `gameClock` is ISO-8601 duration (`PT02M15.00S`) — confirmed by schema consumers; parsed client-side to `2:15`
-- **Status:** ✅ VERIFIED (powers Strip view: leaders, Q1–Q4/OT/T columns, live clock, series line)
-
-#### 10. LeagueStandingsV3 — Verified Standings Endpoint (Added 2026-09-25, corrects prior listing)
-- **Claim:** `https://stats.nba.com/stats/leaguestandingsv3?LeagueID=00&Season=YYYY-YY&SeasonType=Regular+Season` is the official standings endpoint returning `resultSets` with headers `TeamCity, TeamName, Conference, PlayoffRank, WINS, LOSSES, WinPCT, ConferenceGamesBack, HOME, ROAD, L10, strCurrentStreak…`
-- **Sources:**
-  - nba_api docs: https://github.com/swar/nba_api/blob/master/docs/nba_api/stats/endpoints/leaguestandingsv3.md — "Valid URL: https://stats.nba.com/stats/leaguestandingsv3?LeagueID=00&Season=2019-20&SeasonType=Regular+Season&SeasonYear="
-  - hoopR docs: https://hoopr.sportsdataverse.org/reference/nba_leaguestandingsv3.html — full column list
-  - Community: https://www.reddit.com/r/NBAanalytics/comments/1gwsikx/yooooooo_found_a_few_new_nba_endpoints_plus_all/ — "Update: found this standings endpoint https://stats.nba.com/stats/leaguestandingsv3"
-- **Correction:** prior listing `cdn.nba.com/static/json/liveData/standings/standings.json` had NO citable source — now flagged UNVERIFIED and kept only as experimental fallback (code + UI + README all label it as such)
-- **Status:** ✅ VERIFIED (with CORS limitation flagged; East/West table renderer added)
-
-#### 11. Feed Date vs Local Date — 12pm ET Refresh (Added 2026-09-25)
-- **Claim:** CDN feed refreshes ~12pm ET; `gameDate` in feed may differ from viewer local date
-- **Sources:**
-  - Reddit: https://www.reddit.com/r/NBAanalytics/comments/1gwsikx/yooooooo_found_a_few_new_nba_endpoints_plus_all/ — "Today's Scoreboard (12pm EST refresh)"
-  - Bug report: https://github.com/swar/nba_api/issues/573 — feed showed Oct 20 while local date was Oct 21 (timezone handling)
-- **Mitigation:** feed `gameDate` treated as authoritative, shown in UI date pill with explanatory note
-- **Status:** ✅ VERIFIED (flagged as irregularity, handled in UI)
-
-#### 12. Normal Scoreboard Layout Reference — NBA.com/ESPN (Added 2026-09-25, UI ONLY)
-- **Claim:** NBA.com uses a list view and ESPN a grid view with nearly identical info (teams, icons, scores, final status); game views show quarter breakdown + TV info
-- **Source:** https://medium.com/@makeshowlearn/material-design-exploration-nba-scores-aab151d169da — "NBA.com has a list view of games and ESPN.com has a grid view. The information is nearly the same…" and "NBA.com presents the scoring breakdown by quarter… television network information"
-- **Data rule:** layout reference ONLY — no ESPN endpoints are called anywhere in the codebase (verified by grep: zero `espn` network calls; only mention is in explanatory text)
-- **Status:** ✅ VERIFIED (Strip view implements this layout with official data only)
-
-### Irregularities Flagged
-
-1. **Sandbox TLS Block:** Verified via `curl -k -v https://cdn.nba.com/...` returning `SSL_ERROR_SYSCALL` while `api.github.com` works. Ping 8.8.8.8 works. Indicates Akamai blocking datacenter IPs, not general internet failure. Flagged in README and UI.
-2. **CORS on Stats API:** Verified via PlayCaller guide and community reports that stats.nba.com blocks CORS. Our site attempts fetch and shows graceful error with official link.
-3. **No Future Schedule:** Verified via MCP server docs: "Future Schedule: NBA's public APIs don't provide future game schedules. Only current/historical games are available."
-4. **Box Score Timing:** Same source: "Box Score Timing: Detailed player stats may take a few minutes to appear after a game ends."
-
-### No Hallucinations Check
-
-- [x] No invented endpoints — all have source links
-- [x] No fake game IDs — all examples from Reddit/community posts
-- [x] No fake headers — headers from PlayCaller guide and community
-- [x] No fake JSON structure — structure from Yutori blog and StackOverflow
-- [x] All links clickable and verified to exist (via web_search fetch)
-- [x] Game ID breakdown from real repo, not invented
-- [x] Limitations documented with sources, not hidden
-
-### Manual Review Checklist for Reviewer
-
-Open these in browser (not sandbox) to verify:
-
-1. https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json
-2. https://cdn.nba.com/static/json/liveData/playbyplay/playbyplay_0022400247.json
-3. https://cdn.nba.com/static/json/liveData/boxscore/boxscore_0022400247.json
-4. https://www.nba.com/games?date=2024-11-04
-5. https://github.com/ines-alessandra/nba-data (game ID table)
-6. https://pkg.go.dev/github.com/darin-patton-hpe/nbalive (scoreboardv3 docs)
-7. https://www.reddit.com/r/NBAanalytics/comments/1gwsikx/yooooooo_found_a_few_new_nba_endpoints_plus_all/ (endpoint list)
-
-If all 7 load and show expected data, project passes verification.
+Machine-readable evidence lives in [`data/verification/`](../data/verification/); each entry below names the file and the manual-review link.
 
 ---
+
+## 1. Access: can we read official NBA JSON, and from where?
+
+| # | Claim | Result | Evidence | Check it yourself |
+|---|---|---|---|---|
+| 1.1 | A normal browser page cannot fetch `cdn.nba.com` | **Confirmed blocked.** Non-`nba.com` `Origin` → `403` + Akamai page; no CORS header for our origin (CDN sends `Access-Control-Allow-Origin: https://www.nba.com`) | [`browser-transport-probe.json`](../data/verification/browser-transport-probe.json), [`access-probe.json`](../data/verification/access-probe.json) | `curl -sD- -H 'Origin: https://example.com' https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json` (from a residential IP) |
+| 1.2 | A server can, with a browser-shaped header set | **Confirmed 200** from GitHub Actions: `Referer`/`Origin: https://www.nba.com` + Chrome `User-Agent` + `sec-fetch-*`/`sec-ch-ua`. Removing any single header still worked; a minimal UA+Referer+Origin set did **not** | [`deep-probe.json`](../data/verification/deep-probe.json) → `cdnHeaderSensitivity` | same curl with the full header set in `scripts/nba_official.py` |
+| 1.3 | Public CORS relays can proxy it | **No.** 6 of 7 relays failed (5xx, 401, 429, DNS, non-NBA body) | [`access-probe.json`](../data/verification/access-probe.json) → `usableRelays` | re-run `scripts/probe_access.py` |
+| 1.4 | NBA's S3 mirror works around CORS | **No.** Identical bytes with `200` and *no* CORS header → unreadable by a browser | [`s3-probe.json`](../data/verification/s3-probe.json) | `curl -sI https://nba-data.storage.googleapis.com/...` |
+| 1.5 | `stats.nba.com` is reachable from a cloud runner | **No.** Every documented recipe timed out (~45 s) | [`deep-probe.json`](../data/verification/deep-probe.json) → `statsRecipes`, [`endpoint-probe.json`](../data/verification/endpoint-probe.json) | re-run the probe workflow |
+| 1.6 | `data.nba.net` is a usable fallback | **No.** TLS certificate doesn't match the hostname; community reports say feeds stopped in 2022-23 | [`endpoint-probe.json`](../data/verification/endpoint-probe.json) | `curl -sv https://data.nba.net/prod/v1/today.json` |
+| 1.7 | `www.nba.com` pages server-render the numbers | **Yes.** `/games?date=…` embeds game cards in `__NEXT_DATA__` for **any** date (verified back to 1996) | [`cards-probe.json`](../data/verification/cards-probe.json) | open `view-source:https://www.nba.com/games?date=1996-06-16` and search `gameCardFeed` |
+| 1.8 | Team logos / headshots are browser-loadable | **Yes**, plain `200` images, no CORS needed | [`endpoint-probe.json`](../data/verification/endpoint-probe.json) | open a logo URL in a tab |
+
+**Conclusion:** the only working path is *server-side fetch with browser headers → commit compact official JSON → serve same-origin from Pages*. That is exactly what `scripts/sync_nba_data.py` and `.github/workflows/sync-nba-data.yml` do.
+
+---
+
+## 2. Coverage: how far back, and how fresh?
+
+| # | Claim | Result | Evidence |
+|---|---|---|---|
+| 2.1 | CDN box score + play-by-play coverage | **2019-20 → present** (confirmed for `0021900001`, `0022200879`, `0022301170`, `0022400196`, `0022400247`, `0042000404`); 2018-19 and earlier → missing-object `403` | [`coverage-probe.json`](../data/verification/coverage-probe.json), [`deep-probe.json`](../data/verification/deep-probe.json) → `cdnCoverage` |
+| 2.2 | Historical scoreboards before 2019-20 | **Available for any date** via the official date page (quarter scores, records, leaders, TV); verified for 1996-06-16, 2003-06-15, 2010-06-17, 2016-06-19, 2020-10-11, 2024-06-17, 2024-11-04 | [`cards-probe.json`](../data/verification/cards-probe.json) + archived `data/scoreboard/*.json` |
+| 2.3 | Live feed cache/freshness | `cache-control: max-age=10` with etag/last-modified; the pipeline samples it every 10 minutes | [`endpoint-probe.json`](../data/verification/endpoint-probe.json) |
+| 2.4 | Schedule includes future games | **Yes** — 1274 games for 2026-27 with dates through 2027-04-11, read by the pipeline | [`deep-probe.json`](../data/verification/deep-probe.json) → `scheduleFiles`; `data/schedule/2026-27.json` |
+| 2.5 | Standings | **Unavailable.** `cdn.nba.com` standings paths 403; `stats.nba.com` times out; `nba.com/standings` page data doesn't contain the table server-side | [`deep-probe.json`](../data/verification/deep-probe.json) → `staticCandidates`, [`pages-probe.json`](../data/verification/pages-probe.json) → `standings` |
+| 2.6 | Older seasons' schedules | Not published on the CDN (only the current one). Future/deeper seasons need the Stats API or the date pages | [`deep-probe.json`](../data/verification/deep-probe.json) |
+
+---
+
+## 3. Data integrity rules enforced by the pipeline
+
+1. **`_sync` provenance on every file:** `{source, fetchedAtUtc, contentHash, officialBytes, compacted}` — `contentHash` is a sha256 of the *official* payload, so any edit after the fact is detectable.
+2. **Hash-gated writes:** a file is only rewritten when the official payload's hash changes → no churn commits, and "changed at" means "the NBA actually published something new".
+3. **No synthesis:** the pipeline never adds numbers that are not in the official payload. Derived values (e.g. a percentage formatted for display) are computed in the browser from official fields only.
+4. **Cross-check on final:** when a game reaches "Final", the digest is re-read and the stored row is verified against the official box score (scores, team ids) — mismatches are written to `sync-log.json` as `MISMATCH` instead of being silently kept.
+5. **Append-only evidence:** probe workflows add timestamped result files; they never edit previous results.
+6. **Failure visibility:** every fetch attempt, its HTTP status, and the byte count land in [`sync-log.json`](../data/verification/sync-log.json), including failures.
+
+---
+
+## 4. Corrections (things previously stated that were wrong)
+
+| Old claim | Reality | Where fixed |
+|---|---|---|
+| "official CDN is CORS-enabled for any origin" | Non-`nba.com` origins are refused (403) | README §Corrections, data client rewrite |
+| "`data.nba.net` is the fallback" | Certificate invalid; feeds stale since 2022-23 | README, pipeline (removed) |
+| "No public NBA endpoint publishes future games" | `scheduleLeagueV2_1.json` publishes the whole season | README, schedule feature |
+| "Standings from `leaguestandingsv3`" | Unreachable from cloud; CDN standings absent | README limitations, UI shows "not published" |
+| "`0042000404` = 2020 Finals Game 4" | It is PHX @ MIL, 2021-07-14 (2021 Finals Game 4) | corrected here and in README |
+| "Historical detail needs the Stats API" | `nba.com/games?date=` covers any date's scoreboard | README, new pipeline |
+
+---
+
+## 5. Manual review checklist (5 minutes)
+
+- [ ] Open the [live site](https://buffedlizard55-lab.github.io/NBASCOREBOARD/) — the status bar shows the snapshot's capture time and its source URL.
+- [ ] Open [`data/live/scoreboard.json`](https://github.com/buffedlizard55-lab/NBASCOREBOARD/blob/main/data/live/scoreboard.json) — compare `_sync.source` with the official [today's scoreboard](https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json).
+- [ ] Open any archived date file, e.g. [`data/scoreboard/1996-06-16.json`](https://github.com/buffedlizard55-lab/NBASCOREBOARD/blob/main/data/scoreboard/1996-06-16.json) — compare with [nba.com/games?date=1996-06-16](https://www.nba.com/games?date=1996-06-16).
+- [ ] Open [`data/games/0022400154/boxscore.json`](https://github.com/buffedlizard55-lab/NBASCOREBOARD/blob/main/data/games/0022400154/boxscore.json) — compare with the official [box score](https://cdn.nba.com/static/json/liveData/boxscore/boxscore_0022400154.json).
+- [ ] Read [`sync-log.json`](https://github.com/buffedlizard55-lab/NBASCOREBOARD/blob/main/data/verification/sync-log.json) — every status is `ok`/`unchanged`/`failed`, nothing hidden.
+- [ ] Confirm the page's **Sources** section lists every endpoint it reads, with links.
+
+---
+
+## 6. Known irregularities flagged for review
+
+1. **`stats.nba.com` blocks cloud IP ranges** (Akamai) while `cdn.nba.com` answers the same runner with a browser header set. The Stats API is a cornerstone of the community ecosystem, so this asymmetry is worth re-probing occasionally — the pipeline records a fresh result whenever it runs.
+2. **Historical coverage cliff at 2019-20.** Games before that return a `403` (*missing object*, not *forbidden*) for game files, while the date pages happily show 1996. This looks like a data-retention policy, not a permissions problem.
+3. **The CDN sends no CORS header on its S3 mirror** (nba-data.storage.googleapis.com) even though it serves the bytes publicly; only `cdn.nba.com` sets (restrictive) CORS. Practically, that makes the mirror useless for browser apps.
+4. **`Origin`-based blocking on `cdn.nba.com`** rejects `https://buffedlizard55-lab.github.io` with a 403 page, but the *same request* with `Origin: https://www.nba.com` returns 200. If the CDN ever trusts the `Origin` header alone for anything sensitive, that would matter; for public JSON it only affects who can read it.
+5. **`data.nba.net`'s certificate mismatch** is a stale-configuration signal; the host may be decommissioned.
+
+---
+
+## 7. How to reproduce everything from scratch
+
+```bash
+python3 scripts/probe_endpoints.py     # → data/verification/endpoint-probe.json
+python3 scripts/probe_deep.py          # → deep-probe.json (headers, stats, schedule, coverage)
+python3 scripts/probe_access.py        # → access-probe.json (403 mechanics, relays)
+python3 scripts/probe_s3_mirror.py     # → s3-probe.json
+python3 scripts/probe_coverage.py      # → coverage-probe.json
+python3 scripts/probe_cards.py         # → cards-probe.json (date pages)
+python3 scripts/probe_browser_transport.py  # → browser-transport-probe.json
+python3 scripts/probe_pages.py         # → pages-probe.json (nba.com page payloads)
+python3 scripts/sync_nba_data.py --mode daily   # → data/live, data/scoreboard, sync-log.json
+```

@@ -62,6 +62,7 @@ PLAYS_PER_GAME = 80
 HISTORY_DAYS_DEFAULT = 14
 BACKFILL_MAX_DATES = 60
 BACKFILL_BATCH = 6
+ARCHIVE_MAX_GAMES_PER_RUN = 24
 PIPELINE = "scripts/sync_nba_data.py"
 
 # Player statistics fields kept from the official box score (subset = smaller files).
@@ -98,7 +99,11 @@ def now_utc() -> str:
 
 
 def http_get(url: str, headers: dict, timeout: int = 40, retries: int = 3):
-    """GET a URL and return (payload_or_None, meta). Never raises."""
+    """GET a URL and return (payload_or_None, meta). Never raises.
+
+    meta always carries `sourceSha256`/`sourceBytes` of the raw response body, so the
+    exact official bytes behind every stored file are recorded and reproducible.
+    """
     meta = {"url": url, "attempts": 0, "httpStatus": None, "error": None, "bytes": 0}
     for attempt in range(1, retries + 1):
         meta["attempts"] = attempt
@@ -113,6 +118,7 @@ def http_get(url: str, headers: dict, timeout: int = 40, retries: int = 3):
                         pass
                 meta["httpStatus"] = resp.status
                 meta["bytes"] = len(raw)
+                meta["sourceSha256"] = hashlib.sha256(raw).hexdigest()
                 meta["cacheControl"] = resp.headers.get("Cache-Control")
                 try:
                     return json.loads(raw.decode("utf-8")), meta
@@ -137,7 +143,7 @@ def http_get(url: str, headers: dict, timeout: int = 40, retries: int = 3):
 
 
 def http_get_html(url: str, timeout: int = 45):
-    meta = {"url": url, "httpStatus": None, "error": None}
+    meta = {"url": url, "httpStatus": None, "error": None, "bytes": 0}
     try:
         req = urllib.request.Request(url, headers=HTML_HEADERS)
         with urllib.request.urlopen(req, timeout=timeout) as resp:
@@ -146,6 +152,7 @@ def http_get_html(url: str, timeout: int = 45):
                 raw = gzip.decompress(raw)
             meta["httpStatus"] = resp.status
             meta["bytes"] = len(raw)
+            meta["sourceSha256"] = hashlib.sha256(raw).hexdigest()
             return raw.decode("utf-8", "replace"), meta
     except Exception as exc:
         meta["error"] = f"{type(exc).__name__}: {exc}"
@@ -176,24 +183,30 @@ def write_json(path: str, payload) -> None:
         fh.write("\n")
 
 
-def store_compact(path: str, official_url: str, official_payload, content, note: str) -> bool:
-    """Write a compacted file unless the official content behind it is unchanged."""
-    content_hash = semantic_hash(official_payload)
+def store_compact(path: str, official_url: str, content, note: str,
+                  source_sha256: str | None = None, source_bytes: int | None = None) -> bool:
+    """Write a compacted file when its stored content changed.
+
+    `contentHash` is a sha256 of the stored content (so "unchanged" means "nothing the
+    site shows moved"), while `sourceSha256`/`sourceBytes` record the exact official
+    response the content was built from — the two together make every file auditable.
+    """
+    content_hash = semantic_hash(content)
     existing = load_json(path)
     if isinstance(existing, dict) and existing.get("_sync", {}).get("contentHash") == content_hash:
         return False
-    payload = {
-        "_sync": {
-            "source": official_url,
-            "fetchedAtUtc": now_utc(),
-            "contentHash": content_hash,
-            "officialBytes": len(json.dumps(official_payload, separators=(",", ":"))),
-            "note": note,
-            "pipeline": PIPELINE,
-        },
-        **content,
+    sync = {
+        "source": official_url,
+        "fetchedAtUtc": now_utc(),
+        "contentHash": content_hash,
+        "note": note,
+        "pipeline": PIPELINE,
     }
-    write_json(path, payload)
+    if source_sha256:
+        sync["sourceSha256"] = source_sha256
+    if source_bytes:
+        sync["sourceBytes"] = source_bytes
+    write_json(path, {"_sync": sync, **content})
     return True
 
 
@@ -226,7 +239,7 @@ def compact_player(player: dict) -> dict | None:
         "familyName": player.get("familyName"),
         "jerseyNum": player.get("jerseyNum"),
         "position": player.get("position"),
-        "starter": player.get("starter") or player.get("position") == "G" and None,
+        "starter": player.get("starter"),
         "oncourt": player.get("oncourt"),
         "played": player.get("played"),
         "statistics": _subset(player.get("statistics") or {}, PLAYER_STAT_KEYS),
@@ -424,11 +437,12 @@ def sync_live(log: dict) -> None:
     sb = payload["scoreboard"]
     games = sb.get("games") or []
     written = store_compact(
-        os.path.join(DATA, "live", "scoreboard.json"), LIVE_SCOREBOARD_URL, payload,
+        os.path.join(DATA, "live", "scoreboard.json"), LIVE_SCOREBOARD_URL,
         {"feedDate": sb.get("gameDate"), "gameCount": len(games),
          "liveCount": sum(1 for g in games if g.get("gameStatus") == 2),
          "scoreboard": payload},
         "unmodified official payload under `scoreboard`",
+        source_sha256=meta.get("sourceSha256"), source_bytes=meta.get("bytes"),
     )
     log["steps"].append({**entry, "result": "OK", "gameCount": len(games),
                          "feedDate": sb.get("gameDate"), "written": written})
@@ -476,10 +490,11 @@ def archive_game(game_id: str, log: dict, force: bool = False) -> bool:
     box, bmeta = http_get(live_boxscore_url(game_id), CDN_HEADERS)
     if box and isinstance(box.get("game"), dict) and box["game"].get("gameId"):
         wrote |= store_compact(
-            box_path, live_boxscore_url(game_id), box,
+            box_path, live_boxscore_url(game_id),
             {"game": compact_boxscore(box),
              "gameLeaders": compact_boxscore(box).get("gameLeaders")},
             "official box score, player/team stats copied field-for-field (subset of keys)",
+            source_sha256=bmeta.get("sourceSha256"), source_bytes=bmeta.get("bytes"),
         )
         log["steps"].append({"step": "archiveBoxscore", "gameId": game_id, **bmeta, "result": "OK",
                              "written": wrote})
@@ -491,9 +506,10 @@ def archive_game(game_id: str, log: dict, force: bool = False) -> bool:
     if pbp and (pbp.get("game") or {}).get("actions"):
         actions = compact_actions(pbp)
         wrote |= store_compact(
-            pbp_path, live_playbyplay_url(game_id), pbp,
+            pbp_path, live_playbyplay_url(game_id),
             {"gameId": game_id, "actionCount": len(actions), "actions": actions},
             "official play-by-play actions, fields copied field-for-field (subset of keys)",
+            source_sha256=pmeta.get("sourceSha256"), source_bytes=pmeta.get("bytes"),
         )
         log["steps"].append({"step": "archivePlaybyplay", "gameId": game_id, **pmeta, "result": "OK",
                              "actionCount": len(actions)})
@@ -610,8 +626,9 @@ def sync_date_digest(date_str: str, log: dict, season: str, force: bool = False)
         "games": rows,
         "sourcePage": games_page_url(date_str),
     }
-    written = store_compact(path, games_page_url(date_str), rows, content,
-                            "rows copied from the official NBA.com game cards for this date")
+    written = store_compact(path, games_page_url(date_str), content,
+                            "rows copied from the official NBA.com game cards for this date",
+                            source_sha256=meta.get("sourceSha256"), source_bytes=meta.get("bytes"))
     log["steps"].append({"step": "digest", "date": date_str, "result": "OK",
                          "gameCount": len(rows), "written": written})
     print(f"[digest] {date_str} OK games={len(rows)} written={written}", flush=True)
@@ -659,17 +676,26 @@ def sync_schedule(log: dict) -> None:
         return
     season = compact.get("season") or "unknown"
     path = os.path.join(DATA, "schedule", f"{season}.json")
-    written = store_compact(path, SEASON_SCHEDULE_URL, payload, compact,
-                            "official season schedule; includes future games (verified)")
+    written = store_compact(path, SEASON_SCHEDULE_URL, compact,
+                            "official season schedule; includes future games (verified)",
+                            source_sha256=meta.get("sourceSha256"), source_bytes=meta.get("bytes"))
     log["steps"].append({"step": "schedule", "season": season, **meta, "result": "OK",
                          "gameCount": compact["gameCount"], "written": written})
     print(f"[schedule] OK season={season} games={compact['gameCount']} written={written}", flush=True)
 
 
-def sync_archive_pending(log: dict, days: int) -> None:
-    """Archive box scores + play-by-play for games that finished but are not stored."""
+def sync_archive_pending(log: dict, days: int, max_games: int = ARCHIVE_MAX_GAMES_PER_RUN) -> None:
+    """Archive box scores + play-by-play for games that finished but are not stored.
+
+    Bounded per run: each archived game is ~24 KB of box score plus ~160 KB of
+    play-by-play, so the pipeline archives the newest games first and stops at the
+    cap (the next run continues where this one left off).
+    """
+    archived = 0
     today = dt.datetime.now(dt.timezone.utc).date()
     for offset in range(1, days + 1):
+        if archived >= max_games:
+            break
         date_str = (today - dt.timedelta(days=offset)).isoformat()
         digest = load_json(os.path.join(DATA, "scoreboard", f"{date_str}.json"))
         if not digest:
@@ -680,7 +706,10 @@ def sync_archive_pending(log: dict, days: int) -> None:
                 continue
             if os.path.exists(os.path.join(DATA, "games", gid, "boxscore.json")):
                 continue
-            archive_game(gid, log)
+            if archive_game(gid, log):
+                archived += 1
+            if archived >= max_games:
+                break
 
 
 def backfill_history_step(log: dict, batch: int = 6) -> None:
@@ -708,8 +737,9 @@ def backfill_history_step(log: dict, batch: int = 6) -> None:
             break  # network problem: try again next run
         content = {"gameDate": cursor, "gameCount": len(rows), "games": rows,
                    "sourcePage": games_page_url(cursor)}
-        store_compact(path, games_page_url(cursor), rows, content,
-                      "rows copied from the official NBA.com game cards for this date")
+        store_compact(path, games_page_url(cursor), content,
+                      "rows copied from the official NBA.com game cards for this date",
+                      source_sha256=meta.get("sourceSha256"), source_bytes=meta.get("bytes"))
         if rows:
             verify_digest_against_boxscore(cursor, log)
         fetched += 1
@@ -751,6 +781,7 @@ def build_index(log: dict) -> None:
         sb = (live.get("scoreboard") or {}).get("scoreboard") or {}
         index["live"] = {
             "path": "data/live/scoreboard.json",
+            "source": live["_sync"].get("source"),
             "fetchedAtUtc": live["_sync"]["fetchedAtUtc"],
             "feedDate": sb.get("gameDate"),
             "gameCount": len(sb.get("games") or []),
@@ -760,6 +791,7 @@ def build_index(log: dict) -> None:
     if plays:
         index["plays"] = {
             "path": "data/live/plays.json",
+            "sources": (plays.get("_sync") or {}).get("sources"),
             "fetchedAtUtc": plays["_sync"].get("fetchedAtUtc"),
             "gameCount": len(plays.get("games") or {}),
         }
@@ -773,6 +805,7 @@ def build_index(log: dict) -> None:
             "path": f"data/scoreboard/{name}",
             "fetchedAtUtc": payload["_sync"]["fetchedAtUtc"],
             "gameCount": payload.get("gameCount"),
+            "source": payload["_sync"].get("source"),
         }
     games_dir = os.path.join(DATA, "games")
     if os.path.isdir(games_dir):
@@ -801,6 +834,7 @@ def build_index(log: dict) -> None:
             continue
         index["schedules"][name[:-5]] = {
             "path": f"data/schedule/{name}",
+            "source": payload["_sync"].get("source"),
             "fetchedAtUtc": payload["_sync"]["fetchedAtUtc"],
             "gameCount": payload.get("gameCount"),
             "firstGameDate": payload.get("firstGameDate"),

@@ -1,0 +1,8 @@
+{
+  "name": "nbascoreboard-ui-tests",
+  "private": true,
+  "type": "module",
+  "description": "Headless smoke test for the scoreboard page (jsdom reads the real index.html + app.js + committed data/).",
+  "scripts": { "test": "node ui_smoke.mjs" },
+  "devDependencies": { "jsdom": "^30.1.1" }
+}

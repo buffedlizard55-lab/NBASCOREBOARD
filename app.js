@@ -43,6 +43,11 @@ const state = {
   playbyplay: null,
   timer: null,
   relay: readRelay(),
+  // 'snapshot' = the committed official data; 'direct' = this browser reads the
+  // official CDN itself (only possible when a live CORS test succeeds).
+  sourceMode: 'snapshot',
+  directOk: null,
+  directError: null,
 };
 
 const el = (id) => document.getElementById(id);
@@ -67,12 +72,70 @@ function withRelay(url) {
   return `${state.relay}${sep}url=${encodeURIComponent(url)}`;
 }
 
+/* Direct path: the browser itself calls the official feed. Measured to fail from
+ * non-nba.com origins, so it is only used when the visitor's own test says it works
+ * (or when they point the page at their own relay). Data stays 100% official. */
+async function getOfficial(url, { noCache = true } = {}) {
+  const target = state.relay ? withRelay(url) : url;
+  const res = await fetch(target, noCache ? { cache: 'no-store' } : {});
+  if (!res.ok) throw new Error(`HTTP ${res.status} from ${target}`);
+  return res.json();
+}
+
+async function testDirectAccess() {
+  const out = el('directResult');
+  out.textContent = 'testing…';
+  try {
+    const payload = await getOfficial(OFFICIAL.live);
+    const games = payload?.scoreboard?.games;
+    if (!Array.isArray(games)) throw new Error('unexpected payload');
+    state.directOk = true;
+    state.directError = null;
+    out.innerHTML = `<span class="ok">readable</span> — ${games.length} official game${games.length === 1 ? '' : 's'} in the live feed. ` +
+      `Direct live mode is now on (10 s refresh, straight from cdn.nba.com).`;
+    setSourceMode('direct');
+    return true;
+  } catch (e) {
+    state.directOk = false;
+    state.directError = String(e.message || e);
+    out.innerHTML = `<span class="warn">blocked</span> — ${esc(state.directError)}. ` +
+      `That is the expected result for a page on this origin (the CDN only trusts nba.com); the board keeps using the published official snapshot.`;
+    setSourceMode('snapshot');
+    return false;
+  }
+}
+
+function setSourceMode(mode) {
+  state.sourceMode = mode;
+  const pill = el('sourceModePill');
+  if (pill) pill.textContent = mode === 'direct' ? (state.relay ? 'live via your relay' : 'live via cdn.nba.com') : 'published snapshot';
+  const test = el('testDirectBtn');
+  if (test) test.textContent = mode === 'direct' ? 'Re-test direct access' : 'Test direct CDN access';
+  startTimer();
+  refreshAll();
+}
+
 async function getJSON(url, { relay = false, noCache = false } = {}) {
   const target = relay ? withRelay(url) : url;
   const opts = noCache ? { cache: 'no-cache' } : {};
   const res = await fetch(target, opts);
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${target}`);
   return res.json();
+}
+
+function safeDate(value) {
+  if (!value) return null;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function formatMinutes(iso) {
+  if (!iso || typeof iso !== 'string') return iso == null ? '' : String(iso);
+  const m = iso.match(/^PT(?:(\d+)M)?([\d.]+)S$/);
+  if (!m) return iso;
+  const mins = parseInt(m[1] || '0', 10);
+  const secs = Math.floor(parseFloat(m[2] || '0'));
+  return `${mins}:${String(secs).padStart(2, '0')}`;
 }
 
 function parseClock(clock) {
@@ -170,7 +233,10 @@ function normCardGame(g) {
     period: g.period,
     regulation: 4,
     seriesText: '',
-    gameEt: g.gameTimeEastern || g.gameTimeUtc,
+    // The card's gameTimeEastern is ET wall-clock labelled "Z" and must never be fed to
+    // Date(); gameTimeUtc is the real instant, so viewer-local times are correct.
+    gameEt: g.gameTimeUtc || null,
+    gameEtLabel: g.gameTimeEastern || null,
     seasonYear: g.seasonYear,
     seasonType: g.seasonType,
     shareUrl: g.shareUrl,
@@ -180,7 +246,7 @@ function normCardGame(g) {
       away: g.away?.leader || null,
     },
     home: {
-      id: g.home?.teamId, tricode: g.home?.tricode, city: g.home?.name ? null : null,
+      id: g.home?.teamId, tricode: g.home?.tricode, city: null,
       name: g.home?.name, wins: g.home?.wins, losses: g.home?.losses,
       score: g.home?.score,
       periods: (g.home?.periods || []).map((p) => p.score),
@@ -238,7 +304,8 @@ function updateFreshness() {
   el('provLive').textContent = `${live.fetchedAtUtc || '—'} (UTC) · ${live.gameCount ?? 0} games`;
   el('liveDatePill').textContent = live.feedDate ? `feed date ${live.feedDate}` : '—';
   el('liveCountPill').textContent = `${live.liveCount ?? 0} live / ${live.gameCount ?? 0} games`;
-  el('buildInfo').textContent = `Published data: ${live.fetchedAtUtc || '—'} · archived dates: ${Object.keys(state.index?.scoreboards || {}).length} · archived games: ${Object.keys(state.index?.games || {}).length}${state.relay ? ' · relay: ' + state.relay : ''}`;
+  el('buildInfo').textContent = `Published data: ${live.fetchedAtUtc || '—'} · archived dates: ${Object.keys(state.index?.scoreboards || {}).length} · archived games: ${Object.keys(state.index?.games || {}).length}` +
+    ` · data path: ${state.sourceMode === 'direct' ? (state.relay ? `your relay (${state.relay})` : 'direct from cdn.nba.com') : 'published snapshot'}${state.relay ? ' · relay configured' : ''}`;
 }
 
 /* -------------------------------------------------------------- rendering */
@@ -251,7 +318,9 @@ function statusBadgeFor(g) {
   if (g.status === 3) {
     return `<span class="badge final">FINAL</span><span class="clock">${esc(g.statusText.replace('Final', '') || '')}</span>`;
   }
-  return `<span class="badge sched">${esc(g.statusText || 'Scheduled')}</span><span class="clock">${esc(g.gameEt ? new Date(g.gameEt).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '')}</span>`;
+  const d = safeDate(g.gameEt);
+  const local = d ? d.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+  return `<span class="badge sched">${esc(g.statusText || 'Scheduled')}</span><span class="clock">${esc(local)}</span>`;
 }
 
 function periodsHeader(g) {
@@ -343,7 +412,8 @@ function filterGames(games) {
   if (!q) return games;
   return games.filter((g) => {
     const hay = [g.home.tricode, g.away.tricode, g.home.name, g.away.name,
-                 g.leaders?.home?.name, g.leaders?.away?.name, g.id, g.seriesText]
+                 g.home.city, g.away.city, g.leaders?.home?.name, g.leaders?.away?.name,
+                 g.id, g.seriesText, g.dateEst]
       .filter(Boolean).join(' ').toLowerCase();
     return hay.includes(q);
   });
@@ -352,21 +422,30 @@ function filterGames(games) {
 /* --------------------------------------------------------------- live view */
 
 async function loadLive({ quiet = false } = {}) {
-  if (!quiet) setStatus('loading', 'Reading published live feed…', PUBLISHED.live);
+  const direct = state.sourceMode === 'direct';
+  if (!quiet) {
+    if (direct) setStatus('loading', 'Reading the official live feed directly…', state.relay || OFFICIAL.live);
+    else setStatus('loading', 'Reading published live feed…', PUBLISHED.live);
+  }
   try {
-    const payload = await getJSON(PUBLISHED.live, { noCache: true });
-    const sb = payload.scoreboard?.scoreboard || payload.official?.scoreboard || {};
+    const payload = direct ? await getOfficial(OFFICIAL.live) : await getJSON(PUBLISHED.live, { noCache: true });
+    const sb = payload.scoreboard?.scoreboard || payload.scoreboard || payload.official?.scoreboard || {};
     const games = (sb.games || []).map(normLiveGame);
-    state.live = { games, feedDate: sb.gameDate, fetchedAtUtc: payload._sync?.fetchedAtUtc, source: payload._sync?.source };
+    const sync = payload._sync || { source: state.relay ? withRelay(OFFICIAL.live) : OFFICIAL.live, fetchedAtUtc: payload.meta?.time };
+    state.live = { games, feedDate: sb.gameDate, fetchedAtUtc: sync.fetchedAtUtc, source: sync.source, direct };
     state.date = null;
     el('viewDatePill').textContent = 'Live feed (today)';
     const liveCount = games.filter((g) => g.status === 2).length;
     const when = state.live.feedDate || 'unknown date';
-    const age = payload._sync?.fetchedAtUtc ? timeAgo(payload._sync.fetchedAtUtc) : 'unknown';
+    const age = sync.fetchedAtUtc ? timeAgo(sync.fetchedAtUtc) : (direct ? 'live' : 'unknown');
     const msg = games.length
       ? `${games.length} games published for ${when}${liveCount ? ` · ${liveCount} in progress` : ''}`
       : `No games scheduled for ${when} (official feed)`;
     if (!quiet) setStatus(liveCount ? 'live' : 'ok', msg, `snapshot ${age} · source cdn.nba.com live feed`);
+
+    // On the direct path, refresh the visible quarter/clock detail more aggressively
+    // and ignore the (possibly stale) committed copy entirely.
+    if (direct && games.length) { state.date = null; state.dateResultGames = null; }
     renderGames(games, `<h3>No games today</h3><p>The official feed (${esc(OFFICIAL.live)}) reports no games for ${esc(when)}.
       Use <a href="#schedule">Schedule</a> to look ahead, or <a href="#date">By date</a> for a past night.</p>`);
     loadPlays();
@@ -416,6 +495,8 @@ async function loadDate(dateStr) {
     el('liveNote').textContent = `Showing the archived official scoreboard for ${dateStr}. Rows are copied from nba.com/games for that night.`;
     setStatus('ok', `${games.length} games archived for ${dateStr}`, `source ${OFFICIAL.gamesPage(dateStr)}`);
   } catch (e) {
+    state.dateResultGames = null;
+    renderGames([], `<h3>Nothing archived for ${esc(dateStr)} yet</h3>`);
     box.innerHTML = `<div class="card"><h3>${esc(dateStr)} is not archived yet</h3>
       <p>The pipeline stores official date pages as it works backwards through the calendar, so this date may simply not have been reached yet.
       You can always read it directly on NBA.com:</p>
@@ -462,7 +543,9 @@ async function openGame(gameId) {
   el('gameDetail').scrollIntoView?.({ behavior: 'smooth', block: 'start' });
 
   try {
-    const box = await getJSON(PUBLISHED.box(gameId));
+    const box = state.sourceMode === 'direct'
+      ? await getOfficial(OFFICIAL.box(gameId))
+      : await getJSON(PUBLISHED.box(gameId));
     state.boxscore = box;
     renderBoxscore(box);
   } catch (e) {
@@ -470,17 +553,40 @@ async function openGame(gameId) {
     el('boxscoreContent').innerHTML = boxscoreFallback(g, e);
   }
   try {
-    const pbp = await getJSON(PUBLISHED.pbp(gameId));
+    const pbp = state.sourceMode === 'direct'
+      ? await getOfficial(OFFICIAL.pbp(gameId))
+      : await getJSON(PUBLISHED.pbp(gameId));
     state.playbyplay = pbp;
     renderPlayByPlay(pbp);
   } catch (e) {
     state.playbyplay = null;
+    const live = await livePlaysFor(gameId);
+    if (live) {
+      el('playbyplayContent').innerHTML = `<div class="card"><h3>Live snapshot — most recent actions</h3>
+        <p class="note">This game is not archived yet, so the board shows the latest actions the pipeline published in
+        <a href="${PUBLISHED.plays}">data/live/plays.json</a> (last ${(live.actions || []).length} official actions). It fills in completely once the game is final.</p>
+        <div class="pbp">${(live.actions || []).slice().reverse().map((a) => `<div class="pbp-row">
+          <span class="pbp-time">${esc(periodName(a.period))} ${esc(parseClock(a.clock))}</span>
+          <span class="pbp-team ${esc(a.teamTricode || '')}">${esc(a.teamTricode || '')}</span>
+          <span class="pbp-desc">${esc(a.description || '')}</span>
+          <span class="pbp-score">${a.scoreAway != null ? `${esc(a.scoreAway)}–${esc(a.scoreHome)}` : ''}</span>
+        </div>`).join('')}</div>
+        <p class="note">Source: <a href="${esc(live._source || '')}" target="_blank" rel="noopener">official play-by-play</a></p></div>`;
+      return;
+    }
     el('playbyplayContent').innerHTML = `<div class="card"><h3>Play-by-play not archived for this game</h3>
       <p>${esc(String(e.message || e))}</p>
       <p>The pipeline archives official play-by-play for games from 2019-20 onwards once they are final, and keeps today's games refreshed in
       <a href="${PUBLISHED.plays}">data/live/plays.json</a>.</p>
       <p><a href="${esc(OFFICIAL.pbp(gameId))}" target="_blank" rel="noopener">Open the official feed ↗</a></p></div>`;
   }
+}
+
+async function livePlaysFor(gameId) {
+  try {
+    if (!state.plays) state.plays = await getJSON(PUBLISHED.plays, { noCache: true });
+    return state.plays?.games?.[gameId] || null;
+  } catch (e) { return null; }
 }
 
 function boxscoreFallback(g, err) {
@@ -508,14 +614,13 @@ function renderBoxscore(box) {
     const t = side === 'home' ? g.homeTeam : g.awayTeam;
     if (!t) return '';
     const players = t.players || [];
-    const starters = players.filter((p) => p.starter === true || p.played === '1' && p.starter);
     const rows = players.map((p) => `<tr>
         <td class="player-cell">
           <img class="headshot" loading="lazy" alt="" src="${headshot(p.personId)}" onerror="this.style.display='none'">
           <span>${esc(p.name || p.nameI || '')}${p.jerseyNum ? ` <span class="muted">#${esc(p.jerseyNum)}</span>` : ''}</span>
           ${p.position ? `<span class="muted">${esc(p.position)}</span>` : ''}
         </td>
-        <td>${statCell(p, 'minutes')}</td><td><b>${statCell(p, 'points')}</b></td>
+        <td>${esc(formatMinutes(p.statistics?.minutes))}</td><td><b>${statCell(p, 'points')}</b></td>
         <td>${statCell(p, 'reboundsTotal')}</td><td>${statCell(p, 'assists')}</td>
         <td>${statCell(p, 'steals')}</td><td>${statCell(p, 'blocks')}</td>
         <td>${statCell(p, 'turnovers')}</td>
@@ -556,7 +661,7 @@ function paintActions(actions) {
   const q = (el('searchActions').value || '').toLowerCase();
   const rows = actions.filter((a) => (period === 'all' || String(a.period) === period)
     && (team === 'all' || a.teamTricode === team)
-    && (!q || String(a.description || '').toLowerCase().includes(q)));
+    && (!q || `${a.description || ''} ${a.actionType || ''} ${a.subType || ''}`.toLowerCase().includes(q)));
   el('playbyplayContent').innerHTML = `<div class="card">
     <div class="note">${rows.length} of ${actions.length} actions${state.playbyplay?._sync?.source ? ` · source <a href="${esc(state.playbyplay._sync.source)}" target="_blank" rel="noopener">official play-by-play</a>` : ''}</div>
     <div class="pbp">${rows.map((a) => `<div class="pbp-row">
@@ -570,7 +675,8 @@ function paintActions(actions) {
 function renderInfoPanel(g) {
   const rows = [
     ['Game ID', g.id],
-    ['Date', g.gameEt ? new Date(g.gameEt).toLocaleString() : (g.dateEst || '—')],
+    ['Time on NBA.com', g.gameEtLabel || '—'],
+    ['Date', safeDate(g.gameEt)?.toLocaleString() || g.gameEtLabel || g.dateEst || '—'],
     ['Season', g.seasonYear ? `${g.seasonYear} ${g.seasonType || ''}` : '—'],
     ['Series', g.seriesText || '—'],
     ['Arena', g.arena || '—'],
@@ -629,6 +735,7 @@ function initViews() {
   });
   el('closeDetail').addEventListener('click', () => el('gameDetail').classList.add('hidden'));
   el('refreshBtn').addEventListener('click', () => { refreshAll(); });
+  el('testDirectBtn').addEventListener('click', testDirectAccess);
   el('autoRefresh').addEventListener('change', () => { state.timer ? stopTimer() : startTimer(); });
   el('prevDayBtn').addEventListener('click', () => shiftDate(-1));
   el('nextDayBtn').addEventListener('click', () => shiftDate(1));
@@ -674,7 +781,13 @@ function backToLive() {
   loadLive();
 }
 
-function startTimer() { stopTimer(); state.timer = setInterval(() => refreshAll(true), 60000); }
+function startTimer() {
+  stopTimer();
+  // Direct reads are cheap snapshots of the official 10-second cache; the committed
+  // copy only changes when the pipeline runs, so it is polled once a minute.
+  const every = state.sourceMode === 'direct' ? 10000 : 60000;
+  state.timer = setInterval(() => refreshAll(true), every);
+}
 function stopTimer() { if (state.timer) clearInterval(state.timer); state.timer = null; }
 
 async function refreshAll(quiet = false) {
@@ -707,10 +820,11 @@ async function init() {
   }
   el('dateInput').value = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
   el('nbaGamesLink').href = OFFICIAL.gamesPage(el('dateInput').value);
+  el('sourceModePill').textContent = 'published snapshot';
   await loadLive();
   updateFreshness();
   startTimer();
-  console.info('[nba-scoreboard] relay:', state.relay || 'none (using published snapshots)');
+  console.info('[nba-scoreboard] data path:', state.sourceMode, '| relay:', state.relay || 'none');
 }
 
 document.addEventListener('DOMContentLoaded', init);
