@@ -190,14 +190,18 @@ def write_json(path: str, payload) -> None:
 
 
 def store_compact(path: str, official_url: str, content, note: str,
-                  source_sha256: str | None = None, source_bytes: int | None = None) -> bool:
+                  source_sha256: str | None = None, source_bytes: int | None = None,
+                  gate=None) -> bool:
     """Write a compacted file when its stored content changed.
 
     `contentHash` is a sha256 of the stored content (so "unchanged" means "nothing the
     site shows moved"), while `sourceSha256`/`sourceBytes` record the exact official
     response the content was built from — the two together make every file auditable.
     """
-    content_hash = semantic_hash(content)
+    # `gate` (when given) is the part of the payload the board actually depends on:
+    # transport metadata such as the feed's own generation time must not cause a commit
+    # on every run. The full payload is still stored; only the change test narrows.
+    content_hash = semantic_hash(gate if gate is not None else content)
     existing = load_json(path)
     if isinstance(existing, dict) and existing.get("_sync", {}).get("contentHash") == content_hash:
         return False
@@ -432,6 +436,21 @@ def digest_game(box_payload: dict, source_url: str) -> dict:
 # ----------------------------------------------------------------------- steps
 
 
+def live_gate_payload(payload: dict) -> dict:
+    """The official live feed minus volatile transport metadata (`meta.time`).
+
+    Measured: the feed's `meta.time` changes on every request while the game data is
+    identical (an empty offseason feed is otherwise byte-identical between runs), so
+    hashing it rewrote `data/live/scoreboard.json` every 10 minutes — ~144 commits a
+    day that trip GitHub Pages' build-rate limit. The gate keeps real changes (scores,
+    clocks, periods, status) and drops only the timestamp.
+    """
+    sb = payload.get("scoreboard") or {}
+    if not isinstance(sb, dict):
+        return payload
+    return {"feedDate": sb.get("gameDate"), "games": sb.get("games") or []}
+
+
 def sync_live(log: dict) -> None:
     print("[live] official today's scoreboard", flush=True)
     payload, meta = http_get(LIVE_SCOREBOARD_URL, CDN_HEADERS)
@@ -447,11 +466,14 @@ def sync_live(log: dict) -> None:
         {"feedDate": sb.get("gameDate"), "gameCount": len(games),
          "liveCount": sum(1 for g in games if g.get("gameStatus") == 2),
          "scoreboard": payload},
-        "unmodified official payload under `scoreboard`",
+        "unmodified official payload under `scoreboard` (write gated on game data, "
+        "not the feed's own timestamp)",
         source_sha256=meta.get("sourceSha256"), source_bytes=meta.get("bytes"),
+        gate=live_gate_payload(payload),
     )
     log["steps"].append({**entry, "result": "OK", "gameCount": len(games),
-                         "feedDate": sb.get("gameDate"), "written": written})
+                         "feedDate": sb.get("gameDate"), "written": written,
+                         "feedMetaTime": (sb.get("meta") or {}).get("time")})
     print(f"[live] OK games={len(games)} feedDate={sb.get('gameDate')} written={written}", flush=True)
 
     # Recent plays for games happening/recently finished today.

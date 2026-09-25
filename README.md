@@ -101,7 +101,7 @@ Human-review links: [today's raw feed](https://cdn.nba.com/static/json/liveData/
 | `data/schedule/<season>.json` | Whole season, including future games | `scheduleLeagueV2_1.json` |
 | `data/verification/*.json` | Probe evidence and the per-run fetch log | probe workflows + pipeline |
 
-Files are only rewritten when the official content changes (a sha256 of the official payload is compared first), which keeps commits meaningful.
+Files are only rewritten when the content the site depends on changes: the write gate hashes the stored content and, for the live feed, ignores the feed's own `meta.time` (measured to change on every request while the game data is identical), so an unchanged feed never produces a commit. Each file records the official source URL, the sha256 of what it shows, and the sha256 + size of the exact official response behind it.
 
 ---
 
@@ -123,7 +123,7 @@ These were wrong or unsupported and are now fixed in code and docs:
 1. **Freshness depends on the path in use.** Server-side probes show the CDN refusing every non-`nba.com` origin, so the committed snapshot (refreshed every 10 minutes by the pipeline) is the guaranteed path in any browser. The page also ships a **Test direct CDN access** button: where a browser *can* read the official feed — or where you point it at your own relay with `?relay=` — it switches itself to 10-second live reads and says which path is active. A direct read that starts failing falls back to the snapshot instead of breaking.
 2. **`stats.nba.com` is unreachable from cloud runners**, so historical stats outside the CDN live-data era (2018-19 and older box scores/play-by-play) are not available here. Older **scoreboards** (quarter scores, records, leaders) *are* available and archived.
 3. **Detail archives are intentionally bounded.** A box score is ~24 KB and a play-by-play ~160 KB per game, so the pipeline archives new finals automatically (last 14 days, max 24 games per run), keeps play-by-play for the last 60 days plus every playoff game, and prunes older regular-season play-by-play (the box score stays). Re-archive any night with `--date YYYY-MM-DD --with-games --force`.
-4. **No standings.** No official standings source answered (stats API blocked; `nba.com/standings` loads its numbers client-side). Shown as "not published" instead of substituting another provider.
+4. **No standings.** Measured across every official candidate we could find — 5 CDN standings paths (missing-object 403), 2 Stats API recipes (read timeout from cloud), `nba.com/standings` HTML (200, but no standings data in its `__NEXT_DATA__` and no standings-shaped node anywhere in `pageProps`) — and the app backend nba.com itself calls (`core-api.nba.com`) answers **403** to our runner and sends `Access-Control-Allow-Origin: https://www.nba.com` only. Shown as "not published" instead of substituting a third-party provider. Evidence: [`standings-probe.json`](data/verification/standings-probe.json), [`core-api-probe.json`](data/verification/core-api-probe.json).
 5. **Playoff/finals dates before 1996** are whatever `nba.com/games?date=…` serves — the archive grows backwards one date at a time, so older nights appear as the cursor reaches them.
 6. **This is a read-only mirror of public endpoints.** It is not affiliated with the NBA; respect NBA's terms and rate limits.
 
@@ -200,6 +200,10 @@ python3 scripts/probe_standings.py      # official standings candidates + nba.co
 python3 scripts/probe_core_api.py       # the API nba.com's front end calls (core-api.nba.com)
 ```
 
+### Publishing
+
+GitHub Pages serves this repository from **`main` / root**, and the repo has **two** publishers configured: GitHub's legacy branch build (which produced the live site verified in this session) and [`deploy.yml`](.github/workflows/deploy.yml) (an Actions artifact deploy that also reports success). They publish the same commit tree, so the result is correct either way, but running both is redundant — and the legacy builder allows only **10 builds per hour**, which matters because the data pipeline commits every 10 minutes during games. Recommended cleanup: **Settings → Pages → Source: GitHub Actions**, so `deploy.yml` is the single path (it also verifies `index.html`/`README.md` before deploying). Until then the pipeline gates its writes so an unchanged feed cannot create a commit (see below), keeping commits well inside that limit.
+
 Workflows: [`sync-nba-data.yml`](.github/workflows/sync-nba-data.yml) (publication, every 10 min) ·
 [`backfill-dates.yml`](.github/workflows/backfill-dates.yml) (archive specific dates) ·
 the `probe-*.yml` verification workflows (evidence) ·
@@ -222,7 +226,7 @@ the `probe-*.yml` verification workflows (evidence) ·
 ## Next steps (prioritised, each with its blocker stated)
 
 1. **Real-time board without any third party (highest value).** The page now ships a **`Test direct CDN access`** button: if your browser can read `cdn.nba.com` (the CDN may trust a real browser where it refuses our server-side probes), the board switches itself to 10-second live reads from the official feed and says so in the header. The same test runs through a visitor relay if one is configured (`?relay=…`). *Blocker:* the CDN returned 403 for every non-nba.com origin we could measure from a server; only a real browser can settle how it treats an ordinary reader.
-2. **Standings without third parties.** *New evidence:* nba.com's own front end calls **`core-api.nba.com`** (with `Core-Api-Key`/`Core-Api-Version` headers) and one of its chunks references the Stats endpoint `leaguestandingsv3`; every CDN standings path tried is a missing-object `403` and the Stats API still times out from cloud. Next: read `data/verification/core-api-probe.json` — if a `core-api.nba.com` route answers a foreign origin with `Access-Control-Allow-Origin`, standings (and possibly truly live data) can be read straight from the browser. *Blocker:* the route names and key are embedded in minified JS; only what the probe extracts can be called.
+2. **Standings without third parties.** *Measured answer:* `core-api.nba.com` — the backend nba.com's own front end calls with `Core-Api-Key`/`Core-Api-Version` — returns **403** to a cloud runner on every route tried, including `/api/v1/authenticate`, and its `Access-Control-Allow-Origin` is `https://www.nba.com` only, so a page on this origin cannot read it either; a chunk that references the Stats endpoint `leaguestandingsv3` inherits the same blocked Stats host. Remaining option: derive the table from official per-team records (every archived date page carries them) and label it clearly as *computed from official records* rather than published standings. *Blocker:* only a `nba.com`-origin host (or a licensed feed) reaches the real thing.
 3. **Wider detail archive.** Bulk-archive box scores + play-by-play for whole past seasons from the CDN (2019-20+). *Blocker:* size — ~200 MB per season of play-by-play; needs a size policy (e.g. current season only, or external storage).
 4. **Shot charts.** Play-by-play actions carry `x`/`y` and `shotDistance`; render a half-court chart per game. *Blocker:* none — data is already in `data/games/*/playbyplay.json`.
 5. **In-game win probability.** `pbOdds` exists in the live feed; decide whether to surface official odds. *Blocker:* product decision (betting-adjacent).
@@ -237,7 +241,7 @@ the `probe-*.yml` verification workflows (evidence) ·
 |---|---|---|
 | 2026-09-25 | `arena/01a0d9ed-nbascoreboard` | First build: static page, live feed attempt, standings attempt (PRs #1–#3) |
 | 2026-09-25 | `arena/01a0d9f3-nbascoreboard` | Strip view, schema docs, standings correction (PR #4) |
-| 2026-09-25 | `arena/01a0da01-nbascoreboard` | **Reverse-engineering pass:** probed 7 different access paths on real egress; found the 403 is `Origin`-based, that the pipeline egress can read the CDN with browser headers, that S3 has no CORS, that stats.nba.com is blocked from cloud, that CDN coverage starts 2019-20, and that `nba.com/games?date=` server-renders any date. Rebuilt the pipeline (live feed, any-date history, schedule incl. future, box score + PBP archive), rewrote the UI to read published data, corrected six wrong claims from earlier sessions, added verification evidence + fetch log to the page |
+| 2026-09-25 | `arena/01a0da01-nbascoreboard` | **Merged to `main` (PRs #5, #6) and verified live:** probed 7 different access paths on real egress; found the 403 is `Origin`-based, that the pipeline egress can read the CDN with browser headers, that S3 has no CORS, that stats.nba.com is blocked from cloud, that CDN coverage starts 2019-20, and that `nba.com/games?date=` server-renders any date. Rebuilt the pipeline (live feed, any-date history, schedule incl. future, box score + PBP archive), rewrote the UI to read published data, corrected six wrong claims from earlier sessions, added verification evidence + fetch log to the page · then: audit-grade provenance (`sourceSha256`/`sourceBytes` on all 65 artifacts), direct-access self-test, 30-assertion UI smoke test as a merge gate, measured standings/core-api verdict, size-budget retention, and a write gate that stops metadata churn. Merged in PRs #5/#6; the live site was then fetched and checked against this repo's data |
 
 ---
 
