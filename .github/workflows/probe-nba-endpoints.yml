@@ -16,7 +16,7 @@ permissions:
 
 concurrency:
   # All data-writing workflows share one group so their commits never race.
-  group: nba-data-writes
+  group: nba-probe-writes
   cancel-in-progress: false
 
 jobs:
