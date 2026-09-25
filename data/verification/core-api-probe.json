@@ -1,0 +1,160 @@
+{
+ "generatedAtUtc": "2026-09-25T20:17:12.385231+00:00",
+ "question": "What does nba.com's own front end call, and can a browser read it?",
+ "extracted": {
+  "appBundles": [
+   "https://www.nba.com/_next/static/chunks/framework-ad7abf312d5d61d4.js",
+   "https://www.nba.com/_next/static/chunks/main-196c53f13b153e43.js",
+   "https://www.nba.com/_next/static/chunks/pages/_app-f31363c7185906d8.js"
+  ],
+  "bundleFetches": [
+   {
+    "url": "https://www.nba.com/_next/static/chunks/framework-ad7abf312d5d61d4.js",
+    "method": "GET",
+    "httpStatus": 200,
+    "bytes": 140992,
+    "error": null,
+    "access_control_allow_origin": "https://www.nba.com",
+    "access_control_allow_headers": "*",
+    "access_control_allow_methods": "GET,POST",
+    "content_type": "application/javascript; charset=UTF-8",
+    "cache_control": "public, max-age=3600",
+    "vary": "Accept-Encoding"
+   },
+   {
+    "url": "https://www.nba.com/_next/static/chunks/main-196c53f13b153e43.js",
+    "method": "GET",
+    "httpStatus": 200,
+    "bytes": 121519,
+    "error": null,
+    "access_control_allow_origin": "https://www.nba.com",
+    "access_control_allow_headers": "*",
+    "access_control_allow_methods": "GET,POST",
+    "content_type": "application/javascript; charset=UTF-8",
+    "cache_control": "public, max-age=3600",
+    "vary": "Accept-Encoding"
+   }
+  ],
+  "hosts": [],
+  "apiRoutes": [],
+  "headerNames": [],
+  "contexts": {
+   "Core-Api-Key": [],
+   "Core-Api-Version": [],
+   "core-api.nba.com": [],
+   "leaguestandings": [],
+   "standings": [],
+   "boxscore": [],
+   "playbyplay": [],
+   "todaysScoreboard": [],
+   "capi-preview": []
+  }
+ },
+ "hostTests": [
+  {
+   "host": "https://core-api.nba.com/",
+   "httpStatus": 403,
+   "error": "HTTPError 403",
+   "acaO": "https://www.nba.com"
+  },
+  {
+   "host": "https://cdn.nba.com/",
+   "httpStatus": 403,
+   "error": "HTTPError 403",
+   "acaO": "https://www.nba.com"
+  },
+  {
+   "host": "https://www.nba.com/",
+   "httpStatus": 200,
+   "error": null,
+   "acaO": "https://www.nba.com"
+  },
+  {
+   "host": "https://stats.nba.com/",
+   "httpStatus": 200,
+   "error": null,
+   "acaO": "https://www.nba.com"
+  }
+ ],
+ "preflight": [
+  {
+   "url": "https://core-api.nba.com/",
+   "method": "OPTIONS",
+   "httpStatus": 403,
+   "bytes": 0,
+   "error": "HTTPError 403",
+   "content_type": "text/html",
+   "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;core&#45;api&#46;nba&#46;com&#47;\" on this server.<P>\nReference"
+  },
+  {
+   "url": "https://core-api.nba.com/api/v1/authenticate?requestor_id=nba",
+   "method": "OPTIONS",
+   "httpStatus": 403,
+   "bytes": 0,
+   "error": "HTTPError 403",
+   "content_type": "text/html",
+   "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;core&#45;api&#46;nba&#46;com&#47;api&#47;v1&#47;authenticate&#6"
+  },
+  {
+   "url": "https://core-api.nba.com/api/v1/capi-preview/",
+   "method": "OPTIONS",
+   "httpStatus": 403,
+   "bytes": 0,
+   "error": "HTTPError 403",
+   "content_type": "text/html",
+   "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;core&#45;api&#46;nba&#46;com&#47;api&#47;v1&#47;capi&#45;previe"
+  },
+  {
+   "url": "https://core-api.nba.com/api/v1/checkauthn/",
+   "method": "OPTIONS",
+   "httpStatus": 403,
+   "bytes": 0,
+   "error": "HTTPError 403",
+   "content_type": "text/html",
+   "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;core&#45;api&#46;nba&#46;com&#47;api&#47;v1&#47;checkauthn&#47;"
+  }
+ ],
+ "routeTests": [
+  {
+   "url": "https://core-api.nba.com/",
+   "method": "GET",
+   "httpStatus": 403,
+   "bytes": 0,
+   "error": "HTTPError 403",
+   "access_control_allow_origin": "https://www.nba.com",
+   "content_type": "text/html",
+   "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;core&#45;api&#46;nba&#46;com&#47;\" on this server.<P>\nReference"
+  },
+  {
+   "url": "https://core-api.nba.com/api/v1/authenticate?requestor_id=nba",
+   "method": "GET",
+   "httpStatus": 403,
+   "bytes": 0,
+   "error": "HTTPError 403",
+   "access_control_allow_origin": "https://www.nba.com",
+   "content_type": "text/html",
+   "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;core&#45;api&#46;nba&#46;com&#47;api&#47;v1&#47;authenticate&#6"
+  },
+  {
+   "url": "https://core-api.nba.com/api/v1/capi-preview/",
+   "method": "GET",
+   "httpStatus": 403,
+   "bytes": 0,
+   "error": "HTTPError 403",
+   "access_control_allow_origin": "https://www.nba.com",
+   "content_type": "text/html",
+   "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;core&#45;api&#46;nba&#46;com&#47;api&#47;v1&#47;capi&#45;previe"
+  },
+  {
+   "url": "https://core-api.nba.com/api/v1/checkauthn/",
+   "method": "GET",
+   "httpStatus": 403,
+   "bytes": 0,
+   "error": "HTTPError 403",
+   "access_control_allow_origin": "https://www.nba.com",
+   "content_type": "text/html",
+   "bodyPrefix": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;core&#45;api&#46;nba&#46;com&#47;api&#47;v1&#47;checkauthn&#47;"
+  }
+ ],
+ "conclusion": "core-api.nba.com is the backend nba.com's own front end uses; the routes and header names it needs are recorded above together with the exact HTTP/CORS answers a non-nba.com origin gets."
+}
