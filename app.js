@@ -16,7 +16,12 @@ const ENDPOINTS = {
   scoreboardV2: (date) => `https://stats.nba.com/stats/scoreboardV2?GameDate=${date}&LeagueID=00&DayOffset=0`,
   legacy: (yyyymmdd) => `https://data.nba.net/data/10s/prod/v1/${yyyymmdd}/scoreboard.json`,
   nbaGamesPage: (date) => `https://www.nba.com/games?date=${date}`,
-  standings: 'https://cdn.nba.com/static/json/liveData/standings/standings.json',
+  // Verified standings: https://github.com/swar/nba_api/blob/master/docs/nba_api/stats/endpoints/leaguestandingsv3.md
+  leagueStandingsV3: (season, seasonType) => `https://stats.nba.com/stats/leaguestandingsv3?LeagueID=00&Season=${encodeURIComponent(season)}&SeasonType=${encodeURIComponent(seasonType)}`,
+  nbaStandingsPage: 'https://www.nba.com/standings',
+  // UNVERIFIED experimental path - kept only as fallback attempt, flagged in README/VERIFICATION.md
+  standingsExperimental: 'https://cdn.nba.com/static/json/liveData/standings/standings.json',
+  channels: 'https://cdn.nba.com/static/json/liveData/channels/v2/channels_00.json',
 };
 
 const state = {
@@ -29,6 +34,10 @@ const state = {
   autoRefreshTimer: null,
   detailRefreshTimer: null,
   lastFetch: null,
+  view: 'strip', // 'strip' (normal NBA.com/ESPN-style rows) or 'cards'
+  viewDate: null, // null = live today feed; YYYY-MM-DD = historical lookup mode
+  feedDate: null, // authoritative gameDate from the CDN feed
+  channelsByGame: {}, // gameId -> broadcaster strings from channels endpoint (best-effort)
 };
 
 const els = {
@@ -39,7 +48,14 @@ const els = {
   gameCountPill: document.getElementById('gameCountPill'),
   lastUpdated: document.getElementById('lastUpdated'),
   gamesGrid: document.getElementById('gamesGrid'),
+  gamesStrip: document.getElementById('gamesStrip'),
   gameSearch: document.getElementById('gameSearch'),
+  stripViewBtn: document.getElementById('stripViewBtn'),
+  cardsViewBtn: document.getElementById('cardsViewBtn'),
+  prevDayBtn: document.getElementById('prevDayBtn'),
+  todayBtn: document.getElementById('todayBtn'),
+  nextDayBtn: document.getElementById('nextDayBtn'),
+  viewDatePill: document.getElementById('viewDatePill'),
   refreshBtn: document.getElementById('refreshBtn'),
   autoRefresh: document.getElementById('autoRefresh'),
   gameDetail: document.getElementById('gameDetail'),
@@ -61,6 +77,8 @@ const els = {
   historicalResults: document.getElementById('historicalResults'),
   loadStandingsBtn: document.getElementById('loadStandingsBtn'),
   standingsContent: document.getElementById('standingsContent'),
+  standingsSeason: document.getElementById('standingsSeason'),
+  standingsType: document.getElementById('standingsType'),
 };
 
 function setStatus(type, text, meta='') {
@@ -76,9 +94,95 @@ function formatGameStatus(game) {
   const status = game.gameStatus;
   const text = game.gameStatusText || '';
   if (status === 1) return { label: text || 'Scheduled', cls: 'scheduled' };
-  if (status === 2) return { label: text || `Q${game.period} ${game.gameClock}`, cls: 'live' };
+  if (status === 2) { const derived = `${periodLabel(game.period, game.regulationPeriods)} ${parseClock(game.gameClock)}`.trim(); return { label: text || derived || 'Live', cls: 'live' }; }
   if (status === 3) return { label: text || 'Final', cls: 'final' };
   return { label: text || 'Unknown', cls: 'scheduled' };
+}
+
+// Escape helper for any feed-provided strings rendered into HTML
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// NBA gameClock is ISO-8601 duration like "PT02M15.00S" -> "2:15". Defensive: return '' if unknown.
+function parseClock(gameClock) {
+  if (!gameClock || typeof gameClock !== 'string') return '';
+  const m = gameClock.match(/PT(?:(\d+)M)?([\d.]+)S/);
+  if (!m) return gameClock; // already human-readable (some feeds), pass through
+  const mins = parseInt(m[1] || '0', 10);
+  const secs = Math.floor(parseFloat(m[2] || '0'));
+  return `${mins}:${String(secs).padStart(2, '0')}`;
+}
+
+// Q1-Q4, then OT / 2OT / 3OT... regulationPeriods is 4 for NBA (verified in nba_api schema)
+function periodLabel(period, regulationPeriods = 4) {
+  const p = Number(period) || 0;
+  const reg = Number(regulationPeriods) || 4;
+  if (p <= 0) return '';
+  if (p <= reg) return `Q${p}`;
+  const ot = p - reg;
+  return ot === 1 ? 'OT' : `${ot}OT`;
+}
+
+// Full status line for the normal-looking strip view
+function statusLine(game) {
+  if (game.gameStatus === 2) {
+    const q = periodLabel(game.period, game.regulationPeriods);
+    const c = parseClock(game.gameClock);
+    return game.gameStatusText || `${q} ${c}`.trim() || 'Live';
+  }
+  if (game.gameStatus === 3) {
+    return game.gameStatusText || 'Final';
+  }
+  // Scheduled: prefer official gameStatusText ("7:00 pm ET"), else local time from gameTimeUTC
+  if (game.gameStatusText) return game.gameStatusText;
+  if (game.gameTimeUTC) {
+    try { return new Date(game.gameTimeUTC).toLocaleString([], { weekday: 'short', hour: 'numeric', minute: '2-digit' }); }
+    catch (e) { return 'Scheduled'; }
+  }
+  return 'Scheduled';
+}
+
+function teamRecord(t) {
+  if (!t) return '';
+  if (t.wins === undefined || t.losses === undefined) return '';
+  return `${t.wins}-${t.losses}`;
+}
+
+// Verified schema: game.gameLeaders.homeLeaders/awayLeaders {name, points, rebounds, assists}
+// Source: https://github.com/swar/nba_api/blob/master/src/nba_api/live/nba/endpoints/scoreboard.py
+function leaderText(leader) {
+  if (!leader || !leader.name) return '';
+  const pts = leader.points ?? 0;
+  const reb = leader.rebounds ?? 0;
+  const ast = leader.assists ?? 0;
+  return `${leader.name} – ${pts} PTS, ${reb} REB, ${ast} AST`;
+}
+
+// Best-effort TV info from channels endpoint (structure handled defensively)
+async function loadChannels() {
+  try {
+    const res = await fetchWithHeaders(ENDPOINTS.channels);
+    if (!res.ok) return;
+    const data = await res.json();
+    const map = {};
+    const games = data.games || data.channels?.games || [];
+    (Array.isArray(games) ? games : []).forEach((g) => {
+      const gid = g.gameId || g.gameID;
+      if (!gid) return;
+      const bc = g.broadcasts || g.broadcasters || {};
+      const names = [];
+      ['nationalTvBroadcasters', 'homeTvBroadcasters', 'awayTvBroadcasters'].forEach((k) => {
+        (bc[k] || []).forEach((b) => { if (b.shortName || b.longName) names.push(b.shortName || b.longName); });
+      });
+      if (names.length) map[gid] = [...new Set(names)].join(', ');
+    });
+    state.channelsByGame = map;
+    if (state.games.length && state.view === 'strip') renderStrip(state.filteredGames);
+  } catch (e) {
+    // Non-fatal: TV line simply hidden. Channels endpoint shape varies; never break the board.
+    console.warn('Channels endpoint unavailable (non-fatal):', e.message);
+  }
 }
 
 async function fetchWithHeaders(url, isStatsApi=false) {
@@ -111,18 +215,23 @@ async function loadTodaysScoreboard() {
     state.games = games;
     state.lastFetch = new Date();
     const gameDate = sb.gameDate || new Date().toISOString().split('T')[0];
-    els.gameDatePill.textContent = gameDate;
+    state.feedDate = gameDate;
+    state.viewDate = null; // live mode
+    els.gameDatePill.textContent = `Feed: ${gameDate}`;
     els.gameCountPill.textContent = `${games.length} games`;
-    setStatus(games.some(g=>g.gameStatus===2) ? 'live' : 'loading', 
-      games.length ? `Loaded ${games.length} games from NBA.com` : 'No games today — check NBA.com for schedule',
-      `Updated ${state.lastFetch.toLocaleTimeString()} • ${gameDate} • Source: cdn.nba.com`
+    els.viewDatePill.textContent = 'Today (live feed)';
+    const liveCount = games.filter(g=>g.gameStatus===2).length;
+    setStatus(liveCount ? 'live' : 'loading',
+      games.length ? `Loaded ${games.length} games from NBA.com${liveCount ? ` (${liveCount} live)` : ''}` : 'No games today — check NBA.com for schedule',
+      `Updated ${state.lastFetch.toLocaleTimeString()} • Feed date ${gameDate} (authoritative) • Source: cdn.nba.com`
     );
     applyGameSearchFilter();
+    loadChannels(); // best-effort TV info, non-blocking
     return games;
   } catch (e) {
     console.error('Failed to load scoreboard', e);
     setStatus('error', `Failed to load NBA feed: ${e.message}`, 'Sandbox may block cdn.nba.com TLS — try in real browser. Raw URL: ' + ENDPOINTS.todaysScoreboard);
-    els.gamesGrid.innerHTML = `
+    const errHtml = `
       <div class="card">
         <h3>⚠️ Unable to fetch live data in this environment</h3>
         <p>This sandbox blocks <code>cdn.nba.com</code> TLS (Akamai bot protection). Verified via curl: <code>SSL_ERROR_SYSCALL</code>. Internet works (api.github.com reachable). This is flagged as irregularity.</p>
@@ -139,48 +248,65 @@ async function loadTodaysScoreboard() {
         </div>
       </div>
     `;
+    els.gamesStrip.innerHTML = errHtml;
+    els.gamesGrid.innerHTML = errHtml;
     return [];
   }
 }
 
 function loadMockData() {
+  // Mock uses the EXACT verified schema from nba_api scoreboard.py so the demo exercises real render paths.
+  // Source: https://github.com/swar/nba_api/blob/master/src/nba_api/live/nba/endpoints/scoreboard.py
+  const P = (q1,q2,q3,q4,ot) => {
+    const arr = [
+      {period:1,periodType:'REGULAR',score:q1},{period:2,periodType:'REGULAR',score:q2},
+      {period:3,periodType:'REGULAR',score:q3},{period:4,periodType:'REGULAR',score:q4},
+    ];
+    if (ot !== undefined) arr.push({period:5,periodType:'OVERTIME',score:ot});
+    return arr;
+  };
   const mockGames = [
     {
-      gameId: '0022400247',
-      gameStatus: 3,
-      gameStatusText: 'Final',
-      period: 4,
-      gameClock: '',
-      gameTimeUTC: '2024-11-04T00:00:00Z',
-      homeTeam: { teamId: 1610612747, teamCity: 'Los Angeles', teamName: 'Lakers', teamTricode: 'LAL', wins: 10, losses: 5, score: 118, periods: [{period:1,score:30},{period:2,score:28},{period:3,score:32},{period:4,score:28}] },
-      awayTeam: { teamId: 1610612739, teamCity: 'Cleveland', teamName: 'Cavaliers', teamTricode: 'CLE', wins: 12, losses: 3, score: 122, periods: [{period:1,score:32},{period:2,score:30},{period:3,score:28},{period:4,score:32}] },
+      gameId: '0022400196', gameCode: '20241104/MIALAL', gameStatus: 2, gameStatusText: 'Q4 2:15',
+      period: 4, gameClock: 'PT02M15.00S', gameTimeUTC: '2024-11-04T02:30:00Z', gameEt: '2024-11-03T21:30:00Z',
+      regulationPeriods: 4, seriesGameNumber: '', seriesText: '',
+      homeTeam: { teamId: 1610612747, teamCity: 'Los Angeles', teamName: 'Lakers', teamTricode: 'LAL', wins: 10, losses: 5, score: 105, inBonus: '1', timeoutsRemaining: 2, periods: P(25,30,28,22) },
+      awayTeam: { teamId: 1610612748, teamCity: 'Miami', teamName: 'Heat', teamTricode: 'MIA', wins: 8, losses: 7, score: 102, inBonus: '0', timeoutsRemaining: 1, periods: P(28,22,30,22) },
+      gameLeaders: {
+        homeLeaders: { personId: 2544, name: 'LeBron James', jerseyNum: '23', position: 'F', teamTricode: 'LAL', points: 28, rebounds: 8, assists: 9 },
+        awayLeaders: { personId: 1628389, name: 'Bam Adebayo', jerseyNum: '13', position: 'C', teamTricode: 'MIA', points: 24, rebounds: 11, assists: 5 },
+      },
+      pbOdds: { team: 'LAL', odds: 1.45, suspended: 0 },
     },
     {
-      gameId: '0022400196',
-      gameStatus: 2,
-      gameStatusText: 'Q4 02:15',
-      period: 4,
-      gameClock: 'PT02M15.00S',
-      gameTimeUTC: '2024-11-04T02:30:00Z',
-      homeTeam: { teamId: 1610612744, teamCity: 'Golden State', teamName: 'Warriors', teamTricode: 'GSW', wins: 9, losses: 6, score: 105, periods: [{period:1,score:25},{period:2,score:30},{period:3,score:28},{period:4,score:22}] },
-      awayTeam: { teamId: 1610612748, teamCity: 'Miami', teamName: 'Heat', teamTricode: 'MIA', wins: 8, losses: 7, score: 102, periods: [{period:1,score:28},{period:2,score:22},{period:3,score:30},{period:4,score:22}] },
+      gameId: '0022400247', gameCode: '20241104/CLEGSW', gameStatus: 3, gameStatusText: 'Final/OT',
+      period: 5, gameClock: '', gameTimeUTC: '2024-11-04T00:00:00Z', gameEt: '2024-11-03T19:00:00Z',
+      regulationPeriods: 4, seriesGameNumber: '', seriesText: '',
+      homeTeam: { teamId: 1610612744, teamCity: 'Golden State', teamName: 'Warriors', teamTricode: 'GSW', wins: 9, losses: 6, score: 118, timeoutsRemaining: 0, periods: P(30,28,32,20,8) },
+      awayTeam: { teamId: 1610612739, teamCity: 'Cleveland', teamName: 'Cavaliers', teamTricode: 'CLE', wins: 12, losses: 3, score: 122, timeoutsRemaining: 0, periods: P(32,30,28,20,12) },
+      gameLeaders: {
+        homeLeaders: { personId: 201939, name: 'Stephen Curry', jerseyNum: '30', position: 'G', teamTricode: 'GSW', points: 35, rebounds: 5, assists: 7 },
+        awayLeaders: { personId: 1628971, name: 'Donovan Mitchell', jerseyNum: '45', position: 'G', teamTricode: 'CLE', points: 38, rebounds: 6, assists: 4 },
+      },
+      pbOdds: { team: null, odds: 0.0, suspended: 1 },
     },
     {
-      gameId: '0022301170',
-      gameStatus: 3,
-      gameStatusText: 'Final',
-      period: 4,
-      gameClock: '',
-      gameTimeUTC: '2023-04-09T00:00:00Z',
-      homeTeam: { teamId: 1610612738, teamCity: 'Boston', teamName: 'Celtics', teamTricode: 'BOS', wins: 57, losses: 25, score: 121, periods: [{period:1,score:30},{period:2,score:30},{period:3,score:31},{period:4,score:30}] },
-      awayTeam: { teamId: 1610612737, teamCity: 'Atlanta', teamName: 'Hawks', teamTricode: 'ATL', wins: 41, losses: 41, score: 114, periods: [{period:1,score:28},{period:2,score:28},{period:3,score:29},{period:4,score:29}] },
+      gameId: '0022400250', gameCode: '20241104/BOSNYK', gameStatus: 1, gameStatusText: '7:30 pm ET',
+      period: 0, gameClock: '', gameTimeUTC: '2024-11-05T00:30:00Z', gameEt: '2024-11-04T19:30:00Z',
+      regulationPeriods: 4, seriesGameNumber: '', seriesText: '',
+      homeTeam: { teamId: 1610612752, teamCity: 'New York', teamName: 'Knicks', teamTricode: 'NYK', wins: 11, losses: 4, score: 0, timeoutsRemaining: 7, periods: [] },
+      awayTeam: { teamId: 1610612738, teamCity: 'Boston', teamName: 'Celtics', teamTricode: 'BOS', wins: 13, losses: 2, score: 0, timeoutsRemaining: 7, periods: [] },
+      gameLeaders: { homeLeaders: { personId: 0, name: '', points: 0, rebounds: 0, assists: 0 }, awayLeaders: { personId: 0, name: '', points: 0, rebounds: 0, assists: 0 } },
+      pbOdds: { team: null, odds: 0.0, suspended: 0 },
     }
   ];
   state.games = mockGames;
   state.lastFetch = new Date();
-  els.gameDatePill.textContent = '2024-11-04 (MOCK)';
+  state.feedDate = '2024-11-04';
+  els.gameDatePill.textContent = 'Feed: 2024-11-04 (MOCK)';
   els.gameCountPill.textContent = `${mockGames.length} games (mock)`;
-  setStatus('live', 'Showing mock data (sandbox blocks real feed)', 'Real users on GitHub Pages will see live data');
+  els.viewDatePill.textContent = 'Today (live feed)';
+  setStatus('live', 'Showing mock data (sandbox blocks real feed)', 'Mock follows verified nba_api schema • Real users on GitHub Pages see live data');
   applyGameSearchFilter();
 }
 
@@ -192,10 +318,152 @@ function applyGameSearchFilter() {
     state.filteredGames = state.games.filter(g => {
       const home = `${g.homeTeam?.teamCity || ''} ${g.homeTeam?.teamName || ''} ${g.homeTeam?.teamTricode || ''}`.toLowerCase();
       const away = `${g.awayTeam?.teamCity || ''} ${g.awayTeam?.teamName || ''} ${g.awayTeam?.teamTricode || ''}`.toLowerCase();
-      return home.includes(q) || away.includes(q) || g.gameId.includes(q);
+      const leaders = `${g.gameLeaders?.homeLeaders?.name || ''} ${g.gameLeaders?.awayLeaders?.name || ''}`.toLowerCase();
+      return home.includes(q) || away.includes(q) || leaders.includes(q) || (g.gameId || '').includes(q);
     });
   }
-  renderGames(state.filteredGames);
+  renderCurrentView();
+}
+
+function renderCurrentView() {
+  if (state.view === 'strip') {
+    els.gamesStrip.classList.remove('hidden');
+    els.gamesGrid.classList.add('hidden');
+    renderStrip(state.filteredGames);
+  } else {
+    els.gamesGrid.classList.remove('hidden');
+    els.gamesStrip.classList.add('hidden');
+    renderGames(state.filteredGames);
+  }
+}
+
+function setView(view) {
+  state.view = view;
+  try { localStorage.setItem('sbView', view); } catch (e) {}
+  els.stripViewBtn.classList.toggle('active', view === 'strip');
+  els.cardsViewBtn.classList.toggle('active', view === 'cards');
+  els.stripViewBtn.setAttribute('aria-pressed', view === 'strip' ? 'true' : 'false');
+  els.cardsViewBtn.setAttribute('aria-pressed', view === 'cards' ? 'true' : 'false');
+  renderCurrentView();
+}
+
+// Normal-looking scoreboard rows (NBA.com list view / ESPN style):
+// status | AWAY logo tricode record | Q1 Q2 Q3 Q4 [OT] T | HOME ... | leaders + series
+function renderStrip(games) {
+  if (!games.length) {
+    if (state.games.length && els.gameSearch.value) {
+      els.gamesStrip.innerHTML = `<div class="card"><h3>No games match filter "${esc(els.gameSearch.value)}"</h3><p>Showing ${state.games.length} total games. Clear filter to see all.</p></div>`;
+    } else {
+      els.gamesStrip.innerHTML = `<div class="card"><h3>No games in this feed</h3><p>Check <a href="https://www.nba.com/games" target="_blank">NBA.com/games</a> for the schedule. Data source: <code>${ENDPOINTS.todaysScoreboard}</code></p></div>`;
+    }
+    return;
+  }
+  // Max periods across games determines OT columns (regular = 4)
+  const maxPeriods = Math.max(4, ...games.map(g => Math.max((g.homeTeam?.periods || []).length, (g.awayTeam?.periods || []).length, Number(g.period) || 0)));
+  const otCount = Math.max(0, maxPeriods - 4);
+  const qHeader = [1,2,3,4].map(q => `<th>Q${q}</th>`).join('')
+    + Array.from({length: otCount}, (_, i) => `<th>${i === 0 ? 'OT' : (i + 1) + 'OT'}</th>`).join('')
+    + '<th class="total-col">T</th>';
+
+  els.gamesStrip.innerHTML = games.map(game => {
+    const status = formatGameStatus(game);
+    const home = game.homeTeam || {};
+    const away = game.awayTeam || {};
+    const homeWin = (home.score || 0) > (away.score || 0) && game.gameStatus === 3;
+    const awayWin = (away.score || 0) > (home.score || 0) && game.gameStatus === 3;
+    const rowCells = (team) => {
+      const periods = team.periods || [];
+      let cells = '';
+      for (let q = 1; q <= 4; q++) {
+        const p = periods.find(x => Number(x.period) === q);
+        cells += `<td>${p ? esc(p.score) : (game.gameStatus === 1 ? '' : '-')}</td>`;
+      }
+      for (let o = 1; o <= otCount; o++) {
+        const p = periods.find(x => Number(x.period) === 4 + o);
+        cells += `<td>${p ? esc(p.score) : '-'}</td>`;
+      }
+      const showScore = game.gameStatus !== 1;
+      cells += `<td class="total-col">${showScore ? esc(team.score ?? '') : ''}</td>`;
+      return cells;
+    };
+    const logo = (team) => team.teamId
+      ? `<img src="${ENDPOINTS.teamLogo(team.teamId)}" alt="${esc(team.teamTricode || '')}" loading="lazy" onerror="this.style.display='none'">`
+      : '';
+    const teamCell = (team, won) => `
+      <td class="strip-team ${won ? 'winner' : ''}">
+        <span class="strip-logo">${logo(team)}</span>
+        <span class="strip-tricode">${esc(team.teamTricode || '???')}</span>
+        <span class="strip-record">${esc(teamRecord(team))}</span>
+      </td>`;
+    const leaders = game.gameLeaders || {};
+    const awayL = leaderText(leaders.awayLeaders);
+    const homeL = leaderText(leaders.homeLeaders);
+    const leadersHtml = (awayL || homeL)
+      ? `<div class="strip-leaders">${awayL ? `<span><strong>${esc(away.teamTricode || '')}:</strong> ${esc(awayL)}</span>` : ''}${homeL ? `<span><strong>${esc(home.teamTricode || '')}:</strong> ${esc(homeL)}</span>` : ''}</div>`
+      : '';
+    const tv = state.channelsByGame[game.gameId];
+    const metaBits = [];
+    if (game.seriesText) metaBits.push(esc(game.seriesText));
+    if (tv) metaBits.push(`📺 ${esc(tv)}`);
+    if (game.gameStatus === 1 && game.gameEt && game.gameEt !== game.gameStatusText) metaBits.push(`Tip: ${esc(game.gameStatusText || '')}`);
+    const metaHtml = metaBits.length ? `<div class="strip-meta">${metaBits.join(' • ')}</div>` : '';
+    // Live clock line: show full status only when it adds info beyond the badge (avoids "Q4 2:15" twice)
+    const full = statusLine(game);
+    const clockLine = (game.gameStatus === 2 && full && full !== status.label) ? full : '';
+    return `
+      <div class="strip-row ${status.cls}" data-gameid="${esc(game.gameId)}" tabindex="0" role="button" aria-label="${esc(away.teamTricode || '')} at ${esc(home.teamTricode || '')}, ${esc(full)}">
+        <div class="strip-status">
+          <span class="status-badge ${status.cls}">${esc(status.label)}</span>
+          ${clockLine ? `<span class="strip-clock">${esc(clockLine)}</span>` : ''}
+          <span class="strip-id">${esc(game.gameId || '')}</span>
+        </div>
+        <div class="strip-table-wrap">
+          <table class="strip-table">
+            <thead><tr><th class="strip-team-head">Team</th>${qHeader}</tr></thead>
+            <tbody>
+              <tr>${teamCell(away, awayWin)}${rowCells(away)}</tr>
+              <tr>${teamCell(home, homeWin)}${rowCells(home)}</tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="strip-side">
+          ${leadersHtml}
+          ${metaHtml}
+          <span class="strip-cta">Box + PBP →</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  els.gamesStrip.querySelectorAll('.strip-row').forEach(row => {
+    const open = () => {
+      const gid = row.dataset.gameid;
+      const game = state.games.find(g => g.gameId === gid);
+      selectGame(gid, game);
+    };
+    row.addEventListener('click', open);
+    row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+  });
+}
+
+// Date navigation: Today reloads the live CDN feed; Prev/Next jumps to historical lookup for that date
+function shiftViewDate(days) {
+  const base = state.feedDate || new Date().toISOString().split('T')[0];
+  const d = new Date(base + 'T12:00:00Z');
+  d.setUTCDate(d.getUTCDate() + days);
+  const iso = d.toISOString().split('T')[0];
+  state.viewDate = iso;
+  els.viewDatePill.textContent = iso;
+  els.dateInput.value = iso;
+  els.nbaGamesLink.href = ENDPOINTS.nbaGamesPage(iso);
+  loadByDate();
+  document.getElementById('historical').scrollIntoView({ behavior: 'smooth' });
+}
+
+function backToToday() {
+  state.viewDate = null;
+  els.viewDatePill.textContent = 'Today (live feed)';
+  loadTodaysScoreboard();
 }
 
 function renderGames(games) {
@@ -253,8 +521,14 @@ function renderGames(games) {
           <span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span>${(home.periods?.length||0)>4 ? '<span>OT</span>'.repeat((home.periods.length-4)) : ''}
           <div style="display:flex; gap:4px; margin-left:8px; flex-wrap:wrap;">${qScores || '<span style="color:var(--muted)">No Q scores yet</span>'}</div>
         </div>
+        ${(game.gameLeaders?.awayLeaders?.name || game.gameLeaders?.homeLeaders?.name) ? `
+        <div class="card-leaders">
+          ${game.gameLeaders.awayLeaders?.name ? `<div>◂ ${esc(leaderText(game.gameLeaders.awayLeaders))}</div>` : ''}
+          ${game.gameLeaders.homeLeaders?.name ? `<div>◂ ${esc(leaderText(game.gameLeaders.homeLeaders))}</div>` : ''}
+        </div>` : ''}
+        ${game.seriesText ? `<div class="card-series">${esc(game.seriesText)}</div>` : ''}
         <div class="game-footer">
-          <span>${game.gameStatus===1 ? 'Scheduled' : game.gameStatus===2 ? `Live P${game.period} ${game.gameClock || ''}` : 'Final'}</span>
+          <span>${esc(statusLine(game))}</span>
           <span>Click for PBP & Box →</span>
         </div>
       </div>
@@ -524,30 +798,114 @@ async function loadByDate() {
   els.historicalResults.innerHTML = html;
 }
 
-// Standings loader (Pass 3)
+// Standings loader — verified official endpoint first, experimental CDN path second.
+// Verified: https://github.com/swar/nba_api/blob/master/docs/nba_api/stats/endpoints/leaguestandingsv3.md
+// Valid URL: https://stats.nba.com/stats/leaguestandingsv3?LeagueID=00&Season=2019-20&SeasonType=Regular+Season
 async function loadStandings() {
-  els.standingsContent.innerHTML = `<div class="loading">Loading standings from ${ENDPOINTS.standings}...</div>`;
+  const season = (els.standingsSeason.value || '').trim() || defaultSeason();
+  const seasonType = els.standingsType.value || 'Regular Season';
+  const url = ENDPOINTS.leagueStandingsV3(season, seasonType);
+  els.standingsContent.innerHTML = `<div class="loading">Loading official standings (${esc(season)}, ${esc(seasonType)})...<br><code>${esc(url)}</code></div>`;
+  // Attempt 1: verified Stats API (expected to fail in browser due to CORS — handled gracefully)
   try {
-    const res = await fetchWithHeaders(ENDPOINTS.standings);
+    const res = await fetchWithHeaders(url, true);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    // Try to parse different possible structures
-    const standings = data.standings || data.league?.standard?.conference || data;
-    els.standingsContent.innerHTML = `
-      <div style="font-size:12px; color:var(--muted); margin-bottom:10px;">Raw standings loaded — structure varies by season. Showing JSON preview (first 2000 chars) + link to raw.</div>
-      <pre style="background:var(--card2); padding:12px; border-radius:8px; font-size:11px; overflow:auto; max-height:400px;">${JSON.stringify(data, null, 2).substring(0, 8000)}</pre>
-      <div class="endpoint-info"><code>Source: ${ENDPOINTS.standings}</code> <a href="${ENDPOINTS.standings}" target="_blank" class="link">Raw ↗</a></div>
-    `;
+    const rows = extractStandingsRows(data);
+    if (rows.length) {
+      renderStandingsTables(rows, season, seasonType, url);
+      return;
+    }
+    throw new Error('No standings rows parsed from Stats API response');
   } catch (e) {
-    els.standingsContent.innerHTML = `
-      <div class="card">
-        <h3>Failed to load standings: ${e.message}</h3>
-        <p>Endpoint: <code>${ENDPOINTS.standings}</code></p>
-        <p>May be sandbox block or endpoint changed. Try in real browser: <a href="${ENDPOINTS.standings}" target="_blank">${ENDPOINTS.standings} ↗</a></p>
-        <p>Alternative official: <a href="https://www.nba.com/standings" target="_blank">https://www.nba.com/standings</a></p>
-      </div>
-    `;
+    console.warn('leaguestandingsv3 failed (often CORS):', e.message);
   }
+  // Attempt 2: experimental CDN path (UNVERIFIED — best effort only)
+  try {
+    const res = await fetchWithHeaders(ENDPOINTS.standingsExperimental);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const rows = extractStandingsRows(data);
+    if (rows.length) {
+      renderStandingsTables(rows, season, seasonType, ENDPOINTS.standingsExperimental + ' (experimental, unverified)');
+      return;
+    }
+    throw new Error('No standings rows parsed from experimental CDN response');
+  } catch (e2) {
+    console.warn('Experimental CDN standings failed:', e2.message);
+  }
+  // Graceful fallback with official links for manual verification
+  els.standingsContent.innerHTML = `
+    <div class="card">
+      <h3>Standings unavailable in this browser session</h3>
+      <p>The verified official endpoint <code>${esc(url)}</code> is CORS-blocked from browsers (requires server-side headers per <a href="https://playcallerapp.com/blog/nba-api-for-developers" target="_blank">PlayCaller guide</a>), and the experimental CDN path did not return data. This is a known, flagged limitation.</p>
+      <p><strong>Verify manually (official):</strong></p>
+      <ul style="margin:10px 0 10px 20px; font-size:13px;">
+        <li><a href="${ENDPOINTS.nbaStandingsPage}" target="_blank">${ENDPOINTS.nbaStandingsPage}</a> — official standings page</li>
+        <li><a href="${esc(url)}" target="_blank">Open Stats API JSON directly ↗</a> (works as a direct navigation/server fetch, not XHR)</li>
+        <li>Server-side: <code>curl -H "Referer: https://www.nba.com/" -H "x-nba-stats-origin: stats" -H "x-nba-stats-token: true" "${esc(url)}"</code></li>
+      </ul>
+      <p style="font-size:12px; color:var(--muted);">Docs: <a href="https://github.com/swar/nba_api/blob/master/docs/nba_api/stats/endpoints/leaguestandingsv3.md" target="_blank">nba_api leaguestandingsv3</a> • <a href="https://hoopr.sportsdataverse.org/reference/nba_leaguestandingsv3.html" target="_blank">hoopR</a></p>
+    </div>
+  `;
+}
+
+// Stats API resultSets shape: { resultSets: [{ name: 'League Standings', headers: [...], rowSet: [[...], ...] } }
+function extractStandingsRows(data) {
+  try {
+    const sets = data.resultSets || data.resultSet || [];
+    const arr = Array.isArray(sets) ? sets : [sets];
+    for (const s of arr) {
+      const headers = s.headers || [];
+      const rows = s.rowSet || [];
+      if (!headers.length || !rows.length) continue;
+      const idx = (name) => headers.indexOf(name);
+      if (idx('TeamCity') === -1) continue;
+      return rows.map(r => ({
+        teamId: r[idx('TeamID')], city: r[idx('TeamCity')], name: r[idx('TeamName')],
+        conference: r[idx('Conference')], division: r[idx('Division')],
+        wins: r[idx('WINS')], losses: r[idx('LOSSES')], pct: r[idx('WinPCT')],
+        gb: r[idx('ConferenceGamesBack')], home: r[idx('HOME')], road: r[idx('ROAD')],
+        l10: r[idx('L10')], streak: r[idx('strCurrentStreak')] ?? r[idx('CurrentStreak')],
+        playoffRank: r[idx('PlayoffRank')],
+      }));
+    }
+  } catch (e) { console.warn('extractStandingsRows failed:', e.message); }
+  return [];
+}
+
+function renderStandingsTables(rows, season, seasonType, sourceUrl) {
+  const east = rows.filter(r => (r.conference || '').toLowerCase().includes('east'))
+    .sort((a, b) => (Number(a.playoffRank) || 99) - (Number(b.playoffRank) || 99));
+  const west = rows.filter(r => (r.conference || '').toLowerCase().includes('west'))
+    .sort((a, b) => (Number(a.playoffRank) || 99) - (Number(b.playoffRank) || 99));
+  const table = (confRows, title) => `
+    <div class="standings-table-wrap">
+      <h4>${title} (${esc(season)} ${esc(seasonType)})</h4>
+      <table class="standings-table">
+        <thead><tr><th>#</th><th>Team</th><th>W</th><th>L</th><th>PCT</th><th>GB</th><th>HOME</th><th>ROAD</th><th>L10</th><th>STRK</th></tr></thead>
+        <tbody>
+          ${confRows.map((r, i) => `
+            <tr>
+              <td>${esc(r.playoffRank ?? (i + 1))}</td>
+              <td class="standings-team">${r.teamId ? `<img src="${ENDPOINTS.teamLogo(r.teamId)}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}<span>${esc(r.city)} ${esc(r.name)}</span></td>
+              <td>${esc(r.wins)}</td><td>${esc(r.losses)}</td><td>${esc(r.pct)}</td><td>${esc(r.gb)}</td>
+              <td>${esc(r.home)}</td><td>${esc(r.road)}</td><td>${esc(r.l10)}</td><td>${esc(r.streak)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  els.standingsContent.innerHTML = `
+    <div class="standings-grid">${table(east, 'Eastern Conference')}${table(west, 'Western Conference')}</div>
+    <div class="endpoint-info"><code>Source: ${esc(sourceUrl)}</code> • Official standings also at <a href="${ENDPOINTS.nbaStandingsPage}" target="_blank" class="link">NBA.com/standings ↗</a></div>
+  `;
+}
+
+// Default season string: NBA season starting year = current year if Oct-Dec, else previous year
+function defaultSeason() {
+  const now = new Date();
+  const y = now.getMonth() >= 9 ? now.getFullYear() : now.getFullYear() - 1;
+  return `${y}-${String((y + 1) % 100).padStart(2, '0')}`;
 }
 
 // Event Listeners
@@ -573,6 +931,11 @@ els.dateInput.addEventListener('change', (e) => {
 });
 els.gameSearch.addEventListener('input', applyGameSearchFilter);
 els.loadStandingsBtn.addEventListener('click', loadStandings);
+els.stripViewBtn.addEventListener('click', () => setView('strip'));
+els.cardsViewBtn.addEventListener('click', () => setView('cards'));
+els.prevDayBtn.addEventListener('click', () => shiftViewDate(-1));
+els.nextDayBtn.addEventListener('click', () => shiftViewDate(1));
+els.todayBtn.addEventListener('click', backToToday);
 document.querySelectorAll('.chip').forEach(chip => {
   chip.addEventListener('click', () => {
     els.gameIdInput.value = chip.dataset.id;
@@ -619,6 +982,15 @@ function stopDetailAutoRefresh() {
 }
 
 // Init
+try {
+  const savedView = localStorage.getItem('sbView');
+  if (savedView === 'cards' || savedView === 'strip') state.view = savedView;
+} catch (e) {}
+els.stripViewBtn.classList.toggle('active', state.view === 'strip');
+els.cardsViewBtn.classList.toggle('active', state.view === 'cards');
+els.stripViewBtn.setAttribute('aria-pressed', state.view === 'strip' ? 'true' : 'false');
+els.cardsViewBtn.setAttribute('aria-pressed', state.view === 'cards' ? 'true' : 'false');
+els.standingsSeason.value = defaultSeason();
 loadTodaysScoreboard();
 startAutoRefresh();
 els.dateInput.valueAsDate = new Date('2024-11-04'); // Known date with games per verification
@@ -632,4 +1004,6 @@ try {
 
 window.selectGame = selectGame;
 window.loadMockData = loadMockData;
+window.setView = setView;
+window.backToToday = backToToday;
 window.ENDPOINTS = ENDPOINTS;
