@@ -1,5 +1,5 @@
 {
-  "generatedAtUtc": "2026-09-25T19:38:06.819626+00:00",
+  "generatedAtUtc": "2026-09-25T19:58:26.818338+00:00",
   "runner": {
     "corsCheckOrigin": "https://buffedlizard55-lab.github.io",
     "python": "3.12.14",
@@ -26,8 +26,8 @@
         "mime-version": "1.0",
         "content-type": "text/html",
         "content-length": "445",
-        "expires": "Fri, 25 Sep 2026 19:38:06 GMT",
-        "date": "Fri, 25 Sep 2026 19:38:06 GMT",
+        "expires": "Fri, 25 Sep 2026 19:58:26 GMT",
+        "date": "Fri, 25 Sep 2026 19:58:26 GMT",
         "connection": "close",
         "x-frame-options": "sameorigin",
         "x-xss-protection": "1; mode=block",
@@ -35,7 +35,7 @@
         "strict-transport-security": "max-age=86400"
       },
       "error": "HTTPError 403",
-      "elapsedMs": 158,
+      "elapsedMs": 99,
       "label": "live-scoreboard-today"
     },
     {
@@ -57,8 +57,8 @@
         "mime-version": "1.0",
         "content-type": "text/html",
         "content-length": "447",
-        "expires": "Fri, 25 Sep 2026 19:38:07 GMT",
-        "date": "Fri, 25 Sep 2026 19:38:07 GMT",
+        "expires": "Fri, 25 Sep 2026 19:58:26 GMT",
+        "date": "Fri, 25 Sep 2026 19:58:26 GMT",
         "connection": "close",
         "x-frame-options": "sameorigin",
         "x-xss-protection": "1; mode=block",
@@ -66,7 +66,7 @@
         "strict-transport-security": "max-age=86400"
       },
       "error": "HTTPError 403",
-      "elapsedMs": 98,
+      "elapsedMs": 45,
       "label": "live-playbyplay-2024"
     },
     {
@@ -88,8 +88,8 @@
         "mime-version": "1.0",
         "content-type": "text/html",
         "content-length": "443",
-        "expires": "Fri, 25 Sep 2026 19:38:07 GMT",
-        "date": "Fri, 25 Sep 2026 19:38:07 GMT",
+        "expires": "Fri, 25 Sep 2026 19:58:27 GMT",
+        "date": "Fri, 25 Sep 2026 19:58:27 GMT",
         "connection": "close",
         "x-frame-options": "sameorigin",
         "x-xss-protection": "1; mode=block",
@@ -97,7 +97,7 @@
         "strict-transport-security": "max-age=86400"
       },
       "error": "HTTPError 403",
-      "elapsedMs": 117,
+      "elapsedMs": 59,
       "label": "live-boxscore-2024"
     },
     {
@@ -119,8 +119,8 @@
         "mime-version": "1.0",
         "content-type": "text/html",
         "content-length": "436",
-        "expires": "Fri, 25 Sep 2026 19:38:07 GMT",
-        "date": "Fri, 25 Sep 2026 19:38:07 GMT",
+        "expires": "Fri, 25 Sep 2026 19:58:27 GMT",
+        "date": "Fri, 25 Sep 2026 19:58:27 GMT",
         "connection": "close",
         "x-frame-options": "sameorigin",
         "x-xss-protection": "1; mode=block",
@@ -128,7 +128,7 @@
         "strict-transport-security": "max-age=86400"
       },
       "error": "HTTPError 403",
-      "elapsedMs": 136,
+      "elapsedMs": 55,
       "label": "live-odds"
     },
     {
@@ -150,8 +150,8 @@
         "mime-version": "1.0",
         "content-type": "text/html",
         "content-length": "442",
-        "expires": "Fri, 25 Sep 2026 19:38:07 GMT",
-        "date": "Fri, 25 Sep 2026 19:38:07 GMT",
+        "expires": "Fri, 25 Sep 2026 19:58:27 GMT",
+        "date": "Fri, 25 Sep 2026 19:58:27 GMT",
         "connection": "close",
         "x-frame-options": "sameorigin",
         "x-xss-protection": "1; mode=block",
@@ -159,7 +159,7 @@
         "strict-transport-security": "max-age=86400"
       },
       "error": "HTTPError 403",
-      "elapsedMs": 104,
+      "elapsedMs": 69,
       "label": "live-channels"
     },
     {
@@ -181,8 +181,8 @@
         "mime-version": "1.0",
         "content-type": "text/html",
         "content-length": "431",
-        "expires": "Fri, 25 Sep 2026 19:38:07 GMT",
-        "date": "Fri, 25 Sep 2026 19:38:07 GMT",
+        "expires": "Fri, 25 Sep 2026 19:58:27 GMT",
+        "date": "Fri, 25 Sep 2026 19:58:27 GMT",
         "connection": "close",
         "x-frame-options": "sameorigin",
         "x-xss-protection": "1; mode=block",
@@ -190,7 +190,7 @@
         "strict-transport-security": "max-age=86400"
       },
       "error": "HTTPError 403",
-      "elapsedMs": 171,
+      "elapsedMs": 54,
       "label": "static-schedule-v2-1"
     },
     {
@@ -212,8 +212,8 @@
         "mime-version": "1.0",
         "content-type": "text/html",
         "content-length": "425",
-        "expires": "Fri, 25 Sep 2026 19:38:07 GMT",
-        "date": "Fri, 25 Sep 2026 19:38:07 GMT",
+        "expires": "Fri, 25 Sep 2026 19:58:27 GMT",
+        "date": "Fri, 25 Sep 2026 19:58:27 GMT",
         "connection": "close",
         "x-frame-options": "sameorigin",
         "x-xss-protection": "1; mode=block",
@@ -221,7 +221,7 @@
         "strict-transport-security": "max-age=86400"
       },
       "error": "HTTPError 403",
-      "elapsedMs": 87,
+      "elapsedMs": 67,
       "label": "static-schedule-v2"
     },
     {
@@ -243,8 +243,8 @@
         "mime-version": "1.0",
         "content-type": "text/html",
         "content-length": "441",
-        "expires": "Fri, 25 Sep 2026 19:38:07 GMT",
-        "date": "Fri, 25 Sep 2026 19:38:07 GMT",
+        "expires": "Fri, 25 Sep 2026 19:58:27 GMT",
+        "date": "Fri, 25 Sep 2026 19:58:27 GMT",
         "connection": "close",
         "x-frame-options": "sameorigin",
         "x-xss-protection": "1; mode=block",
@@ -252,7 +252,7 @@
         "strict-transport-security": "max-age=86400"
       },
       "error": "HTTPError 403",
-      "elapsedMs": 64,
+      "elapsedMs": 47,
       "label": "static-schedule-2025-26"
     },
     {
@@ -274,10 +274,10 @@
         "etag": "\"d94b140e57157bfba57822e2ca7e29b1\"",
         "content-type": "image/svg+xml",
         "vary": "Accept-Encoding",
-        "date": "Fri, 25 Sep 2026 19:38:07 GMT"
+        "date": "Fri, 25 Sep 2026 19:58:27 GMT"
       },
       "bodyPrefix": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->\r\n<svg version=\"1.1\" id=\"Layer_3\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http",
-      "elapsedMs": 88,
+      "elapsedMs": 58,
       "label": "logo-lakers"
     },
     {
@@ -299,10 +299,10 @@
         "etag": "\"e895432fbe74ec2aa5dc80db3f848e1e\"",
         "content-type": "image/png",
         "cache-control": "private, no-transform, max-age=43200",
-        "date": "Fri, 25 Sep 2026 19:38:07 GMT"
+        "date": "Fri, 25 Sep 2026 19:58:27 GMT"
       },
       "bodyPrefix": "\ufffdPNG\r\n\u001a\n\u0000\u0000\u0000\rIHDR\u0000\u0000\u0001\u0004\u0000\u0000\u0000\ufffd\b\u0003\u0000\u0000\u0000\ufffd\ufffd\ufffd\ufffd\u0000\u0000\u0003\u0000PLTE\u0000\u0000\u0000*0-\ufffd\ufffd5eF;oL=yXN+1+ $%\ufffd\ufffd?\u001f!#\"!\"\u001e\u001d\u001d\ufffdXD !!   \u0738:\u0019\u0018\u0019\ufffd\ufffd\ufffd \u001f\u001e$!\"\u000f\u000f\u000e(\u001b\u0015)$#\u0013\u0013\u0013:%\u001ct`|L6-\ufffd\ufffdm\ufffd\ufffd\u001cs~U\ufffd{\u001e\ufffd\ufffd9;&\"KFB\ufffd\ufffd7\ufffd\ufffd\u0019\ufffd\ufffd\ufffd;\"\ufffd\ufffd\ufffd\ufffdRP/\ufffd\ufffdc\n\n\t\ufffd\ufffd \u000e\r\f\b\u0007\u0007\ufffd\ufffd6\ufffd\ufffd\n\u0005\u0005\u0005\ufffd\ufffd\r\ufffd\ufffd\u001c\ufffd\ufffd\u0007c4\u001d\ufffd\ufffd1\ufffd\ufffd:\u0012\u0011\u0010\ufffdV>=$\u0017,\u0019\u0011\ufffdS=^1",
-      "elapsedMs": 163,
+      "elapsedMs": 49,
       "label": "headshot-lebron"
     },
     {
@@ -324,8 +324,8 @@
         "mime-version": "1.0",
         "content-type": "text/html",
         "content-length": "445",
-        "expires": "Fri, 25 Sep 2026 19:38:08 GMT",
-        "date": "Fri, 25 Sep 2026 19:38:08 GMT",
+        "expires": "Fri, 25 Sep 2026 19:58:27 GMT",
+        "date": "Fri, 25 Sep 2026 19:58:27 GMT",
         "connection": "close",
         "x-frame-options": "sameorigin",
         "x-xss-protection": "1; mode=block",
@@ -333,7 +333,7 @@
         "strict-transport-security": "max-age=86400"
       },
       "error": "HTTPError 403",
-      "elapsedMs": 63,
+      "elapsedMs": 46,
       "label": "experimental-date-scoreboard"
     },
     {
@@ -355,8 +355,8 @@
         "mime-version": "1.0",
         "content-type": "text/html",
         "content-length": "439",
-        "expires": "Fri, 25 Sep 2026 19:38:08 GMT",
-        "date": "Fri, 25 Sep 2026 19:38:08 GMT",
+        "expires": "Fri, 25 Sep 2026 19:58:27 GMT",
+        "date": "Fri, 25 Sep 2026 19:58:27 GMT",
         "connection": "close",
         "x-frame-options": "sameorigin",
         "x-xss-protection": "1; mode=block",
@@ -364,7 +364,7 @@
         "strict-transport-security": "max-age=86400"
       },
       "error": "HTTPError 403",
-      "elapsedMs": 97,
+      "elapsedMs": 44,
       "label": "experimental-scoreboard-00"
     },
     {
@@ -381,7 +381,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45089,
+      "elapsedMs": 45080,
       "label": "stats-scoreboardv3-2025-11-04"
     },
     {
@@ -398,7 +398,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45136,
+      "elapsedMs": 45189,
       "label": "stats-scoreboardv3-2016-06-19"
     },
     {
@@ -415,7 +415,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45128,
+      "elapsedMs": 45075,
       "label": "stats-scoreboardv3-1996-06-16"
     },
     {
@@ -432,7 +432,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45248,
+      "elapsedMs": 45037,
       "label": "stats-leaguestandingsv3-2025-26"
     },
     {
@@ -449,7 +449,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45231,
+      "elapsedMs": 45064,
       "label": "stats-boxscoretraditionalv3"
     },
     {
@@ -466,7 +466,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45184,
+      "elapsedMs": 45158,
       "label": "stats-playbyplayv3"
     },
     {
@@ -483,7 +483,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45099,
+      "elapsedMs": 45084,
       "label": "stats-scheduleleaguev2"
     },
     {
@@ -500,7 +500,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45135,
+      "elapsedMs": 45158,
       "label": "stats-commonplayerinfo"
     },
     {
@@ -513,7 +513,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45238,
+      "elapsedMs": 45081,
       "label": "control-no-stats-headers"
     },
     {
@@ -528,7 +528,7 @@
       ],
       "ok": false,
       "error": "URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'data.nba.net'. (_ssl.c:1010)>",
-      "elapsedMs": 139,
+      "elapsedMs": 71,
       "label": "legacy-data-nba-net-2020"
     },
     {
@@ -543,7 +543,7 @@
       ],
       "ok": false,
       "error": "URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'data.nba.net'. (_ssl.c:1010)>",
-      "elapsedMs": 54,
+      "elapsedMs": 5,
       "label": "legacy-data-nba-net-old-path"
     },
     {
@@ -558,7 +558,7 @@
       ],
       "ok": false,
       "error": "URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'data.nba.net'. (_ssl.c:1010)>",
-      "elapsedMs": 58,
+      "elapsedMs": 5,
       "label": "legacy-data-nba-net-2025"
     },
     {
@@ -575,7 +575,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45119,
+      "elapsedMs": 45087,
       "label": "harvest-scoreboard-2025-11-04"
     },
     {
@@ -592,7 +592,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45170,
+      "elapsedMs": 45064,
       "label": "harvest-scoreboard-2025-06-22"
     },
     {
@@ -609,7 +609,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45174,
+      "elapsedMs": 45101,
       "label": "harvest-scoreboard-2024-11-04"
     },
     {
@@ -626,7 +626,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45120,
+      "elapsedMs": 45092,
       "label": "harvest-scoreboard-2022-01-15"
     },
     {
@@ -643,7 +643,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45132,
+      "elapsedMs": 45141,
       "label": "harvest-scoreboard-2019-10-22"
     },
     {
@@ -660,7 +660,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45126,
+      "elapsedMs": 45157,
       "label": "harvest-scoreboard-2016-06-19"
     },
     {
@@ -677,7 +677,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45127,
+      "elapsedMs": 45101,
       "label": "harvest-scoreboard-2010-06-17"
     },
     {
@@ -694,7 +694,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45201,
+      "elapsedMs": 45070,
       "label": "harvest-scoreboard-2005-06-23"
     },
     {
@@ -711,7 +711,7 @@
       ],
       "ok": false,
       "error": "TimeoutError: The read operation timed out",
-      "elapsedMs": 45151,
+      "elapsedMs": 45138,
       "label": "harvest-scoreboard-1996-06-16"
     }
   ],
