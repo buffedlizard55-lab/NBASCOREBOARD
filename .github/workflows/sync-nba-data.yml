@@ -1,36 +1,22 @@
 name: Sync official NBA data
 
-# The scoreboard's always-fresh static fallback.
-#
-# GitHub Actions runs this on a real network egress, pulls ONLY official NBA
-# endpoints (cdn.nba.com / stats.nba.com), and commits the responses next to the
-# site so GitHub Pages serves them same-origin. That removes the two blockers a
-# purely client-side page cannot beat: stats.nba.com has no CORS headers, and some
-# client networks cannot reach cdn.nba.com at all.
-#
-# Commits happen only when the official content actually changed, which keeps the
-# repo and the Pages build budget healthy.
-
+# GitHub's schedule is best-effort, not a real-time service. Publish only NBA-owned
+# responses, and preserve the last valid snapshot if an endpoint fails validation.
 on:
   schedule:
-    # Every 10 minutes (two offsets): GitHub's scheduler is explicitly best-effort and
-    # was measured NOT to have fired this repo's single '*/10' entry since it was added
-    # (0 schedule-triggered runs), so a second offset gives the scheduler another chance
-    # at each boundary. Concurrency below makes overlapping ticks harmless.
-    - cron: '*/10 * * * *'
-    - cron: '5,15,25,35,45,55 * * * *'
-  # Activity-based freshness: whenever a deploy finishes on main, refresh the data too,
-  # so the snapshot is never older than the last thing that happened in the repo.
-  workflow_run:
-    workflows: ["Deploy NBA Scoreboard to GitHub Pages"]
-    types: [completed]
+    - cron: '*/5 * * * *'  # fastest GitHub Actions schedule; may be delayed/skipped
+    - cron: '0 6 * * *'    # one full schedule/history pass each UTC day
   workflow_dispatch:
     inputs:
       mode:
-        description: 'live = today only, daily = + recent history, full = + schedule/backfill, refresh = re-read stored files to add provenance'
+        description: 'live = board/details, daily = + recent dates, full = + schedule/backfill, refresh = provenance refresh'
         type: choice
         options: [live, daily, full, refresh]
         default: daily
+      game:
+        description: 'Optional official 10-digit NBA game ID to re-verify its complete box/PBP'
+        required: false
+        type: string
   push:
     branches: [main]
     paths:
@@ -42,7 +28,6 @@ permissions:
   contents: write
 
 concurrency:
-  # All data-writing workflows share one group so their commits never race.
   group: nba-data-writes
   cancel-in-progress: false
 
@@ -53,71 +38,74 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
       - name: Decide sync mode
         id: mode
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          DISPATCH_MODE: ${{ inputs.mode }}
         run: |
           set -euo pipefail
-          if [ "${{ github.event_name }}" = "workflow_run" ]; then
-            # A deploy just shipped on main: take a fresh snapshot (live-only; the
-            # heavy pass stays on the 06 UTC schedule).
-            echo "mode=live" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event_name }}" = "schedule" ]; then
-            # One heavy pass a day at 06:00 UTC (02:00 ET, after the last game);
-            # the rest of the day only refreshes the live feed.
-            if [ "$(date -u +%H)" = "06" ]; then echo "mode=full" >> "$GITHUB_OUTPUT";
-            else echo "mode=daily" >> "$GITHUB_OUTPUT"; fi
-          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "mode=${{ inputs.mode }}" >> "$GITHUB_OUTPUT"
+          if [ "${GITHUB_EVENT_NAME}" = 'schedule' ]; then
+            if [ "$SCHEDULE" = '0 6 * * *' ]; then mode=full; else mode=daily; fi
+          elif [ "${GITHUB_EVENT_NAME}" = 'workflow_dispatch' ]; then
+            mode="${DISPATCH_MODE:-daily}"
           else
-            # Maintainers can request a specific mode from the commit message:
-            #   [sync:full], [sync:daily] or [sync:refresh]   (default on push is live)
-            msg="${{ github.event.head_commit.message }}"
-            if printf '%s' "$msg" | grep -q '\[sync:full\]'; then echo "mode=full" >> "$GITHUB_OUTPUT";
-            elif printf '%s' "$msg" | grep -q '\[sync:daily\]'; then echo "mode=daily" >> "$GITHUB_OUTPUT";
-            elif printf '%s' "$msg" | grep -q '\[sync:refresh\]'; then echo "mode=refresh" >> "$GITHUB_OUTPUT";
-            else echo "mode=live" >> "$GITHUB_OUTPUT"; fi
+            if [[ "$COMMIT_MSG" == *'[sync:full]'* ]]; then mode=full
+            elif [[ "$COMMIT_MSG" == *'[sync:daily]'* ]]; then mode=daily
+            else mode=live; fi
+          fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch, validate and archive official data
+        id: ingest
+        continue-on-error: true # commit the failure evidence, then fail the job below
+        env:
+          AUDIT_GAME: ${{ inputs.game }}
+          SYNC_MODE: ${{ steps.mode.outputs.mode }}
+        run: |
+          set -euo pipefail
+          if [ -n "$AUDIT_GAME" ]; then
+            python3 scripts/sync_nba_data.py --mode "$SYNC_MODE" --game "$AUDIT_GAME"
+          else
+            python3 scripts/sync_nba_data.py --mode "$SYNC_MODE"
           fi
 
-      - name: Sync official NBA data
-        run: python3 scripts/sync_nba_data.py --mode ${{ steps.mode.outputs.mode }}
-
-      - name: Report what changed
+      - name: Report the run
+        if: always()
         run: |
-          echo "### NBA data sync (${{ steps.mode.outputs.mode }})" >> "$GITHUB_STEP_SUMMARY"
           python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import json
-          log = json.load(open('data/verification/sync-log.json'))['runs'][0]
-          print(f"\n- run: `{log['runStartedUtc']}` → `{log.get('runFinishedUtc')}`")
-          print(f"- steps OK: **{log['summary']['ok']}**, failed: **{log['summary']['failed']}**, files written: **{log['summary']['written']}**\n")
-          print("| step | target | result | status | games/teams |")
-          print("|---|---|---|---|---|")
-          for s in log['steps'][:40]:
-              target = s.get('date') or s.get('season') or s.get('candidate') or s.get('step')
-              extra = s.get('gameCount') if s.get('gameCount') is not None else s.get('teamCount', '')
-              print(f"| {s.get('step')} | `{target}` | {s.get('result')} | {s.get('httpStatus')} | {extra} |")
+          history = json.load(open('data/verification/sync-log.json'))
+          hb = history.get('heartbeat') or {}
+          print('### Official NBA sync')
+          print(f"Latest published check: {hb.get('lastCheckedUtc', 'unavailable')}")
+          print(f"Last successful live read: {hb.get('lastSuccessfulLiveUtc', 'unavailable')}")
+          print(f"Status: {hb.get('lastResult', 'unknown')}")
+          for issue in hb.get('issues') or []:
+              print(f"- IRREGULARITY: {issue}")
           PY
 
-      - name: Commit data when it changed
+      - name: Commit changed data and error evidence
+        if: always()
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add data
-          if git diff --cached --quiet; then
-            echo "No official data changes — nothing to commit."
-            exit 0
-          fi
-          git commit -m "data: official NBA sync (${{ steps.mode.outputs.mode }}) [skip ci]"
+          if git diff --cached --quiet; then echo 'No new data or evidence'; exit 0; fi
+          git commit -m 'data: official NBA sync (${{ steps.mode.outputs.mode }}) [skip ci]'
           for attempt in 1 2 3 4 5; do
-            git pull --rebase --autostash -X theirs -q origin "${GITHUB_REF_NAME}" && git push && { echo "pushed"; exit 0; }
-            echo "push attempt ${attempt} failed, retrying"; sleep 5
+            git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push origin "${GITHUB_REF_NAME}" && exit 0
+            echo "retry $attempt"; sleep 5
           done
-          echo "could not push data"; exit 1
+          echo 'Unable to publish official data / failure evidence' >&2
+          exit 1
 
-# Trigger notes: this workflow runs on schedule (every 10 min), on dispatch, and when
-# the sync script or this file changes. Data commits it makes carry [skip ci] so they
-# never re-trigger themselves or the probe workflows.
+      - name: Fail visibly when any NBA read or validation failed
+        if: steps.ingest.outcome != 'success'
+        run: exit 1

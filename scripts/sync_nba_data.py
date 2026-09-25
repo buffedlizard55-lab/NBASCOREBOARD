@@ -14,11 +14,10 @@ WHY SERVER-SIDE (measured, 2026-09-25 — see data/verification/):
 
 WHAT IT PUBLISHES (all under data/, all traceable to an official URL):
   data/live/scoreboard.json        today's official live scoreboard (raw payload)
-  data/live/plays.json             compacted recent plays for today's games
   data/schedule/<season>.json      compacted official season schedule (incl. future)
-  data/scoreboard/<date>.json      compacted scoreboard for a played date
-  data/games/<gameId>/boxscore.json    compacted official box score (archived at final)
-  data/games/<gameId>/playbyplay.json  compacted official play-by-play (archived at final)
+  data/scoreboard/<date>.json      compacted NBA.com date cards, incl. checked empty dates
+  data/games/<gameId>/boxscore.json    current or final official player/team statistics
+  data/games/<gameId>/playbyplay.json  every official action for a current or final game
   data/index.json                  manifest the site reads first
   data/verification/sync-log.json  machine record of every fetch (url, status, counts)
 
@@ -35,6 +34,7 @@ import gzip
 import hashlib
 import json
 import os
+import re
 import sys
 import time
 import urllib.error
@@ -58,7 +58,7 @@ from nba_official import live_playbyplay_url as pbp_url  # noqa: F401  (kept exp
 DATA = os.path.join(ROOT, "data")
 LOG_PATH = os.path.join(DATA, "verification", "sync-log.json")
 MAX_LOG_RUNS = 30
-PLAYS_PER_GAME = 80
+GAME_ID = re.compile(r"^\d{10}$")
 HISTORY_DAYS_DEFAULT = 14
 BACKFILL_MAX_DATES = 60
 BACKFILL_BATCH = 6
@@ -187,6 +187,74 @@ def write_json(path: str, payload) -> None:
     with open(path, "w", encoding="utf-8") as fh:
         json.dump(payload, fh, ensure_ascii=False, separators=(",", ":"), sort_keys=False)
         fh.write("\n")
+
+
+def valid_date(value: str) -> bool:
+    if not isinstance(value, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+        return False
+    try:
+        return dt.date.fromisoformat(value).isoformat() == value
+    except ValueError:
+        return False
+
+
+def valid_game_id(value) -> bool:
+    return isinstance(value, str) and bool(GAME_ID.fullmatch(value))
+
+
+def detail_era(game: dict) -> bool:
+    """CDN game files have been observed from the 2019-20 season, not earlier."""
+    season = game.get("seasonYear") or ""
+    return isinstance(season, str) and season[:4].isdigit() and int(season[:4]) >= 2019
+
+
+def known_schedule_game_ids(date_str: str) -> set[str]:
+    """Known NBA season-schedule game IDs for an ET date, if published here.
+
+    The date cards and live feed are authoritative for results; the schedule is
+    only a guard against declaring a known game night empty when a feed is partial.
+    An absent schedule cannot establish that a day had no games.
+    """
+    schedule_dir = os.path.join(DATA, "schedule")
+    if not os.path.isdir(schedule_dir):
+        return set()
+    ids = set()
+    for filename in os.listdir(schedule_dir):
+        if filename.endswith(".json"):
+            sched = load_json(os.path.join(schedule_dir, filename)) or {}
+            ids.update(g["gameId"] for g in sched.get("games", [])
+                       if g.get("gameDateEst") == date_str and valid_game_id(g.get("gameId")))
+    return ids
+
+
+def scoreboard_error(payload) -> str | None:
+    """Never turn a changed/partial NBA response into a fake 'no games' night."""
+    sb = payload.get("scoreboard") if isinstance(payload, dict) else None
+    if not isinstance(sb, dict) or not valid_date(sb.get("gameDate")):
+        return "missing or invalid scoreboard.gameDate"
+    if not isinstance(sb.get("games"), list):
+        return "missing scoreboard.games array"
+    if not sb["games"] and known_schedule_game_ids(sb["gameDate"]):
+        return "empty live feed contradicts published NBA season schedule; retry rather than display zero games"
+    seen = set()
+    for g in sb["games"]:
+        if not isinstance(g, dict) or not valid_game_id(g.get("gameId")):
+            return "game without a valid official gameId"
+        if g["gameId"] in seen:
+            return f"duplicate gameId {g['gameId']}"
+        seen.add(g["gameId"])
+        for side in ("homeTeam", "awayTeam"):
+            t = g.get(side)
+            if not isinstance(t, dict) or not t.get("teamId") or not t.get("teamTricode"):
+                return f"game {g['gameId']} missing {side} identity"
+    return None
+
+
+def last_action_score(actions: list) -> tuple | None:
+    for a in reversed(actions):
+        if a.get("scoreAway") is not None and a.get("scoreHome") is not None:
+            return str(a["scoreAway"]), str(a["scoreHome"])
+    return None
 
 
 def store_compact(path: str, official_url: str, content, note: str,
@@ -451,100 +519,164 @@ def live_gate_payload(payload: dict) -> dict:
     return {"feedDate": sb.get("gameDate"), "games": sb.get("games") or []}
 
 
-def sync_live(log: dict) -> None:
+def sync_live(log: dict) -> bool:
+    """Publish NBA's live board and *complete* box/PBP for games underway.
+
+    A live game must not have to wait until Final for its player stats or its first
+    400 actions. The same game files are updated while live, then kept at final.
+    """
     print("[live] official today's scoreboard", flush=True)
     payload, meta = http_get(LIVE_SCOREBOARD_URL, CDN_HEADERS)
-    entry = {"step": "live", **meta}
-    if not payload or not isinstance(payload.get("scoreboard"), dict):
-        log["steps"].append({**entry, "result": "FAILED"})
-        print(f"[live] FAILED status={meta.get('httpStatus')} err={meta.get('error')}", flush=True)
-        return
+    error = scoreboard_error(payload)
+    if error:
+        log["steps"].append({"step": "live", **meta, "result": "INVALID" if payload is not None else "FAILED",
+                             "error": meta.get("error") or error})
+        print(f"[live] FAILED status={meta.get('httpStatus')} err={error}", flush=True)
+        return False  # keep the last good snapshot, never publish an invented empty night
     sb = payload["scoreboard"]
-    games = sb.get("games") or []
+    games = sb["games"]
     written = store_compact(
         os.path.join(DATA, "live", "scoreboard.json"), LIVE_SCOREBOARD_URL,
-        {"feedDate": sb.get("gameDate"), "gameCount": len(games),
+        {"feedDate": sb["gameDate"], "gameCount": len(games),
          "liveCount": sum(1 for g in games if g.get("gameStatus") == 2),
          "scoreboard": payload},
-        "unmodified official payload under `scoreboard` (write gated on game data, "
-        "not the feed's own timestamp)",
+        "unmodified official payload under scoreboard (write gated on game data, not meta.time)",
         source_sha256=meta.get("sourceSha256"), source_bytes=meta.get("bytes"),
         gate=live_gate_payload(payload),
     )
-    log["steps"].append({**entry, "result": "OK", "gameCount": len(games),
-                         "feedDate": sb.get("gameDate"), "written": written,
-                         "feedMetaTime": (sb.get("meta") or {}).get("time")})
-    print(f"[live] OK games={len(games)} feedDate={sb.get('gameDate')} written={written}", flush=True)
+    log["steps"].append({"step": "live", **meta, "result": "OK", "gameCount": len(games),
+                         "feedDate": sb["gameDate"], "written": written})
+    print(f"[live] OK games={len(games)} feedDate={sb['gameDate']} written={written}", flush=True)
 
-    # Recent plays for games happening/recently finished today.
-    plays = {"_sync": {"sources": [], "note": "compacted official play-by-play actions (last N)"},
-             "games": {}}
     for g in games:
-        gid = g.get("gameId")
-        if g.get("gameStatus") not in (2, 3) or not gid:
+        if g.get("gameStatus") not in (2, 3):
             continue
-        pbp, pmeta = http_get(live_playbyplay_url(gid), CDN_HEADERS)
-        if not pbp or not (pbp.get("game") or {}).get("actions"):
-            log["steps"].append({"step": "livePlays", "gameId": gid, **pmeta, "result": "FAILED"})
-            continue
-        actions = compact_actions(pbp, limit=PLAYS_PER_GAME)
-        plays["games"][gid] = {
-            "gameStatus": g.get("gameStatus"),
-            "gameStatusText": g.get("gameStatusText"),
-            "actions": actions,
-            "_source": live_playbyplay_url(gid),
-        }
-        plays["_sync"]["sources"].append(live_playbyplay_url(gid))
-        log["steps"].append({"step": "livePlays", "gameId": gid, **pmeta, "result": "OK",
-                             "actionCount": len(actions)})
-    if plays["games"]:
-        path = os.path.join(DATA, "live", "plays.json")
-        existing = load_json(path)
-        new_hash = semantic_hash({k: v for k, v in plays["games"].items()})
-        if not existing or existing.get("_sync", {}).get("contentHash") != new_hash:
-            plays["_sync"]["contentHash"] = new_hash
-            plays["_sync"]["fetchedAtUtc"] = now_utc()
-            write_json(path, plays)
-            print(f"[live] plays written for {len(plays['games'])} games", flush=True)
+        gid = g["gameId"]
+        old_box = load_json(os.path.join(DATA, "games", gid, "boxscore.json")) or {}
+        # Refresh every in-progress game; at Final replace any provisional detail.
+        bg = old_box.get("game") or {}
+        final_drift = g["gameStatus"] == 3 and any(
+            str((bg.get(side) or {}).get("score")) != str((g.get(side) or {}).get("score"))
+            or (bg.get(side) or {}).get("teamId") != (g.get(side) or {}).get("teamId")
+            for side in ("homeTeam", "awayTeam"))
+        force = g["gameStatus"] == 2 or bg.get("gameStatus") != 3 or final_drift
+        archive_game(gid, log, force=force, expected=g)
+    # Obsolete last-80-actions feed cannot masquerade as the full live PBP.
+    old_plays = os.path.join(DATA, "live", "plays.json")
+    if os.path.exists(old_plays):
+        os.remove(old_plays)
+        log["steps"].append({"step": "removeTruncatedPlays", "result": "OK", "written": True})
+    return True
 
 
-def archive_game(game_id: str, log: dict, force: bool = False) -> bool:
-    """Archive official box score + play-by-play once a game is final."""
+def archive_game(game_id: str, log: dict, force: bool = False,
+                 expected: dict | None = None) -> bool:
+    """Keep official full box/PBP for a live or final game; reject swapped/partial files."""
+    if not valid_game_id(game_id):
+        log["steps"].append({"step": "gameDetails", "gameId": game_id, "result": "INVALID"})
+        return False
     box_path = os.path.join(DATA, "games", game_id, "boxscore.json")
     pbp_path = os.path.join(DATA, "games", game_id, "playbyplay.json")
     if not force and os.path.exists(box_path) and os.path.exists(pbp_path):
-        return False
+        saved_box = (load_json(box_path) or {}).get("game") or {}
+        saved_actions = (load_json(pbp_path) or {}).get("actions") or []
+        complete = (saved_box.get("gameStatus") == 3 and saved_actions and
+                    (saved_actions[-1].get("actionType"), saved_actions[-1].get("subType")) == ("game", "end") and
+                    last_action_score(saved_actions) == (
+                        str((saved_box.get("awayTeam") or {}).get("score")),
+                        str((saved_box.get("homeTeam") or {}).get("score"))))
+        agrees_with_card = not expected or expected.get("gameStatus") != 3 or all(
+            (saved_box.get(f"{side}Team") or {}).get("teamId") ==
+            (expected.get(f"{side}Team") or expected.get(side) or {}).get("teamId") and
+            str((saved_box.get(f"{side}Team") or {}).get("score")) ==
+            str((expected.get(f"{side}Team") or expected.get(side) or {}).get("score"))
+            for side in ("home", "away"))
+        if complete and agrees_with_card:
+            return False  # only a COMPLETE, cross-checked final can be skipped
     wrote = False
     box, bmeta = http_get(live_boxscore_url(game_id), CDN_HEADERS)
-    if box and isinstance(box.get("game"), dict) and box["game"].get("gameId"):
-        wrote |= store_compact(
+    game = box.get("game") if isinstance(box, dict) else None
+    valid_box = (isinstance(game, dict) and game.get("gameId") == game_id
+                 and game.get("gameStatus") in (2, 3)
+                 and all(isinstance(game.get(side), dict)
+                         and game[side].get("teamId") and game[side].get("teamTricode")
+                         and game[side].get("score") is not None
+                         for side in ("homeTeam", "awayTeam")))
+    if valid_box and expected and expected.get("gameStatus") == 3:
+        # 'expected' may be an NBA live-board game (homeTeam/awayTeam) or a
+        # compacted NBA.com date card (home/away). Compare before storing a box,
+        # not merely after an inconsistent archive has already been published.
+        matches = game.get("gameStatus") == 3 and all(
+            (game[f"{side}Team"].get("teamId") ==
+             (expected.get(f"{side}Team") or expected.get(side) or {}).get("teamId") and
+             str(game[f"{side}Team"].get("score")) ==
+             str((expected.get(f"{side}Team") or expected.get(side) or {}).get("score")))
+            for side in ("home", "away"))
+        if not matches:
+            log["steps"].append({"step": "archiveBoxscore", "gameId": game_id, **bmeta,
+                                 "result": "MISMATCH", "error": "NBA scoreboard/date card and NBA box score disagree"})
+            return False  # don't publish a contradictory 'final'; retry on next poll
+    if valid_box:
+        compact = compact_boxscore(box)
+        box_written = store_compact(
             box_path, live_boxscore_url(game_id),
-            {"game": compact_boxscore(box),
-             "gameLeaders": compact_boxscore(box).get("gameLeaders")},
+            {"game": compact, "gameLeaders": compact.get("gameLeaders")},
             "official box score, player/team stats copied field-for-field (subset of keys)",
             source_sha256=bmeta.get("sourceSha256"), source_bytes=bmeta.get("bytes"),
         )
-        log["steps"].append({"step": "archiveBoxscore", "gameId": game_id, **bmeta, "result": "OK",
-                             "written": wrote})
-        print(f"[archive] {game_id} boxscore OK {bmeta.get('bytes')}B", flush=True)
+        wrote |= box_written
+        log["steps"].append({"step": "archiveBoxscore", "gameId": game_id, **bmeta,
+                             "result": "OK", "written": box_written})
     else:
-        log["steps"].append({"step": "archiveBoxscore", "gameId": game_id, **bmeta, "result": "FAILED"})
-        print(f"[archive] {game_id} boxscore FAILED status={bmeta.get('httpStatus')}", flush=True)
+        log["steps"].append({"step": "archiveBoxscore", "gameId": game_id, **bmeta,
+                             "result": "INVALID" if box is not None else "FAILED",
+                             "error": bmeta.get("error") or "missing/mismatched game, teams or score"})
+
+    # A previously stored in-progress PBP is not a complete final game. Once the
+    # box becomes final, remove the provisional action file if it does not already
+    # contain NBA's Game End with the final score. This also makes the next poll
+    # retry a PBP fetch that failed during the final transition.
+    if valid_box and game["gameStatus"] == 3 and os.path.exists(pbp_path):
+        old_actions = (load_json(pbp_path) or {}).get("actions") or []
+        old_last = old_actions[-1] if old_actions else {}
+        complete = (old_last.get("actionType"), old_last.get("subType")) == ("game", "end")
+        expected_score = (str(game["awayTeam"]["score"]), str(game["homeTeam"]["score"]))
+        if not complete or last_action_score(old_actions) != expected_score:
+            os.remove(pbp_path)
+            wrote = True
+            log["steps"].append({"step": "retireIncompletePlaybyplay", "gameId": game_id,
+                                 "result": "OK", "written": True,
+                                 "note": "provisional actions did not contain NBA's matching final Game End"})
+
     pbp, pmeta = http_get(live_playbyplay_url(game_id), CDN_HEADERS)
-    if pbp and (pbp.get("game") or {}).get("actions"):
-        actions = compact_actions(pbp)
-        wrote |= store_compact(
-            pbp_path, live_playbyplay_url(game_id),
-            {"gameId": game_id, "actionCount": len(actions), "actions": actions},
-            "official play-by-play actions, fields copied field-for-field (subset of keys)",
-            source_sha256=pmeta.get("sourceSha256"), source_bytes=pmeta.get("bytes"),
-        )
-        log["steps"].append({"step": "archivePlaybyplay", "gameId": game_id, **pmeta, "result": "OK",
-                             "actionCount": len(actions)})
-        print(f"[archive] {game_id} pbp OK actions={len(actions)}", flush=True)
-    else:
-        log["steps"].append({"step": "archivePlaybyplay", "gameId": game_id, **pmeta, "result": "FAILED"})
-        print(f"[archive] {game_id} pbp FAILED status={pmeta.get('httpStatus')}", flush=True)
+    pg = pbp.get("game") if isinstance(pbp, dict) else None
+    raw_actions = pg.get("actions") if isinstance(pg, dict) else None
+    if (not isinstance(pg, dict) or pg.get("gameId") != game_id
+            or not isinstance(raw_actions, list) or not raw_actions
+            or not all(isinstance(a, dict) for a in raw_actions)):
+        log["steps"].append({"step": "archivePlaybyplay", "gameId": game_id, **pmeta,
+                             "result": "INVALID" if pbp is not None else "FAILED",
+                             "error": pmeta.get("error") or "missing/mismatched game or actions"})
+        return wrote
+    actions = compact_actions(pbp)  # ALL actions, including during a live game
+    current_box = game if valid_box else (load_json(box_path) or {}).get("game") or {}
+    if current_box.get("gameStatus") == 3:
+        expected_score = (str(current_box["awayTeam"]["score"]), str(current_box["homeTeam"]["score"]))
+        actual = last_action_score(actions)
+        if actual != expected_score or (actions[-1].get("actionType"), actions[-1].get("subType")) != ("game", "end"):
+            log["steps"].append({"step": "archivePlaybyplay", "gameId": game_id, **pmeta,
+                                 "result": "MISMATCH", "error": f"PBP score {actual}, final action {actions[-1].get('actionType')}/{actions[-1].get('subType')} != completed box {expected_score}"})
+            return wrote  # no provisional actions can masquerade as complete Final
+    pbp_written = store_compact(
+        pbp_path, live_playbyplay_url(game_id),
+        {"gameId": game_id, "actionCount": len(actions), "actions": actions},
+        "all official play-by-play actions, fields copied field-for-field (subset of keys)",
+        source_sha256=pmeta.get("sourceSha256"), source_bytes=pmeta.get("bytes"),
+    )
+    wrote |= pbp_written
+    log["steps"].append({"step": "archivePlaybyplay", "gameId": game_id, **pmeta,
+                         "result": "OK", "actionCount": len(actions), "written": pbp_written})
+    print(f"[details] {game_id} actions={len(actions)} written={wrote}", flush=True)
     return wrote
 
 
@@ -578,7 +710,7 @@ def compact_card(cd: dict) -> dict | None:
                 "points": leader.get("points"), "rebounds": leader.get("rebounds"),
                 "assists": leader.get("assists"), "blocks": leader.get("blocks"),
                 "steals": leader.get("steals"),
-            } if leader else None,
+            } if leader.get("personId") and leader.get("name") else None,
         }
 
     bcs = cd.get("broadcasters") or {}
@@ -630,66 +762,116 @@ def cards_for_date(date_str: str, log: dict):
                              "result": f"PARSE_ERROR {exc}"})
         return None, meta
     props = ((nd.get("props") or {}).get("pageProps") or {})
-    feed = props.get("gameCardFeed") or {}
-    cards = [c for mod in (feed.get("modules") or []) for c in (mod.get("cards") or [])]
-    rows = [r for r in (compact_card((c or {}).get("cardData") or {}) for c in cards) if r]
+    selected = props.get("selectedDate")
+    # NBA currently server-renders this alongside the cards. When it is a date
+    # string, reject a redirected/default page rather than archive its empty feed
+    # as the requested night. Older page variants may omit this field entirely.
+    if isinstance(selected, str) and selected and not selected.startswith(date_str):
+        log["steps"].append({"step": "cards", "date": date_str, **meta,
+                             "result": "INVALID", "error": f"NBA page selected {selected}, not {date_str}"})
+        return None, meta
+    feed = props.get("gameCardFeed")
+    modules = feed.get("modules") if isinstance(feed, dict) else None
+    if not isinstance(modules, list):
+        log["steps"].append({"step": "cards", "date": date_str, **meta,
+                             "result": "INVALID", "error": "missing gameCardFeed.modules"})
+        return None, meta
+    try:
+        cards = []
+        for mod in modules:
+            if not isinstance(mod, dict) or not isinstance(mod.get("cards"), list):
+                raise ValueError("invalid cards module")
+            cards.extend(mod["cards"])
+        rows = []
+        for card in cards:
+            cd = card.get("cardData") if isinstance(card, dict) else None
+            if (not isinstance(cd, dict) or not valid_game_id(cd.get("gameId"))
+                    or not str(cd.get("gameTimeEastern") or "").startswith(date_str)
+                    or any(not isinstance(cd.get(t), dict) or not cd[t].get("teamId")
+                           or not cd[t].get("teamTricode") for t in ("homeTeam", "awayTeam"))):
+                raise ValueError("missing game identity or ET date differs from request")
+            rows.append(compact_card(cd))
+        if len({r["gameId"] for r in rows}) != len(rows):
+            raise ValueError("duplicate game IDs")
+    except ValueError as exc:
+        log["steps"].append({"step": "cards", "date": date_str, **meta,
+                             "result": "INVALID", "error": str(exc)})
+        return None, meta  # no silent dropping of bad rows or invented 0-game dates
     log["steps"].append({"step": "cards", "date": date_str, **meta, "result": "OK",
                          "gameCount": len(rows)})
     print(f"[cards] {date_str} cards={len(rows)}", flush=True)
     return rows, meta
 
 
-def sync_date_digest(date_str: str, log: dict, season: str, force: bool = False) -> bool:
-    """Archive the official scoreboard for one date (live, historical or future)."""
-    path = os.path.join(DATA, "scoreboard", f"{date_str}.json")
-    if not force and os.path.exists(path):
+def sync_date_digest(date_str: str, log: dict, season: str | None = None,
+                     force: bool = False) -> bool:
+    """Archive one NBA date; re-read unfinished rows until NBA marks them final.
+
+    A date that is 'yesterday' in UTC may still have games live in the US. It must
+    not get frozen as an incomplete historical scoreboard at the first fetch.
+    """
+    if not valid_date(date_str):
+        log["steps"].append({"step": "digest", "date": date_str, "result": "INVALID"})
         return False
+    path = os.path.join(DATA, "scoreboard", f"{date_str}.json")
+    existing = load_json(path)
+    scheduled = known_schedule_game_ids(date_str)
+    if not force and existing and isinstance(existing.get("games"), list):
+        games = existing["games"]
+        # A schedule published later can reveal that an earlier zero-card fetch
+        # was incomplete. Do not freeze that apparent empty night forever.
+        if games and all(g.get("gameStatus") == 3 for g in games):
+            return True
+        if not games and not scheduled:
+            return True
     rows, meta = cards_for_date(date_str, log)
     if rows is None:
         return False
+    if not rows and scheduled:
+        log["steps"].append({"step": "cardsVsSchedule", "date": date_str,
+                             "url": games_page_url(date_str), "result": "MISMATCH",
+                             "error": f"NBA date page has zero cards; NBA schedule lists {len(scheduled)} games"})
+        return False
     rows.sort(key=lambda r: (r.get("gameTimeUtc") or "", r.get("gameId") or ""))
-    content = {
-        "gameDate": date_str,
-        "gameCount": len(rows),
-        "games": rows,
-        "sourcePage": games_page_url(date_str),
-    }
+    content = {"gameDate": date_str, "gameCount": len(rows), "games": rows,
+               "sourcePage": games_page_url(date_str)}
     written = store_compact(path, games_page_url(date_str), content,
                             "rows copied from the official NBA.com game cards for this date",
                             source_sha256=meta.get("sourceSha256"), source_bytes=meta.get("bytes"))
     log["steps"].append({"step": "digest", "date": date_str, "result": "OK",
                          "gameCount": len(rows), "written": written})
     print(f"[digest] {date_str} OK games={len(rows)} written={written}", flush=True)
-    return written
+    return True
 
 
 def verify_digest_against_boxscore(date_str: str, log: dict) -> None:
-    """Cross-check an archived date against official CDN box scores (2019-20+ only).
+    """Compare final date cards with *archived official* box scores, when available.
 
-    Independent-source check: the card digest comes from www.nba.com HTML, the box
-    score from cdn.nba.com JSON. If the final scores disagree, the run is flagged.
+    Never infer a box score exists from the game ID: the CDN is only confirmed for
+    sampled games from 2019-20 on and older files may be missing or pruned.
     """
-    digest = load_json(os.path.join(DATA, "scoreboard", f"{date_str}.json"))
-    if not digest:
-        return
+    digest = load_json(os.path.join(DATA, "scoreboard", f"{date_str}.json")) or {}
     for g in digest.get("games", []):
         gid = g.get("gameId")
-        if not gid or str(gid) < "0021900001":  # CDN game files start with 2019-20
+        if g.get("gameStatus") != 3 or not valid_game_id(gid):
             continue
-        box, meta = http_get(live_boxscore_url(gid), CDN_HEADERS)
-        if not box or not isinstance(box.get("game"), dict):
-            continue
-        official = box["game"]
-        hb = (official.get("homeTeam") or {}).get("score")
-        ab = (official.get("awayTeam") or {}).get("score")
-        hd = (g.get("home") or {}).get("score")
-        ad = (g.get("away") or {}).get("score")
-        match = (hb == hd and ab == ad)
-        log["steps"].append({"step": "verifyScore", "gameId": gid, "result": "OK" if match else "MISMATCH",
-                             "cards": f"{ad}-{hd}", "cdnBoxscore": f"{ab}-{hb}",
-                             **{k: meta.get(k) for k in ("httpStatus", "bytes")}})
-        if not match:
-            print(f"[verify] MISMATCH {gid}: cards {ad}-{hd} vs boxscore {ab}-{hb} — flagged", flush=True)
+        box = load_json(os.path.join(DATA, "games", gid, "boxscore.json")) or {}
+        official = box.get("game")
+        if not isinstance(official, dict) or official.get("gameStatus") != 3:
+            continue  # not cross-checked; do not claim otherwise
+        matches = official.get("gameId") == gid
+        for side in ("home", "away"):
+            team = official.get(f"{side}Team") or {}
+            card = g.get(side) or {}
+            matches &= (team.get("teamId") == card.get("teamId") and
+                        str(team.get("score")) == str(card.get("score")))
+        entry = {"step": "verifyScore", "gameId": gid, "date": date_str,
+                 "url": box.get("_sync", {}).get("source"),
+                 "cardsSource": digest.get("_sync", {}).get("source"),
+                 "result": "OK" if matches else "MISMATCH"}
+        log["steps"].append(entry)
+        if not matches:
+            print(f"[verify] MISMATCH {gid} between official cards and CDN box score", flush=True)
 
 
 def sync_schedule(log: dict) -> None:
@@ -699,10 +881,13 @@ def sync_schedule(log: dict) -> None:
         print(f"[schedule] FAILED status={meta.get('httpStatus')}", flush=True)
         return
     compact = compact_schedule(payload)
-    if not compact:
-        log["steps"].append({"step": "schedule", **meta, "result": "SHAPE_UNKNOWN"})
+    if (not compact or not re.fullmatch(r"\d{4}-\d{2}", str(compact.get("season")))
+            or compact.get("leagueId") != "00" or not compact["gameCount"]
+            or len({g["gameId"] for g in compact["games"]}) != compact["gameCount"]):
+        log["steps"].append({"step": "schedule", **meta, "result": "INVALID",
+                             "error": "season, league, games or unique IDs missing"})
         return
-    season = compact.get("season") or "unknown"
+    season = compact["season"]
     path = os.path.join(DATA, "schedule", f"{season}.json")
     written = store_compact(path, SEASON_SCHEDULE_URL, compact,
                             "official season schedule; includes future games (verified)",
@@ -719,25 +904,38 @@ def sync_archive_pending(log: dict, days: int, max_games: int = ARCHIVE_MAX_GAME
     play-by-play, so the pipeline archives the newest games first and stops at the
     cap (the next run continues where this one left off).
     """
-    archived = 0
+    attempted = 0
     today = dt.datetime.now(dt.timezone.utc).date()
     for offset in range(1, days + 1):
-        if archived >= max_games:
+        if attempted >= max_games:
             break
         date_str = (today - dt.timedelta(days=offset)).isoformat()
-        digest = load_json(os.path.join(DATA, "scoreboard", f"{date_str}.json"))
-        if not digest:
-            continue
+        digest = load_json(os.path.join(DATA, "scoreboard", f"{date_str}.json")) or {}
         for g in digest.get("games", []):
             gid = g.get("gameId")
-            if not gid:
+            if g.get("gameStatus") != 3 or not valid_game_id(gid) or not detail_era(g):
                 continue
-            if os.path.exists(os.path.join(DATA, "games", gid, "boxscore.json")):
+            box = load_json(os.path.join(DATA, "games", gid, "boxscore.json")) or {}
+            pbp_path = os.path.join(DATA, "games", gid, "playbyplay.json")
+            bg = box.get("game") or {}
+            pbp_file = load_json(pbp_path) or {}
+            actions = pbp_file.get("actions") or []
+            matches = bg.get("gameStatus") == 3 and all(
+                (bg.get(f"{side}Team") or {}).get("teamId") == (g.get(side) or {}).get("teamId")
+                and str((bg.get(f"{side}Team") or {}).get("score")) == str((g.get(side) or {}).get("score"))
+                for side in ("home", "away"))
+            complete = bool(actions and actions[-1].get("actionType") == "game"
+                            and actions[-1].get("subType") == "end"
+                            and last_action_score(actions) == (
+                                str((bg.get("awayTeam") or {}).get("score")),
+                                str((bg.get("homeTeam") or {}).get("score"))))
+            if matches and complete:
                 continue
-            if archive_game(gid, log):
-                archived += 1
-            if archived >= max_games:
+            archive_game(gid, log, force=True, expected=g)
+            attempted += 1  # bound failed attempts too; retry on the next run
+            if attempted >= max_games:
                 break
+        verify_digest_against_boxscore(date_str, log)
 
 
 def backfill_history_step(log: dict, batch: int = 6) -> None:
@@ -757,19 +955,13 @@ def backfill_history_step(log: dict, batch: int = 6) -> None:
             print("[backfill] reached earliest target", flush=True)
             break
         path = os.path.join(DATA, "scoreboard", f"{cursor}.json")
-        if os.path.exists(path):
+        existing = load_json(path)
+        if existing and (existing.get("gameCount") != 0 or not known_schedule_game_ids(cursor)):
             cursor = (dt.date.fromisoformat(cursor) - dt.timedelta(days=1)).isoformat()
             continue
-        rows, meta = cards_for_date(cursor, log)
-        if rows is None:
-            break  # network problem: try again next run
-        content = {"gameDate": cursor, "gameCount": len(rows), "games": rows,
-                   "sourcePage": games_page_url(cursor)}
-        store_compact(path, games_page_url(cursor), content,
-                      "rows copied from the official NBA.com game cards for this date",
-                      source_sha256=meta.get("sourceSha256"), source_bytes=meta.get("bytes"))
-        if rows:
-            verify_digest_against_boxscore(cursor, log)
+        if not sync_date_digest(cursor, log, force=True):
+            break  # NBA failure/mismatch: retry the same date on the next full run
+        verify_digest_against_boxscore(cursor, log)
         fetched += 1
         cursor = (dt.date.fromisoformat(cursor) - dt.timedelta(days=1)).isoformat()
     state["nextDate"] = cursor
@@ -814,7 +1006,7 @@ def prune_details(log: dict, budget_bytes: int = PBP_BUDGET_BYTES,
             continue  # playoffs and recent games stay
         os.remove(pbp_path)
         freed += size
-        log["steps"].append({"step": "prunePlaybyplay", "gameId": gid, "result": "OK",
+        log["steps"].append({"step": "prunePlaybyplay", "gameId": gid, "result": "OK", "written": True,
                              "note": f"removed {size} B to stay under the {budget_bytes // (1024*1024)} MB archive budget; "
                                      f"box score kept, restore with --date … --with-games --force"})
     print(f"[prune] archive was {total // 1024} KB, freed {freed // 1024} KB", flush=True)
@@ -872,12 +1064,13 @@ def build_index(log: dict) -> None:
             "note": "Every file keeps the official source URL and a sha256 of the payload it was built from.",
         },
         "live": None,
-        "plays": None,
         "heartbeat": {
-            "lastCheckedUtc": log.get("runStartedUtc"),
-            "lastMeaningfulUtc": heartbeat.get("lastMeaningfulUtc"),
-            "mode": log.get("mode"),
+            "lastCheckedUtc": heartbeat.get("lastCheckedUtc"),
+            "lastSuccessfulLiveUtc": heartbeat.get("lastSuccessfulLiveUtc"),
+            "lastResult": heartbeat.get("lastResult"),
+            "mode": heartbeat.get("mode"),
         },
+        "issues": heartbeat.get("issues") or [],
         "scoreboards": {},
         "games": {},
         "schedules": {},
@@ -900,14 +1093,6 @@ def build_index(log: dict) -> None:
             "feedDate": sb.get("gameDate"),
             "gameCount": len(sb.get("games") or []),
             "liveCount": sum(1 for g in sb.get("games") or [] if g.get("gameStatus") == 2),
-        }
-    plays = load_json(os.path.join(DATA, "live", "plays.json"))
-    if plays:
-        index["plays"] = {
-            "path": "data/live/plays.json",
-            "sources": (plays.get("_sync") or {}).get("sources"),
-            "fetchedAtUtc": plays["_sync"].get("fetchedAtUtc"),
-            "gameCount": len(plays.get("games") or {}),
         }
     for name in sorted(os.listdir(os.path.join(DATA, "scoreboard"))) if os.path.isdir(os.path.join(DATA, "scoreboard")) else []:
         if not name.endswith(".json"):
@@ -940,7 +1125,6 @@ def build_index(log: dict) -> None:
                 "hasPlaybyplay": os.path.exists(os.path.join(games_dir, gid, "playbyplay.json")),
                 "officialBoxscore": box["_sync"]["source"],
             }
-    del heartbeat
     for name in sorted(os.listdir(os.path.join(DATA, "schedule"))) if os.path.isdir(os.path.join(DATA, "schedule")) else []:
         if not name.endswith(".json"):
             continue
@@ -965,36 +1149,32 @@ def build_index(log: dict) -> None:
 
 
 def append_log(log: dict) -> bool:
-    """Store the run record — but only when storing it says something new.
-
-    Every run is a fetch worth recording, yet a run that changed nothing and failed
-    nothing is identical in substance to the one before it (the 10-minute live check of
-    an empty offseason feed). Storing those one by one produced a commit every 10
-    minutes and, with it, a Pages build every 10 minutes. So: runs that wrote files or
-    failed are always stored, and runs that changed nothing update a single hourly
-    heartbeat instead. Full detail is kept for the last 30 stored runs.
-    """
+    """Store noteworthy runs and one liveness heartbeat per hour (not a commit/tick)."""
     history = load_json(LOG_PATH) or {"runs": []}
-    runs = history.get("runs") or []
-    summary = log.get("summary") or {}
-    meaningful = (summary.get("written") or 0) > 0 or (summary.get("failed") or 0) > 0 \
-        or log.get("mode") != "live"
-    hour = (log.get("runStartedUtc") or "")[:13]
     previous = history.get("heartbeat") or {}
+    summary = log.get("summary") or {}
+    issues = [{k: step[k] for k in ("step", "date", "gameId", "url", "result", "error") if k in step}
+              for step in log["steps"] if step.get("result") != "OK"][:20]
+    meaningful = (summary.get("written") or 0) > 0 or bool(issues) or (
+        previous.get("lastResult") not in (None, "OK") and not issues)
+    hour = (log.get("runStartedUtc") or "")[:13]
+    if not meaningful and previous.get("hour") == hour:
+        return False  # successful no-op in this hour: no commit, no fictitious check time
+    live_ok = any(s.get("step") == "live" and s.get("result") == "OK" for s in log["steps"])
     history["heartbeat"] = {
         "hour": hour,
-        "lastCheckedUtc": log.get("runStartedUtc"),
-        "lastMeaningfulUtc": log.get("runStartedUtc") if meaningful else previous.get("lastMeaningfulUtc"),
-        "liveChecksCounted": ((previous.get("liveChecksCounted") or 0) + 1) if not meaningful else 0,
-        "note": "Live checks that changed no file and failed nothing are counted here by hour "
-                "instead of being stored run by run; runs that changed something are below.",
+        "lastCheckedUtc": log["runStartedUtc"],
+        "lastSuccessfulLiveUtc": log["runStartedUtc"] if live_ok else previous.get("lastSuccessfulLiveUtc"),
+        "lastMeaningfulUtc": log["runStartedUtc"] if meaningful else previous.get("lastMeaningfulUtc"),
+        "lastResult": "ISSUES" if issues else "OK",
+        "mode": log.get("mode"),
+        "issues": issues,
+        "note": "Unchanged successful checks publish at most one hourly heartbeat; failed or "
+                "changed runs are stored below (last 30).",
     }
-    history["_note"] = ("Machine-written record of each run: official endpoint called, HTTP "
-                        "status, bytes, and how many games/actions came back.")
-    if not meaningful and previous.get("hour") == hour:
-        return False  # nothing new to say this hour: leave the file (and the repo) alone
-    runs.insert(0, log)
-    history["runs"] = runs[:MAX_LOG_RUNS]
+    history["_note"] = "Last 30 changed/failed runs, plus an hourly successful-check heartbeat."
+    if meaningful:
+        history["runs"] = [log] + (history.get("runs") or [])[:MAX_LOG_RUNS - 1]
     write_json(LOG_PATH, history)
     return True
 
@@ -1009,6 +1189,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=["live", "daily", "full", "refresh"], default="live")
     ap.add_argument("--date", help="build data/scoreboard/<date>.json for this date")
+    ap.add_argument("--game", help="re-verify one official NBA gameId's box score and full PBP")
     ap.add_argument("--season", default=None)
     ap.add_argument("--history-days", type=int, default=HISTORY_DAYS_DEFAULT)
     ap.add_argument("--force", action="store_true", help="rewrite even if unchanged")
@@ -1019,22 +1200,28 @@ def main() -> int:
     season = args.season or default_season()
     log = {"runStartedUtc": now_utc(), "mode": args.mode, "season": season, "steps": []}
 
-    sync_live(log)
-    # Archive any of today's games that just went final.
-    live = load_json(os.path.join(DATA, "live", "scoreboard.json"))
-    if live:
-        for g in ((live.get("scoreboard") or {}).get("scoreboard") or {}).get("games") or []:
-            if g.get("gameStatus") == 3 and g.get("gameId"):
-                archive_game(g["gameId"], log)
+    if args.date and not valid_date(args.date):
+        ap.error("--date must be a real YYYY-MM-DD calendar date")
+    if args.game and not valid_game_id(args.game):
+        ap.error("--game must be a ten-digit official NBA gameId")
+    sync_live(log)  # also updates complete box/PBP for each game in progress
+
+    if args.game:
+        archive_game(args.game, log, force=True)
+        recorded = load_json(os.path.join(DATA, "games", args.game, "boxscore.json")) or {}
+        game_et = ((recorded.get("game") or {}).get("gameEt") or "")[:10]
+        if valid_date(game_et):
+            verify_digest_against_boxscore(game_et, log)
 
     if args.date:
-        sync_date_digest(args.date, log, season, force=True)
-        if args.with_games:
-            digest = load_json(os.path.join(DATA, "scoreboard", f"{args.date}.json"))
-            for g in (digest or {}).get("games", []):
-                gid = str(g.get("gameId") or "")
-                if gid and gid >= "0021900001":  # CDN game files exist from 2019-20 on
-                    archive_game(gid, log, force=args.force)
+        date_ok = sync_date_digest(args.date, log, season, force=True)
+        if args.with_games and date_ok:
+            digest = load_json(os.path.join(DATA, "scoreboard", f"{args.date}.json")) or {}
+            for g in digest.get("games", []):
+                if (g.get("gameStatus") == 3 and valid_game_id(g.get("gameId"))
+                        and detail_era(g)):
+                    archive_game(g["gameId"], log, force=args.force, expected=g)
+            verify_digest_against_boxscore(args.date, log)
 
     if args.mode in ("daily", "full"):
         today = dt.datetime.now(dt.timezone.utc).date()
@@ -1060,16 +1247,16 @@ def main() -> int:
             for date_str in pending[-BACKFILL_MAX_DATES:]:
                 sync_date_digest(date_str, log, season, force=True)
 
-    build_index(log)
     log["runFinishedUtc"] = now_utc()
     log["summary"] = {
         "ok": sum(1 for s in log["steps"] if s.get("result") == "OK"),
-        "failed": sum(1 for s in log["steps"] if s.get("result") == "FAILED"),
+        "failed": sum(1 for s in log["steps"] if s.get("result") != "OK"),
         "written": sum(1 for s in log["steps"] if s.get("written")),
     }
     logged = append_log(log)
+    build_index(log)  # read the persisted heartbeat; don't manufacture a commit/tick
     print(f"[done] {log['summary']} log={logged}", flush=True)
-    return 0
+    return 1 if log["summary"]["failed"] else 0
 
 
 if __name__ == "__main__":

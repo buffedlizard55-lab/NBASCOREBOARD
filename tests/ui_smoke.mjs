@@ -1,161 +1,227 @@
-/* Headless smoke test: real index.html + app.js, real committed data/ files.
- *
- * Requires Node >= 22 (jsdom 30 pulls an undici build that needs it); the CI workflow
- * pins that version so this never fails for a mysterious reason.
+/* jsdom regression suite: the real page against committed NBA data and explicit
+ * synthetic in-progress responses. Synthetic data is ONLY in memory in this test.
  */
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { JSDOM } from 'jsdom';
 
-let JSDOM;
-try {
-  ({ JSDOM } = await import('jsdom'));
-} catch (e) {
-  console.error(`Could not load jsdom on Node ${process.version}: ${e.message}`);
-  console.error('Run this with Node >= 22 (the CI workflow pins it), after: npm --prefix tests install');
-  process.exit(1);
-}
-
-import { fileURLToPath } from 'url';
-const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const html = fs.readFileSync(path.join(REPO, 'index.html'), 'utf8');
-const appjs = fs.readFileSync(path.join(REPO, 'app.js'), 'utf8');
-
-const errors = [];
-const warnings = [];
-
-const index = JSON.parse(fs.readFileSync(path.join(REPO, 'data/index.json'), 'utf8'));
-const live = JSON.parse(fs.readFileSync(path.join(REPO, 'data/live/scoreboard.json'), 'utf8'));
-const feedDate = live.feedDate;
-const archivedDate = index.scoreboards['2024-11-04'] ? '2024-11-04' : Object.keys(index.scoreboards).sort().filter((d) => index.scoreboards[d].gameCount > 1).pop();
-const archivedCount = index.scoreboards[archivedDate].gameCount;
-// Playoff games are never pruned, so their detail archive is always present.
-const detailGame = Object.keys(index.games).filter((g) => g.startsWith('004')).pop() || Object.keys(index.games).pop();
-
-const dom = new JSDOM(html, { runScripts: 'outside-only', url: 'https://buffedlizard55-lab.github.io/NBASCOREBOARD/', pretendToBeVisual: true });
-const { window } = dom;
-window.addEventListener('error', (e) => errors.push(`window error: ${e.message}`));
-
-// fetch shim → read from ./data in the repo
-window.fetch = async (url) => {
-  const rel = String(url).replace(/^https?:\/\/[^/]+\/NBASCOREBOARD\//, '').replace(/^\.\//, '');
-  const file = path.join(REPO, rel);
-  if (!fs.existsSync(file)) return { ok: false, status: 404, async json() { throw new Error('not found'); } };
-  const body = fs.readFileSync(file, 'utf8');
-  return { ok: true, status: 200, async json() { return JSON.parse(body); } };
-};
-window.console.info = () => {};
-window.console.warn = (...a) => warnings.push(a.join(' '));
-window.scrollTo = () => {};
-
-window.document.addEventListener('DOMContentLoaded', () => {});
-
-// run the app
-window.eval(appjs);
-// jsdom fires DOMContentLoaded on its own during parse; if init already missed it, call it
-await new Promise((r) => setTimeout(r, 900));
-
-const doc = window.document;
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const read = (name) => JSON.parse(fs.readFileSync(path.join(ROOT, name), 'utf8'));
+const index = read('data/index.json');
+const live = read('data/live/scoreboard.json');
+const archived = read('data/scoreboard/2024-11-04.json');
+const old = read('data/scoreboard/1996-06-16.json');
+const future = read('data/scoreboard/2026-10-03.json');
+const box = read('data/games/0022400154/boxscore.json');
+const pbp = read('data/games/0022400154/playbyplay.json');
+const OFFICIAL = 'https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json';
+const dom = new JSDOM(fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8'), {
+  runScripts: 'outside-only', url: 'https://buffedlizard55-lab.github.io/NBASCOREBOARD/', pretendToBeVisual: true,
+});
+const { window } = dom, doc = window.document;
 const $ = (id) => doc.getElementById(id);
-const txt = (id) => ($(id)?.textContent || '').trim().replace(/\s+/g, ' ');
-const report = [];
-const check = (name, cond, detail = '') => report.push(`${cond ? 'PASS' : 'FAIL'}  ${name}${detail ? ' — ' + detail : ''}`);
+const text = (id) => ($(id)?.textContent || '').replace(/\s+/g, ' ').trim();
+const errors = [];
+window.addEventListener('error', (e) => errors.push(e.message));
+window.scrollTo = () => {};
+window.console.info = () => {};
+const wait = async (condition, label) => {
+  for (let attempt = 0; attempt < 150; attempt++) {
+    if (condition()) return;
+    await new Promise((r) => setTimeout(r, 20));
+  }
+  throw new Error(`Timed out: ${label}`);
+};
+let mockSnapshot = null, mockIndex = null, mockBox = null, mockPbp = null, directAllowed = false;
+window.fetch = async (url) => {
+  const target = String(url);
+  const pathname = target.replace(/^https?:\/\/[^/]+\/NBASCOREBOARD\//, '').split('?')[0];
+  let data;
+  if (target.startsWith('https://cdn.nba.com/')) {
+    if (!directAllowed) return { ok: false, status: 403 };
+    if (target.startsWith(OFFICIAL)) data = mockSnapshot.scoreboard;
+    else if (target.includes('boxscore_0022400154')) data = mockBox;
+    else if (target.includes('playbyplay_0022400154')) data = { game: { gameId: pbp.gameId, actions: pbp.actions } };
+    else return { ok: false, status: 404 };
+  } else if (pathname === 'data/live/scoreboard.json' && mockSnapshot) data = mockSnapshot;
+  else if (pathname === 'data/index.json' && mockIndex) data = mockIndex;
+  else if (pathname === 'data/games/0022400154/boxscore.json' && mockBox) data = mockBox;
+  else if (pathname === 'data/games/0022400154/playbyplay.json' && mockPbp) data = mockPbp;
+  else {
+    const file = path.resolve(ROOT, pathname);
+    if (!file.startsWith(ROOT + path.sep) || !fs.existsSync(file)) return { ok: false, status: 404 };
+    data = read(pathname);
+  }
+  return { ok: true, status: 200, async json() { return structuredClone(data); } };
+};
+window.eval(fs.readFileSync(path.join(ROOT, 'app.js'), 'utf8'));
+await wait(() => window.NBAScoreboard.state.live && window.NBAScoreboard.state.schedule, 'initial NBA data');
+const app = window.NBAScoreboard;
+const checks = [];
+const check = (label, okay, context = '') => checks.push({ label, okay: !!okay, context });
+const click = (id) => $(id).dispatchEvent(new window.Event('click', { bubbles: true }));
+const change = (id) => $(id).dispatchEvent(new window.Event('change', { bubbles: true }));
+const input = (id) => $(id).dispatchEvent(new window.Event('input', { bubbles: true }));
 
-// ---- live view
-check('status bar shows the official feed date', txt('statusText').includes(feedDate), txt('statusText'));
-check('status meta names the snapshot age', /snapshot/.test(txt('statusMeta')), txt('statusMeta'));
-check('freshness pill filled', txt('freshnessPill').startsWith('snapshot'), txt('freshnessPill'));
-check('build info shows archived counts', /archived dates: \d+/.test(txt('buildInfo')), txt('buildInfo'));
-check('season selector populated', $('seasonSelect').innerHTML.includes(Object.keys(index.schedules).pop()));
-check('archive chips rendered', $('archiveList').querySelectorAll('button.chip').length === Object.keys(index.scoreboards).length,
-  `${$('archiveList').querySelectorAll('button.chip').length} chips for ${Object.keys(index.scoreboards).length} archived dates`);
+// Pass 1: a static Pages reader should not mistake snapshots for a direct stream.
+check('feed date visible with ET label', text('liveDatePill').includes(`${live.feedDate} (ET)`), text('liveDatePill'));
+check('capture time shown, not a guessed current score', text('provLive').length > 5 && text('freshnessPill').includes('captured'));
+check('fetch evidence and NBA data links are present', doc.querySelector('#sources a[href="data/verification/sync-log.json"]')
+  && doc.querySelector('#sources a[href="https://www.nba.com/games?date=1996-06-16"]'));
+check('only game dates offered as archive shortcuts', $('archiveList').querySelectorAll('button').length ===
+  Object.values(index.scoreboards).filter((s) => s.gameCount > 0).length);
+check('schedule is bounded to 7 game days by default', $('scheduleContent').querySelectorAll('.schedule-day').length === 7);
+$('scheduleRange').value = 'all'; change('scheduleRange');
+check('full official season is available on request', $('scheduleContent').querySelectorAll('.schedule-day').length > 100);
+$('scheduleRange').value = 'next'; change('scheduleRange');
+$('scheduleFilter').value = 'Lakers'; input('scheduleFilter');
+check('schedule team search reduces dates', $('scheduleContent').querySelectorAll('.schedule-day').length <= 7
+  && $('scheduleContent').textContent.includes('LAL'));
+$('scheduleFilter').value = ''; input('scheduleFilter');
 
-// ---- date view (historical)
-await window.NBAScoreboard.loadDate(archivedDate);
-check('date view status', txt('statusText').includes(`${archivedCount} games archived for ${archivedDate}`), txt('statusText'));
-const dateRows = $('dateResult').querySelectorAll('.game-row').length;
-check('archived rows rendered', dateRows === archivedCount, `${dateRows} rows for ${archivedCount} games`);
-check('row links to the official date page',
-  $('dateResult').innerHTML.includes(`nba.com/games?date=${archivedDate}`));
+// A missing date never asserts there were no games, and cannot escape data/.
+await app.loadDate('1985-06-09');
+check('unarchived date not mislabelled no games', /not been captured/.test(text('dateResult'))
+  && !/No games on 1985/.test(text('gamesStrip')), text('dateResult'));
+check('NBA.com review link for missing date', $('dateResult').innerHTML.includes('nba.com/games?date=1985-06-09'));
+check('path traversal / invalid calendar dates rejected', (await app.loadDate('../index')) === false
+  && text('dateResult').includes('valid YYYY-MM-DD') && (await app.loadDate('2026-02-30')) === false);
 
-// ---- a pre-2019 date (no box score archive available, quarters only)
-await window.NBAScoreboard.loadDate('1996-06-16');
-check('1996 date renders', /1 games archived for 1996-06-16/.test(txt('statusText')), txt('statusText'));
-check('1996 quarter scores present', $('dateResult').innerHTML.includes('87'));
+await app.loadDate('2024-11-04');
+check('15 archived NBA.com game cards rendered', $('gamesStrip').querySelectorAll('.game-row').length === archived.gameCount);
+check('score on card matches committed official digest', $('gamesStrip').textContent.includes('116')
+  && $('gamesStrip').textContent.includes('114'));
+check('historic source URL visible', $('dateResult').innerHTML.includes('nba.com/games?date=2024-11-04'));
+$('gameSearch').value = 'Cavaliers'; input('gameSearch');
+check('team search filters score rows', $('gamesStrip').querySelectorAll('.game-row').length >= 1
+  && $('gamesStrip').querySelectorAll('.game-row').length < archived.gameCount);
+$('gameSearch').value = ''; input('gameSearch');
+click('cardsViewBtn');
+check('cards toggle is accessible', $('cardsViewBtn').getAttribute('aria-pressed') === 'true'
+  && $('gamesGrid').querySelectorAll('.game-card').length === archived.gameCount);
+click('stripViewBtn');
+await app.openGame('0022400154');
+check('selected game opens correct away/home (not a stale season-schedule row)', text('detailTitle').includes('MIL @ CLE'));
+check('player stats render from archived NBA box score', $('boxscoreContent').textContent.includes('Darius Garland')
+  && $('boxscoreContent').textContent.includes(String(box.game.homeTeam.score)));
+const count = $('playbyplayContent').querySelectorAll('.pbp-row').length;
+check('complete official PBP displayed with source link', count === pbp.actions.length &&
+  $('playbyplayContent').innerHTML.includes('cdn.nba.com/static/json/liveData/playbyplay'), `${count} vs ${pbp.actions.length}`);
+check('latest action shown first', $('playbyplayContent').querySelector('.pbp-row')?.textContent.includes('Game End'));
+click('pbpOrderBtn');
+check('oldest first toggle works', $('playbyplayContent').querySelector('.pbp-row')?.textContent.includes('Period Start'));
+$('periodFilter').value = '4'; change('periodFilter');
+check('Q4 filter narrows plays', $('playbyplayContent').querySelectorAll('.pbp-row').length > 0
+  && $('playbyplayContent').querySelectorAll('.pbp-row').length < count);
+$('periodFilter').value = 'all'; change('periodFilter');
+$('searchActions').value = '3PT'; input('searchActions');
+check('text filter finds official play descriptions', $('playbyplayContent').querySelectorAll('.pbp-row').length > 0
+  && $('playbyplayContent').querySelectorAll('.pbp-row').length < count);
+$('searchActions').value = ''; input('searchActions');
 
-// ---- a future date (scheduled game, no "Invalid Date")
-await window.NBAScoreboard.loadDate('2026-10-03');
-const future = $('dateResult').innerHTML;
-check('future game renders', future.includes('Raptors') || future.includes('TOR'), '');
-check('future game shows the ET tip-off text', future.includes('7:00 pm ET'));
-check('future game shows a local time from real UTC', /Oct/.test(future) || /\d+:\d\d/.test(future));
+await app.loadDate('1996-06-16');
+check('older Finals date has official scores, not fabricated stats', text('gamesStrip').includes('75')
+  && text('gamesStrip').includes('87') && old.gameCount === 1);
+await app.openGame('0049500068');
+check('older game reports unavailable detailed files', text('boxscoreContent').includes('Player stats unavailable')
+  && text('playbyplayContent').includes('unavailable here'));
+await app.loadDate('2026-10-03');
+check('future preseason matchup is available', text('gamesStrip').includes('MIA') && future.gameCount === 1);
+check('pregame scores are not displayed as actual 0–0', $('gamesStrip').querySelector('.total')?.textContent === 'T'
+  && [...$('gamesStrip').querySelectorAll('td.total')].every((e) => e.textContent === '—'));
+check('correct ET tip text and local converted time visible', text('gamesStrip').includes('7:00 pm ET')
+  && text('gamesStrip').includes('Oct'));
+await app.loadDate('2026-10-04');
+check('not-yet-archived date falls back to official season schedule', text('dateResult').includes('published season schedule'));
 
-// ---- unarchived date → graceful message + official link
-await window.NBAScoreboard.loadDate('1985-06-09');
-check('unarchived date explains itself', /not archived yet/.test(txt('statusText')), txt('statusText'));
-check('unarchived date links to nba.com',
-  $('dateResult').innerHTML.includes('nba.com/games?date=1985-06-09'));
-check('stale rows cleared', $('gamesStrip').innerHTML.includes('Nothing archived') || $('gamesStrip').innerHTML.includes('No games'), $('gamesStrip').innerHTML.slice(0, 80));
+// A late response for an older date or game must never overwrite a newer choice.
+const originalFetch = window.fetch;
+let releaseDate, dateStarted = false;
+const delayedDate = new Promise((r) => { releaseDate = r; });
+window.fetch = async (url) => {
+  if (String(url).includes('data/scoreboard/2024-11-04.json')) { dateStarted = true; await delayedDate; }
+  return originalFetch(url);
+};
+const oldRequest = app.loadDate('2024-11-04');
+await wait(() => dateStarted, 'slow date request started');
+await app.loadDate('1996-06-16');
+releaseDate(); await oldRequest;
+check('out-of-order date response cannot replace a newer date', text('viewDatePill').includes('1996-06-16')
+  && $('gamesStrip').querySelectorAll('.game-row').length === 1);
+window.fetch = originalFetch;
+await app.loadDate('2024-11-04');
+let releaseBox, boxStarted = false;
+const delayedBox = new Promise((r) => { releaseBox = r; });
+window.fetch = async (url) => {
+  if (String(url).includes('data/games/0022400154/boxscore.json')) { boxStarted = true; await delayedBox; }
+  return originalFetch(url);
+};
+const oldGame = app.openGame('0022400154');
+await wait(() => boxStarted, 'slow game request started');
+await app.openGame('0022400155');
+releaseBox(); await oldGame;
+check('out-of-order game detail cannot replace a newer game', text('detailTitle').includes('0022400155')
+  && text('boxscoreContent').includes('Wizards') && !text('boxscoreContent').includes('Cavaliers'));
+window.fetch = originalFetch;
 
-// ---- game detail: an archived game (playoff games always keep their full detail)
-await window.NBAScoreboard.openGame(detailGame);
-await new Promise((r) => setTimeout(r, 400));
-const box = $('boxscoreContent').innerHTML;
-const pbp = $('playbyplayContent').innerHTML;
-const archived = index.games[detailGame];
-check('box score rendered', box.includes(String(archived.homeScore)) && box.includes(String(archived.awayScore)),
-  `${archived.awayScore}-${archived.homeScore} ${archived.away}@${archived.home}`);
-check('minutes formatted (not raw ISO)', !/PT\d+M/.test(box), box.match(/PT\d+M[\d.]+S/)?.[0] || '');
-const pbpRows = (pbp.match(/pbp-row/g) || []).length;
-check('play-by-play rendered', pbpRows > 200, `${pbpRows} rows for ${detailGame}`);
-check('pbp shows the official source link', pbp.includes('cdn.nba.com/static/json/liveData/playbyplay'));
-// filters
-$('periodFilter').value = '4';
-$('periodFilter').dispatchEvent(new window.Event('change'));
-const q4 = ($('playbyplayContent').innerHTML.match(/pbp-row/g) || []).length;
-check('period filter narrows the list', q4 > 0 && q4 < pbpRows, `${q4} Q4 rows of ${pbpRows}`);
-$('periodFilter').value = 'all';
-$('periodFilter').dispatchEvent(new window.Event('change'));
-$('searchActions').value = '3pt';
-$('searchActions').dispatchEvent(new window.Event('input'));
-const three = ($('playbyplayContent').innerHTML.match(/pbp-row/g) || []).length;
-check('text filter narrows the list', three > 0 && three < pbpRows, `${three} rows for “3pt”`);
-check('filtered rows mention the query', /3PT/i.test($('playbyplayContent').innerHTML));
-$('searchActions').value = '';
-$('searchActions').dispatchEvent(new window.Event('input'));
+// Synthetic live case: official-shaped samples from an archived NBA game, changed
+// IN MEMORY to an in-progress state. This tests the user journey without guessing
+// whether actual games are underway on the day the test runs.
+const id = '0022400154';
+const now = new Date().toISOString();
+const liveGame = {
+  gameId: id, gameStatus: 2, gameStatusText: 'Q4', gameClock: 'PT02M12.00S', period: 4,
+  gameEt: now, homeTeam: box.game.homeTeam, awayTeam: box.game.awayTeam,
+  gameLeaders: { homeLeaders: { name: 'Darius Garland', points: '39' } },
+};
+mockSnapshot = { _sync: { source: OFFICIAL, fetchedAtUtc: now },
+  scoreboard: { scoreboard: { gameDate: new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York',
+    year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()).replace(/\//g, '-'), games: [liveGame] } } };
+// Use the app's NBA date from the committed feed if the test runner is in another
+// calendar year; the in-memory game is synthetic and is never written to data/.
+mockSnapshot.scoreboard.scoreboard.gameDate = live.feedDate;
+mockIndex = structuredClone(index);
+mockIndex.heartbeat = { lastCheckedUtc: now, lastSuccessfulLiveUtc: now, lastResult: 'OK', mode: 'live' };
+mockIndex.live = { ...index.live, fetchedAtUtc: now, feedDate: live.feedDate, gameCount: 1, liveCount: 1 };
+mockIndex.issues = [];
+mockBox = structuredClone(box); mockBox.game.gameStatus = 2;
+mockPbp = structuredClone(pbp);
+app.backToLive();
+await wait(() => app.state.live?.games.length === 1 && app.state.date === null, 'synthetic live game');
+check('in-progress scoreboard has period, clock and NBA team scores', text('gamesStrip').includes('LIVE')
+  && text('gamesStrip').includes('Q4') && text('gamesStrip').includes('2:12'));
+await app.openGame(id);
+check('live game has player box score BEFORE final', text('boxscoreContent').includes('Darius Garland'));
+check('live game has all actions, not last 80', $('playbyplayContent').querySelectorAll('.pbp-row').length === pbp.actions.length);
+mockSnapshot._sync.fetchedAtUtc = new Date(Date.now() - 2 * 3600 * 1000).toISOString();
+await app.loadLive({ quiet: true });
+check('old game state is labelled LAST SEEN LIVE even if the last NBA check is recent',
+  app.state.isStale && text('gamesStrip').includes('LAST SEEN LIVE') && !$('freshnessAlert').classList.contains('hidden'));
+mockSnapshot._sync.fetchedAtUtc = now;
+await app.loadLive({ quiet: true });
+const dateBefore = app.state.live.feedDate;
+mockSnapshot = { ...mockSnapshot, scoreboard: { scoreboard: { gameDate: dateBefore, games: null } } };
+await app.loadLive({ quiet: true });
+check('malformed NBA feed cannot turn a game night into zero games', app.state.live.games.length === 1
+  && !/No games in the NBA feed/.test(text('gamesStrip')));
+mockSnapshot = { ...mockSnapshot, scoreboard: { scoreboard: { gameDate: dateBefore, games: [liveGame] } } };
+await app.loadLive({ quiet: true });
 
-// ---- A game with no archive (1996 finals) must fall back, not crash
-await window.NBAScoreboard.openGame('0049500068');
-await new Promise((r) => setTimeout(r, 300));
-check('unarchived box score falls back to the date row',
-  $('boxscoreContent').innerHTML.includes('not archived yet'));
-check('unarchived pbp falls back with an official link',
-  $('playbyplayContent').innerHTML.includes('cdn.nba.com'));
+// Browser-to-NBA path only enables direct mode when the raw official shape passes.
+directAllowed = true;
+click('testDirectBtn');
+await wait(() => app.state.sourceMode === 'direct', 'direct mode after successful test');
+await app.openGame(id);
+check('direct raw NBA PBP uses game.actions (not empty)', $('playbyplayContent').querySelectorAll('.pbp-row').length === pbp.actions.length);
+check('direct mode has only the NBA CDN as a source (no relay)', text('sourceModePill').includes('cdn.nba.com')
+  && !fs.readFileSync(path.join(ROOT, 'app.js'), 'utf8').includes('relayUrl'));
+directAllowed = false;
+await app.loadLive({ quiet: true });
+check('direct failure safely falls back to official published snapshot', app.state.sourceMode === 'snapshot'
+  && text('directResult').includes('back to the published snapshot'));
 
-// ---- schedule
-check('schedule rendered', $('scheduleContent').querySelectorAll('.schedule-day').length > 100,
-  `${$('scheduleContent').querySelectorAll('.schedule-day').length} days`);
-$('scheduleFilter').value = 'Lakers';
-$('scheduleFilter').dispatchEvent(new window.Event('input'));
-await new Promise((r) => setTimeout(r, 250));
-const lakersDays = $('scheduleContent').querySelectorAll('.schedule-day').length;
-check('schedule filter works', lakersDays > 0 && lakersDays < 200, `${lakersDays} days with Lakers`);
-$('scheduleFilter').value = '';
-$('scheduleFilter').dispatchEvent(new window.Event('input'));
-
-// ---- back to live
-window.NBAScoreboard.backToLive();
-await new Promise((r) => setTimeout(r, 300));
-check('back to live works', txt('statusText').includes(feedDate), txt('statusText'));
-
-// ---- direct-access self-test (expected to be blocked from this origin)
-$('testDirectBtn').dispatchEvent(new window.Event('click'));
-await new Promise((r) => setTimeout(r, 300));
-check('direct test reports blocked result', /blocked/.test(txt('directResult')) && /snapshot/.test(txt('sourceModePill')),
-  txt('directResult').slice(0, 60));
-
-console.log(report.join('\n'));
-console.log('\nconsole warnings:', warnings.length);
-console.log('uncaught errors:', errors.length ? errors : 'none');
-const failed = report.filter((r) => r.startsWith('FAIL'));
-console.log(`\n${report.length - failed.length}/${report.length} checks passed`);
-process.exit(failed.length ? 1 : 0);
+for (const { label, okay, context } of checks) console.log(`${okay ? 'PASS' : 'FAIL'}  ${label}${context ? ` — ${context}` : ''}`);
+console.log(`\n${checks.filter((c) => c.okay).length}/${checks.length} checks passed; uncaught errors: ${errors.length}`);
+if (errors.length) console.error(errors);
+process.exit(checks.some((c) => !c.okay) || errors.length ? 1 : 0);
