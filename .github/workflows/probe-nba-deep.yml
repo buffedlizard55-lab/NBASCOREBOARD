@@ -3,6 +3,7 @@ name: Probe NBA deep access (verification)
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - 'scripts/probe_deep.py'
       - '.github/workflows/probe-nba-deep.yml'

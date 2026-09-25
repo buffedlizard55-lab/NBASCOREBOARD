@@ -9,6 +9,7 @@ name: Probe NBA core API (verification)
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - 'scripts/probe_core_api.py'
       - '.github/workflows/probe-nba-coreapi.yml'

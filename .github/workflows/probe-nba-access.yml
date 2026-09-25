@@ -3,6 +3,7 @@ name: Probe NBA access paths (verification)
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - 'scripts/probe_access.py'
       - '.github/workflows/probe-nba-access.yml'

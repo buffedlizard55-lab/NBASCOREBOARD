@@ -8,6 +8,7 @@ name: Probe NBA standings sources (verification)
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - 'scripts/probe_standings.py'
       - '.github/workflows/probe-nba-standings.yml'

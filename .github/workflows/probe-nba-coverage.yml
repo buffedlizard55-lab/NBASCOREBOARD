@@ -2,6 +2,7 @@ name: Probe NBA coverage (verification)
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - 'scripts/probe_coverage.py'
       - '.github/workflows/probe-nba-coverage.yml'
