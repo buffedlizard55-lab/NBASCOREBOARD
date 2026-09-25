@@ -18,7 +18,9 @@ on:
         required: false
         type: string
   push:
-    branches: [main]
+    # Temporary verification run on this PR branch: dispatch API is unavailable to
+    # our GitHub integration. Remove this branch before merging to main.
+    branches: [main, arena/01a0da68-nbascoreboard]
     paths:
       - 'scripts/sync_nba_data.py'
       - 'scripts/nba_official.py'
@@ -65,7 +67,8 @@ jobs:
         id: ingest
         continue-on-error: true # commit the failure evidence, then fail the job below
         env:
-          AUDIT_GAME: ${{ inputs.game }}
+          # One real NBA final/PBP re-fetch for this PR's temporary push audit.
+          AUDIT_GAME: ${{ inputs.game || (github.ref_name == 'arena/01a0da68-nbascoreboard' && '0022400154') }}
           SYNC_MODE: ${{ steps.mode.outputs.mode }}
         run: |
           set -euo pipefail
