@@ -246,6 +246,25 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(run["steps"][-1]["result"], "MISMATCH")
         self.assertEqual((self.data / "scoreboard" / f"{date}.json").read_bytes(), before)
 
+    def test_priority_queue_fetches_only_nba_declared_game_dates_and_retries_mismatch(self):
+        date = "2024-11-04"
+        counts = {"2024": {date: 1, "2024-11-05": 0}}
+        sync.write_json(str(self.data / "calendar" / "2024.json"), {"year": "2024", "dateCounts": counts["2024"]})
+        official = self.html([{"cards": [CARD]}], selected_date=date, calendar=counts)
+        with patch.object(sync, "http_get_html", return_value=(official, dict(META))) as fetch:
+            sync.backfill_known_game_days(log(), batch=1)
+            self.assertEqual(fetch.call_count, 1)
+        self.assertEqual(self.read(f"scoreboard/{date}.json")["gameCount"], 1)
+        with patch.object(sync, "http_get_html", side_effect=AssertionError("already archived/zero dates must be skipped")):
+            sync.backfill_known_game_days(log(), batch=1)
+        (self.data / "scoreboard" / f"{date}.json").unlink()
+        bad = self.html([{"cards": [CARD]}], selected_date=date, calendar={"2024": {date: 2}})
+        with patch.object(sync, "http_get_html", return_value=(bad, dict(META))):
+            run = log()
+            sync.backfill_known_game_days(run, batch=1)
+        self.assertFalse((self.data / "scoreboard" / f"{date}.json").exists())
+        self.assertEqual(run["steps"][-1]["result"], "MISMATCH")
+
     def test_known_schedule_prevents_false_empty_night_and_rechecks_cached_zero(self):
         date = "2024-11-04"
         empty = self.html([], selected_date=date)

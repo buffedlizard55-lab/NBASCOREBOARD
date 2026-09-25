@@ -62,7 +62,8 @@ MAX_LOG_RUNS = 30
 GAME_ID = re.compile(r"^\d{10}$")
 HISTORY_DAYS_DEFAULT = 14
 BACKFILL_MAX_DATES = 60
-BACKFILL_BATCH = 30  # max official date-page reads in one daily full run; stop on any failure
+BACKFILL_BATCH = 30  # calendar audit pages per full run; stop on any failure
+KNOWN_GAME_DAYS_BATCH = 20  # additional source-backed game dates, newest first
 ARCHIVE_MAX_GAMES_PER_RUN = 24
 # Play-by-play is ~160 KB per game. The archive keeps everything under this budget
 # (~40 MB) and, when it grows past it, drops the OLDEST regular-season play-by-play
@@ -1050,6 +1051,52 @@ def backfill_history_step(log: dict, batch: int = BACKFILL_BATCH) -> None:
     print(f"[backfill] fetched {fetched} dates, explicit NBA zeros skipped {skipped_zero}, next={cursor}", flush=True)
 
 
+def seed_recent_calendars(log: dict) -> None:
+    """Get official date counts for this and last calendar year automatically.
+
+    NBA's page for any selected date in a year includes that year's sparse counts.
+    One verified date fetch per missing year seeds a bounded game-day priority queue
+    without a third-party schedule or guess about omitted dates.
+    """
+    today = dt.datetime.now(dt.timezone.utc).date()
+    for year in (today.year, today.year - 1):
+        if os.path.exists(os.path.join(DATA, "calendar", f"{year}.json")):
+            continue
+        seed = min(today - dt.timedelta(days=1), dt.date(year, 12, 31))
+        if seed.year == year:
+            sync_date_digest(seed.isoformat(), log, force=True)
+
+
+def backfill_known_game_days(log: dict, batch: int = KNOWN_GAME_DAYS_BATCH) -> None:
+    """Prioritize NBA-declared past GAME days; never claim omitted days empty.
+
+    The sequential cursor continues auditing all calendar dates in parallel, but
+    this queue fills the most useful date scoreboards first. It reads fresh NBA.com
+    date cards and requires their count to agree with the year map. A failed page
+    remains pending and stops the batch so its error stays visible.
+    """
+    calendar_dir = os.path.join(DATA, "calendar")
+    if not os.path.isdir(calendar_dir):
+        return
+    today = dt.datetime.now(dt.timezone.utc).date().isoformat()
+    pending = []
+    for name in os.listdir(calendar_dir):
+        if not re.fullmatch(r"\d{4}\.json", name):
+            continue
+        calendar = load_json(os.path.join(calendar_dir, name)) or {}
+        for date_str, count in (calendar.get("dateCounts") or {}).items():
+            if (date_str < today and type(count) is int and count > 0 and valid_date(date_str)
+                    and not os.path.exists(os.path.join(DATA, "scoreboard", f"{date_str}.json"))):
+                pending.append(date_str)
+    done = 0
+    for date_str in sorted(set(pending), reverse=True)[:batch]:
+        if not sync_date_digest(date_str, log, force=True):
+            break
+        verify_digest_against_boxscore(date_str, log)
+        done += 1
+    print(f"[backfill] verified {done} known NBA game dates; {max(0, len(pending) - done)} still pending", flush=True)
+
+
 def prune_details(log: dict, budget_bytes: int = PBP_BUDGET_BYTES,
                   days: int = PBP_RETENTION_DAYS) -> None:
     """Keep the detail archive under a size budget, dropping the oldest first.
@@ -1332,7 +1379,9 @@ def main() -> int:
 
     if args.mode == "full":
         sync_schedule(log)
+        seed_recent_calendars(log)
         backfill_history_step(log, batch=BACKFILL_BATCH)
+        backfill_known_game_days(log)
         # One-time backfill of this season's finished dates (bounded).
         sched = load_json(os.path.join(DATA, "schedule", f"{season}.json"))
         if sched:
