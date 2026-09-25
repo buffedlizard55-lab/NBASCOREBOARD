@@ -838,6 +838,8 @@ def main() -> int:
     ap.add_argument("--season", default=None)
     ap.add_argument("--history-days", type=int, default=HISTORY_DAYS_DEFAULT)
     ap.add_argument("--force", action="store_true", help="rewrite even if unchanged")
+    ap.add_argument("--with-games", action="store_true",
+                    help="also archive box score + play-by-play for the games of --date (2019-20+)")
     args = ap.parse_args()
 
     season = args.season or default_season()
@@ -853,6 +855,12 @@ def main() -> int:
 
     if args.date:
         sync_date_digest(args.date, log, season, force=True)
+        if args.with_games:
+            digest = load_json(os.path.join(DATA, "scoreboard", f"{args.date}.json"))
+            for g in (digest or {}).get("games", []):
+                gid = str(g.get("gameId") or "")
+                if gid and gid >= "0021900001":  # CDN game files exist from 2019-20 on
+                    archive_game(gid, log)
 
     if args.mode in ("daily", "full"):
         today = dt.datetime.now(dt.timezone.utc).date()

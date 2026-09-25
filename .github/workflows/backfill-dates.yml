@@ -39,13 +39,15 @@ jobs:
           REQUESTED: ${{ inputs.dates }}
         run: |
           set -euo pipefail
-          DATES="${REQUESTED:-1996-06-16,2003-06-15,2010-06-17,2016-06-19,2020-10-11,2024-06-17,2024-11-04,2026-10-03}"
+          # Detail archives (box score + play-by-play) are only possible from 2019-20 on,
+          # so keep the detail-heavy dates recent and the older ones digest-only.
+          DATES="${REQUESTED:-1996-06-16,2010-06-17,2016-06-19,2019-10-22,2020-10-11,2024-06-17,2024-11-04}"
           IFS=',' read -ra LIST <<< "$DATES"
           for d in "${LIST[@]}"; do
             d="$(echo "$d" | xargs)"
             [ -z "$d" ] && continue
             echo "::group::backfill $d"
-            python3 scripts/sync_nba_data.py --mode live --date "$d" || true
+            python3 scripts/sync_nba_data.py --mode live --date "$d" --with-games || true
             echo "::endgroup::"
           done
 
