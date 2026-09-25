@@ -59,6 +59,8 @@ const els = {
   loadByDateBtn: document.getElementById('loadByDateBtn'),
   nbaGamesLink: document.getElementById('nbaGamesLink'),
   historicalResults: document.getElementById('historicalResults'),
+  loadStandingsBtn: document.getElementById('loadStandingsBtn'),
+  standingsContent: document.getElementById('standingsContent'),
 };
 
 function setStatus(type, text, meta='') {
@@ -522,6 +524,32 @@ async function loadByDate() {
   els.historicalResults.innerHTML = html;
 }
 
+// Standings loader (Pass 3)
+async function loadStandings() {
+  els.standingsContent.innerHTML = `<div class="loading">Loading standings from ${ENDPOINTS.standings}...</div>`;
+  try {
+    const res = await fetchWithHeaders(ENDPOINTS.standings);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    // Try to parse different possible structures
+    const standings = data.standings || data.league?.standard?.conference || data;
+    els.standingsContent.innerHTML = `
+      <div style="font-size:12px; color:var(--muted); margin-bottom:10px;">Raw standings loaded — structure varies by season. Showing JSON preview (first 2000 chars) + link to raw.</div>
+      <pre style="background:var(--card2); padding:12px; border-radius:8px; font-size:11px; overflow:auto; max-height:400px;">${JSON.stringify(data, null, 2).substring(0, 8000)}</pre>
+      <div class="endpoint-info"><code>Source: ${ENDPOINTS.standings}</code> <a href="${ENDPOINTS.standings}" target="_blank" class="link">Raw ↗</a></div>
+    `;
+  } catch (e) {
+    els.standingsContent.innerHTML = `
+      <div class="card">
+        <h3>Failed to load standings: ${e.message}</h3>
+        <p>Endpoint: <code>${ENDPOINTS.standings}</code></p>
+        <p>May be sandbox block or endpoint changed. Try in real browser: <a href="${ENDPOINTS.standings}" target="_blank">${ENDPOINTS.standings} ↗</a></p>
+        <p>Alternative official: <a href="https://www.nba.com/standings" target="_blank">https://www.nba.com/standings</a></p>
+      </div>
+    `;
+  }
+}
+
 // Event Listeners
 els.refreshBtn.addEventListener('click', loadTodaysScoreboard);
 els.autoRefresh.addEventListener('change', (e) => {
@@ -544,6 +572,7 @@ els.dateInput.addEventListener('change', (e) => {
   els.nbaGamesLink.href = ENDPOINTS.nbaGamesPage(e.target.value);
 });
 els.gameSearch.addEventListener('input', applyGameSearchFilter);
+els.loadStandingsBtn.addEventListener('click', loadStandings);
 document.querySelectorAll('.chip').forEach(chip => {
   chip.addEventListener('click', () => {
     els.gameIdInput.value = chip.dataset.id;
