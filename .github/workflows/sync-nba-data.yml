@@ -13,9 +13,17 @@ name: Sync official NBA data
 
 on:
   schedule:
-    # Every 10 minutes. Live rows are still fetched straight from cdn.nba.com by the
-    # browser; this snapshot exists for the cases where that is impossible.
+    # Every 10 minutes (two offsets): GitHub's scheduler is explicitly best-effort and
+    # was measured NOT to have fired this repo's single '*/10' entry since it was added
+    # (0 schedule-triggered runs), so a second offset gives the scheduler another chance
+    # at each boundary. Concurrency below makes overlapping ticks harmless.
     - cron: '*/10 * * * *'
+    - cron: '5,15,25,35,45,55 * * * *'
+  # Activity-based freshness: whenever a deploy finishes on main, refresh the data too,
+  # so the snapshot is never older than the last thing that happened in the repo.
+  workflow_run:
+    workflows: ["Deploy NBA Scoreboard to GitHub Pages"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       mode:
@@ -54,7 +62,11 @@ jobs:
         id: mode
         run: |
           set -euo pipefail
-          if [ "${{ github.event_name }}" = "schedule" ]; then
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            # A deploy just shipped on main: take a fresh snapshot (live-only; the
+            # heavy pass stays on the 06 UTC schedule).
+            echo "mode=live" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "schedule" ]; then
             # One heavy pass a day at 06:00 UTC (02:00 ET, after the last game);
             # the rest of the day only refreshes the live feed.
             if [ "$(date -u +%H)" = "06" ]; then echo "mode=full" >> "$GITHUB_OUTPUT";
