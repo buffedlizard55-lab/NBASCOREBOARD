@@ -1,0 +1,35 @@
+name: Probe NBA access paths (verification)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/probe_access.py'
+      - '.github/workflows/probe-nba-access.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: probe-nba-access
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Probe access paths
+        run: python3 scripts/probe_access.py --out data/verification/access-probe.json
+      - name: Commit evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/verification/access-probe.json data/verification/access-probe.md
+          if git diff --cached --quiet; then echo "no changes"; else
+            git commit -m "chore(verify): NBA access probe evidence [skip ci]"
+            git push
+          fi
