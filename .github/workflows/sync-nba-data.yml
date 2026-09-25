@@ -33,7 +33,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: sync-nba-data
+  # All data-writing workflows share one group so their commits never race.
+  group: nba-data-writes
   cancel-in-progress: false
 
 jobs:
@@ -98,7 +99,7 @@ jobs:
           fi
           git commit -m "data: official NBA sync (${{ steps.mode.outputs.mode }}) [skip ci]"
           for attempt in 1 2 3 4 5; do
-            git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push && { echo "pushed"; exit 0; }
+            git pull --rebase --autostash -X theirs -q origin "${GITHUB_REF_NAME}" && git push && { echo "pushed"; exit 0; }
             echo "push attempt ${attempt} failed, retrying"; sleep 5
           done
           echo "could not push data"; exit 1
