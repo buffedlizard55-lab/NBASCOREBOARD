@@ -41,14 +41,23 @@ jobs:
               print(f"{c['date']:11} {c['gameId']:13} {c['kind']:11} {c['httpStatus']}   {c['bytes']}")
           PY
 
+      - name: Upload evidence artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: endpoint-probe-evidence
+          path: data/verification/
+          if-no-files-found: warn
+
       - name: Commit evidence
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/verification/endpoint-probe.json data/verification/endpoint-probe.md
-          if git diff --cached --quiet; then
-            echo "No evidence changes to commit"
-          else
-            git commit -m "chore(verify): endpoint probe evidence [skip ci]"
-            git push
-          fi
+          if git diff --cached --quiet; then echo "No evidence changes to commit"; exit 0; fi
+          git commit -m "chore(verify): endpoint probe evidence [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push && { echo "pushed"; exit 0; }
+            echo "push attempt ${attempt} failed, retrying"; sleep 5
+          done
+          echo "could not push evidence"; exit 1

@@ -90,4 +90,8 @@ jobs:
             exit 0
           fi
           git commit -m "data: official NBA sync (${{ steps.mode.outputs.mode }}) [skip ci]"
-          git push
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase --autostash -q origin "${GITHUB_REF_NAME}" && git push && { echo "pushed"; exit 0; }
+            echo "push attempt ${attempt} failed, retrying"; sleep 5
+          done
+          echo "could not push data"; exit 1
