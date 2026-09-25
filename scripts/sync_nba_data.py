@@ -63,9 +63,11 @@ HISTORY_DAYS_DEFAULT = 14
 BACKFILL_MAX_DATES = 60
 BACKFILL_BATCH = 6
 ARCHIVE_MAX_GAMES_PER_RUN = 24
-# Play-by-play is ~160 KB per game, so the repo keeps it for recent games and every
-# playoff game, and drops it for older regular-season games (a box score stays, and
-# any pruned night can be re-archived with: --date YYYY-MM-DD --with-games --force).
+# Play-by-play is ~160 KB per game. The archive keeps everything under this budget
+# (~40 MB) and, when it grows past it, drops the OLDEST regular-season play-by-play
+# first — playoffs, recent games and the last 60 days are never pruned. Any pruned
+# night can be restored on demand: --date YYYY-MM-DD --with-games --force.
+PBP_BUDGET_BYTES = 40 * 1024 * 1024
 PBP_RETENTION_DAYS = 60
 PIPELINE = "scripts/sync_nba_data.py"
 
@@ -757,29 +759,43 @@ def backfill_history_step(log: dict, batch: int = 6) -> None:
     print(f"[backfill] fetched {fetched} dates, next={cursor}", flush=True)
 
 
-def prune_details(log: dict, days: int = PBP_RETENTION_DAYS) -> None:
-    """Keep play-by-play for recent and playoff games; drop older regular-season files."""
+def prune_details(log: dict, budget_bytes: int = PBP_BUDGET_BYTES,
+                  days: int = PBP_RETENTION_DAYS) -> None:
+    """Keep the detail archive under a size budget, dropping the oldest first.
+
+    Nothing is removed while the archive fits the budget — this only exists so a
+    self-growing archive cannot bloat the repository. Playoffs, anything from the last
+    `days` days, and every box score are never touched.
+    """
     games_dir = os.path.join(DATA, "games")
     if not os.path.isdir(games_dir):
         return
     cutoff = (dt.datetime.now(dt.timezone.utc).date() - dt.timedelta(days=days)).isoformat()
-    pruned = 0
+    entries, total = [], 0
     for gid in sorted(os.listdir(games_dir)):
-        if gid.startswith("004"):  # playoffs / finals: keep forever
+        pbp_path = os.path.join(games_dir, gid, "playbyplay.json")
+        if not os.path.exists(pbp_path):
             continue
+        size = os.path.getsize(pbp_path)
+        total += size
         box = load_json(os.path.join(games_dir, gid, "boxscore.json")) or {}
         game_et = ((box.get("game") or {}).get("gameEt") or "")[:10]
-        if not game_et or game_et >= cutoff:
-            continue
-        pbp_path = os.path.join(games_dir, gid, "playbyplay.json")
-        if os.path.exists(pbp_path):
-            size = os.path.getsize(pbp_path)
-            os.remove(pbp_path)
-            pruned += 1
-            log["steps"].append({"step": "prunePlaybyplay", "gameId": gid, "result": "OK",
-                                 "note": f"removed {size} B; box score kept, re-archive with --with-games"})
-    if pruned:
-        print(f"[prune] removed play-by-play for {pruned} older regular-season games", flush=True)
+        entries.append((game_et, gid, pbp_path, size))
+    if total <= budget_bytes:
+        return
+    over = total - budget_bytes
+    freed = 0
+    for game_et, gid, pbp_path, size in sorted(entries):  # oldest first
+        if freed >= over:
+            break
+        if gid.startswith("004") or (game_et and game_et >= cutoff):
+            continue  # playoffs and recent games stay
+        os.remove(pbp_path)
+        freed += size
+        log["steps"].append({"step": "prunePlaybyplay", "gameId": gid, "result": "OK",
+                             "note": f"removed {size} B to stay under the {budget_bytes // (1024*1024)} MB archive budget; "
+                                     f"box score kept, restore with --date … --with-games --force"})
+    print(f"[prune] archive was {total // 1024} KB, freed {freed // 1024} KB", flush=True)
 
 
 def refresh_stored(log: dict, max_dates: int = 40, max_games: int = 40) -> None:
